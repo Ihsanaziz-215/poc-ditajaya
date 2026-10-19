@@ -1,10 +1,15 @@
 'use server'
 
 import { decide, makeQuote, recordFollowUp, reviseForm, sendQuote, setQuoteDiscount, setQuoteField } from '@/domain/commands/sales'
+import { editOrganization } from '@/domain/commands/organizations'
+import type { OrgInput } from '@/domain/commands/organizations'
 import type { QuoteField } from '@/domain/commands/sales'
 import { run } from '@/server/run'
 import type { ActionResult } from '@/server/run'
 
+export async function editOrganizationAction(cid: string, input: OrgInput): Promise<ActionResult> {
+  return run((db, ctx) => editOrganization(db, ctx, cid, input))
+}
 export async function makeQuoteAction(fid: string): Promise<ActionResult> {
   return run((db, ctx) => makeQuote(db, ctx, fid))
 }

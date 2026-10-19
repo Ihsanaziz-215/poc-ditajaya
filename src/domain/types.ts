@@ -75,6 +75,12 @@ export interface Customer {
   pic: string
   email: string
   addr: string
+  country?: string
+  city?: string
+  province?: string
+  postal?: string
+  /** Sales Owner */
+  owner?: string
   purchases: { date: string; type: 'mesin' | 'sparepart'; what: string; qty: number }[]
   acts: { date: string; what: string }[]
 }

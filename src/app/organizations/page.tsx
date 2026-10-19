@@ -64,7 +64,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                   <td className="num">{l.mesin}</td>
                   <td>{fd(l.last)}</td>
                   <td>{fu ? <span className="b ok">Sudah</span> : <span className="b bad">Belum follow up bulan ini</span>}</td>
-                  <td>{!fu && role === 'Sales' ? <FollowUpButton cid={c.id} /> : '—'}</td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    <Link className="btn sec sm" href={`/organizations/${c.id}/edit`} aria-label={`Edit ${c.name}`}><Icon name="pen" /></Link>{' '}
+                    {!fu && role === 'Sales' && <FollowUpButton cid={c.id} />}
+                  </td>
                   </tr>
                   {sp.cx === c.id && (
                     <tr>
