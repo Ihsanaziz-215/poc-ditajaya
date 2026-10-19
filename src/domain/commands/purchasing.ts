@@ -1,4 +1,4 @@
-import { active, allGood, canSetProc } from '../derived'
+import { active, allGood, canSetProc, need } from '../derived'
 import type { Db, Form, Item, ProcStatus, Supplier } from '../types'
 import { addLog, DomainError, getForm, nextId, notify, requireRole } from './core'
 import type { CommandResult, Ctx } from './core'
@@ -31,11 +31,37 @@ export function setProc(db: Db, ctx: Ctx, fid: string, iid: string, v: 'In Stock
   if (!['In Stock', 'Dibeli', 'Indent'].includes(v)) throw new DomainError('Status pengadaan tidak valid.')
   if (it.proc === 'Perlu Follow Up') throw new DomainError('Selesaikan follow up retur dulu.')
   if (it.proc === v) return
+  if (v !== 'In Stock' && (it.fromStock || 0) >= it.qty) throw new DomainError('Seluruh qty diambil dari stok. Kurangi "Dari stok" dulu kalau ada yang perlu dibeli.')
   if (it.good > 0 || it.bad > 0) throw new DomainError('Barang sudah diterima Gudang, status pengadaan terkunci.')
   if (!canSetProc(it.proc, v)) throw new DomainError(`Status pengadaan sudah ${it.proc} dan tidak bisa mundur.`)
   addLog(ctx, f, `Ubah status pengadaan — ${it.name}`, it.proc || 'Belum Diproses', v)
   it.proc = v
+  if (v === 'In Stock') it.fromStock = it.qty
   if (allGood(f)) return { message: notify(db, ctx, ['Teknisi'], f.id, `Barang siap: ${f.id} bisa dikonfirmasi`), kind: 'info' }
+}
+
+/** Purchasing mencatat berapa qty yang ada di gudang; sisanya (qty − dari stok) yang dibeli. */
+export function setFromStock(db: Db, ctx: Ctx, fid: string, iid: string, value: number): CommandResult {
+  const { f, it } = procContext(db, ctx, fid, iid)
+  if (!(Number.isInteger(value) && value >= 0 && value <= it.qty)) throw new DomainError(`Qty dari stok harus 0 sampai ${it.qty}.`)
+  if (it.proc === 'Perlu Follow Up') throw new DomainError('Selesaikan follow up retur dulu.')
+  if (it.good > 0 || it.bad > 0) throw new DomainError('Barang sudah diterima Gudang, qty dari stok terkunci.')
+  const old = it.fromStock || 0
+  if (old === value) return
+  addLog(ctx, f, `Ubah Qty dari stok — ${it.name}`, String(old), String(value))
+  it.fromStock = value
+  if (value >= it.qty) {
+    if (it.proc !== 'In Stock') {
+      addLog(ctx, f, `Ubah status pengadaan — ${it.name}`, it.proc || 'Belum Diproses', 'In Stock', true)
+      it.proc = 'In Stock'
+    }
+  } else if (it.proc === 'In Stock') {
+    addLog(ctx, f, `Ubah status pengadaan — ${it.name}`, 'In Stock', 'Belum Diproses', true)
+    it.proc = null
+  }
+  const msg = `${it.name}: ${value} dari stok, ${need(it)} perlu dibeli`
+  if (allGood(f)) return { message: notify(db, ctx, ['Teknisi'], f.id, `Barang siap: ${f.id} bisa dikonfirmasi`), kind: 'info' }
+  return { message: msg, kind: 'ok' }
 }
 
 export function setProcInfo(db: Db, ctx: Ctx, fid: string, iid: string, key: 'eta' | 'pnote', value: string): void {

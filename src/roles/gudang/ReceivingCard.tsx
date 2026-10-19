@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { useAction } from '@/components/ui/Providers'
-import { active, remain } from '@/domain/derived'
+import { active, need, remain } from '@/domain/derived'
 import type { Form, Role } from '@/domain/types'
 import { receiveAllAction } from './actions'
 import { ReceiveModal } from './ReceiveModal'
@@ -34,18 +34,18 @@ export function ReceivingCard({ form: f, role, today }: { form: Form; role: Role
       )}
       <div className="wrapx">
         <table className="tbl">
-          <thead><tr><th>Barang</th><th>Supplier asal</th><th className="num">Dipesan</th><th className="num">Masuk baik</th><th className="num">Rusak</th><th>Status</th><th /></tr></thead>
+          <thead><tr><th>Barang</th><th>Supplier asal</th><th className="num">Dibeli</th><th className="num">Masuk baik</th><th className="num">Rusak</th><th>Status</th><th /></tr></thead>
           <tbody>
             {items.map((i) => {
               const ready = (i.proc === 'Dibeli' || i.proc === 'Indent') && remain(i) > 0
               const fromStock = i.proc === 'In Stock'
-              const stt = fromStock ? 'Tidak Perlu' : i.proc === 'Perlu Follow Up' ? 'Diterima Rusak' : i.proc && i.good >= i.qty ? 'Diterima Baik' : 'Belum Diterima'
+              const stt = fromStock ? 'Tidak Perlu' : i.proc === 'Perlu Follow Up' ? 'Diterima Rusak' : i.proc && i.good >= need(i) ? 'Diterima Baik' : 'Belum Diterima'
               const why = ready ? '' : fromStock ? 'Barang dari stok' : i.proc === 'Perlu Follow Up' ? 'Menunggu follow up Purchasing' : !i.proc ? 'Menunggu Purchasing mengecek barang' : 'Sudah lengkap'
               return (
                 <tr key={i.id}>
                   <td>{i.name}</td>
                   <td>{i.supplier || '—'}</td>
-                  <td className="num">{fromStock ? '—' : i.qty}</td>
+                  <td className="num">{fromStock ? '—' : need(i)}</td>
                   <td className="num">{fromStock ? '—' : i.good}</td>
                   <td className="num">{fromStock ? '—' : i.bad || 0}</td>
                   <td><Badge v={stt} /></td>

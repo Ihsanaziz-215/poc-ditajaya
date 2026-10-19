@@ -22,6 +22,8 @@ export interface Item {
   good: number
   bad: number
   stock: number
+  /** Qty yang dipenuhi dari stok gudang (hasil koordinasi Purchasing dengan Gudang). Sisanya yang dibeli. */
+  fromStock?: number
   struck: boolean
   /** Satuan (pcs, set, meter, lot, ...), Part No dan spesifikasi tambahan dari form teknisi. */
   unit?: string

@@ -4,10 +4,10 @@ import { useState } from 'react'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { useAction } from '@/components/ui/Providers'
-import { active, canSetProc } from '@/domain/derived'
+import { active, canSetProc, need } from '@/domain/derived'
 import type { Form, Role } from '@/domain/types'
 import { fd } from '@/lib/format'
-import { markAllBoughtAction, resolveFollowUpAction, setProcAction, setProcInfoAction } from './actions'
+import { markAllBoughtAction, resolveFollowUpAction, setFromStockAction, setProcAction, setProcInfoAction } from './actions'
 
 export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
   const { run, pending } = useAction()
@@ -21,7 +21,7 @@ export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
       <div className="ch">
         <div>
           <h3>Pengadaan</h3>
-          <p className="sub">Purchasing tanya Gudang dulu: In Stock bila barang sudah ada (tidak dibeli dan tidak perlu Stock In), Dibeli, atau Indent. Mur, lem, dan barang habis pakai lain cukup ditambah Sales di quotation. Barang yang dicoret Sales tidak ikut.</p>
+          <p className="sub">Purchasing tanya Gudang dulu, isi Dari stok bila barang sebagian atau seluruhnya sudah ada. Sisanya (Perlu dibeli) ditandai Dibeli atau Indent; kalau semua dari stok otomatis In Stock. Mur, lem, dan barang habis pakai lain cukup ditambah Sales di quotation. Barang yang dicoret Sales tidak ikut.</p>
         </div>
         {!f.done && items.some((i) => !i.proc) && (
           <button className="btn info sm" disabled={pending || !canAct} title={canAct ? undefined : 'Hanya Purchasing yang bisa mengubah status pengadaan'} onClick={() => run(markAllBoughtAction(f.id))}>Tandai semua Dibeli</button>
@@ -29,13 +29,20 @@ export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
       </div>
       <div className="wrapx">
         <table className="tbl">
-          <thead><tr><th>Barang</th><th>Supplier</th><th className="num">Stok saat ini</th><th>Status</th><th>Estimasi tiba</th><th>Catatan purchasing</th></tr></thead>
+          <thead><tr><th>Barang</th><th>Supplier</th><th className="num">Qty</th><th className="num">Stok gudang</th><th className="num">Dari stok</th><th className="num">Perlu dibeli</th><th>Status</th><th>Estimasi tiba</th><th>Catatan purchasing</th></tr></thead>
           <tbody>
             {items.map((i) => (
               <tr key={`${i.id}-${rev}`}>
                 <td>{i.name}</td>
                 <td>{i.supplier || '—'}</td>
-                <td className="num">{i.stock || 0}{(i.stock || 0) < i.qty && <> <small style={{ color: 'var(--muted)' }}>(butuh {i.qty})</small></>}</td>
+                <td className="num">{i.qty}</td>
+                <td className="num">{i.stock || 0}</td>
+                <td className="num">
+                  {canAct && i.proc !== 'Perlu Follow Up' ? (
+                    <input className="q" type="number" min={0} max={i.qty} defaultValue={i.fromStock || 0} disabled={pending || i.good > 0 || i.bad > 0} aria-label="Qty dari stok" onBlur={(e) => e.target.value !== String(i.fromStock || 0) && after(run(setFromStockAction(f.id, i.id, Number(e.target.value))))} />
+                  ) : i.fromStock || 0}
+                </td>
+                <td className="num"><b>{need(i)}</b></td>
                 <td>
                   {i.proc === 'Perlu Follow Up' ? (
                     <>

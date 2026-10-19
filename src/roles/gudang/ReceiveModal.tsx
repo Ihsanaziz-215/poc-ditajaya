@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { Modal } from '@/components/ui/Modal'
 import { useAction } from '@/components/ui/Providers'
-import { remain } from '@/domain/derived'
+import { need, remain } from '@/domain/derived'
 import type { Item } from '@/domain/types'
 import { receiveAction } from './actions'
 
@@ -18,7 +18,7 @@ export function ReceiveModal({ fid, item, today, onClose }: { fid: string; item:
   return (
     <Modal onClose={onClose}>
       <h3>Stock In</h3>
-      <p className="sub" style={{ color: 'var(--muted)' }}>{item.name} · Supplier {item.supplier} · sisa {remain(item)} dari {item.qty}</p>
+      <p className="sub" style={{ color: 'var(--muted)' }}>{item.name} · Supplier {item.supplier} · sisa {remain(item)} dari {need(item)}</p>
       <div className="grid2">
         <div><label className="l">Tanggal terima <span className="req">*</span></label><input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
         <div><label className="l">Qty diterima <span className="req">*</span></label><input type="number" min={1} value={qty} onChange={(e) => setQty(Number(e.target.value))} /></div>

@@ -105,3 +105,42 @@ describe('suppliers', () => {
     expect(db.suppliers[0].active).toBe(false)
   })
 })
+
+describe('stok parsial', () => {
+  test('qty yang dibeli = kebutuhan − dari stok, dan Gudang hanya menerima sisanya', async () => {
+    const { setFromStock } = await import('./purchasing')
+    const { receive } = await import('./gudang')
+    const { need, remain, allGood } = await import('../derived')
+    const db = freshDb()
+    const f = db.forms[2]
+    const it = f.items[2]
+    it.qty = 50
+    it.good = 0
+    it.bad = 0
+    it.proc = null
+    const P = as(db, 'Purchasing')
+    setFromStock(db, P, f.id, it.id, 25)
+    expect(need(it)).toBe(25)
+    setProc(db, P, f.id, it.id, 'Dibeli')
+    expect(remain(it)).toBe(25)
+    expect(() => receive(db, as(db, 'Gudang'), f.id, it.id, { date: '2026-10-17', qty: 26, cond: 'Baik', note: '' })).toThrow('Qty melebihi sisa pesanan (25)')
+    receive(db, as(db, 'Gudang'), f.id, it.id, { date: '2026-10-17', qty: 25, cond: 'Baik', note: '' })
+    expect(it.good).toBe(25)
+    expect(remain(it)).toBe(0)
+    expect(() => setFromStock(db, P, f.id, it.id, 10)).toThrow('terkunci')
+    expect(typeof allGood(f)).toBe('boolean')
+  })
+  test('semua dari stok otomatis In Stock, dan tidak bisa Dibeli', async () => {
+    const { setFromStock } = await import('./purchasing')
+    const db = freshDb()
+    const f = db.forms[2]
+    const it = f.items[1]
+    it.good = 0; it.bad = 0; it.proc = null
+    const P = as(db, 'Purchasing')
+    setFromStock(db, P, f.id, it.id, it.qty)
+    expect(it.proc).toBe('In Stock')
+    setFromStock(db, P, f.id, it.id, it.qty - 1)
+    expect(it.proc).toBe(null)
+    expect(() => setFromStock(db, P, f.id, it.id, it.qty + 1)).toThrow('harus 0 sampai')
+  })
+})

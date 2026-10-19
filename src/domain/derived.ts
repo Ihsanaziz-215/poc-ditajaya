@@ -20,9 +20,11 @@ export function calc(v: { items: QuoteItem[] }) {
 
 export const isExpired = (v: QuoteVersion, t: Date): boolean => !!v.expiry && new Date(v.expiry + 'T00:00:00') < t
 
-export const remain = (i: Item): number => Math.max(i.qty - i.good - i.bad, 0)
+/** Qty yang harus dibeli: kebutuhan dikurangi yang diambil dari stok gudang. */
+export const need = (i: Item): number => (i.proc === 'In Stock' ? 0 : Math.max(i.qty - (i.fromStock || 0), 0))
+export const remain = (i: Item): number => Math.max(need(i) - i.good - i.bad, 0)
 
-const okItem = (i: Item) => i.proc === 'In Stock' || (!!i.proc && i.good >= i.qty)
+const okItem = (i: Item) => i.proc === 'In Stock' || (!!i.proc && i.good >= need(i))
 export const allGood = (f: Form): boolean => active(f).length > 0 && active(f).every(okItem)
 
 const PRC: Record<string, number> = { 'Perlu Follow Up': 5, 'Belum Diproses': 4, Indent: 3, Dibeli: 2, 'In Stock': 1 }

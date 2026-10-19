@@ -1,6 +1,6 @@
 'use server'
 
-import { markAllBought, resolveFollowUp, saveSupplier, sendToSales, setProc, setProcInfo, toggleSupplier } from '@/domain/commands/purchasing'
+import { markAllBought, resolveFollowUp, saveSupplier, sendToSales, setFromStock, setProc, setProcInfo, toggleSupplier } from '@/domain/commands/purchasing'
 import { run } from '@/server/run'
 import type { ActionResult } from '@/server/run'
 
@@ -9,6 +9,9 @@ export async function sendToSalesAction(fid: string): Promise<ActionResult> {
 }
 export async function setProcAction(fid: string, iid: string, v: 'In Stock' | 'Dibeli' | 'Indent'): Promise<ActionResult> {
   return run((db, ctx) => setProc(db, ctx, fid, iid, v))
+}
+export async function setFromStockAction(fid: string, iid: string, value: number): Promise<ActionResult> {
+  return run((db, ctx) => setFromStock(db, ctx, fid, iid, value))
 }
 export async function setProcInfoAction(fid: string, iid: string, key: 'eta' | 'pnote', value: string): Promise<ActionResult> {
   return run((db, ctx) => setProcInfo(db, ctx, fid, iid, key, value))
