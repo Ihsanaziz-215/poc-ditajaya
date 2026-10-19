@@ -1,6 +1,6 @@
 'use server'
 
-import { markAllBought, resolveFollowUp, sendToSales, setProc, setProcInfo } from '@/domain/commands/purchasing'
+import { markAllBought, resolveFollowUp, saveSupplier, sendToSales, setProc, setProcInfo, toggleSupplier } from '@/domain/commands/purchasing'
 import { run } from '@/server/run'
 import type { ActionResult } from '@/server/run'
 
@@ -18,4 +18,11 @@ export async function resolveFollowUpAction(fid: string, iid: string): Promise<A
 }
 export async function markAllBoughtAction(fid: string): Promise<ActionResult> {
   return run((db, ctx) => markAllBought(db, ctx, fid))
+}
+
+export async function saveSupplierAction(input: { id?: string; name: string; contact: string; cats: string[]; active: boolean }): Promise<ActionResult> {
+  return run((db, ctx) => saveSupplier(db, ctx, input))
+}
+export async function toggleSupplierAction(id: string): Promise<ActionResult> {
+  return run((db, ctx) => toggleSupplier(db, ctx, id))
 }

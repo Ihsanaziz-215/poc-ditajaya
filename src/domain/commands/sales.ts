@@ -1,5 +1,5 @@
 import { iso } from '@/lib/format'
-import { active } from '../derived'
+import { active, today } from '../derived'
 import { PERSON } from '../types'
 import type { Db, Quote, QuoteVersion } from '../types'
 import { addLog, DomainError, getForm, notify, requireRole } from './core'
@@ -115,4 +115,13 @@ export function sendQuote(db: Db, ctx: Ctx, qid: string, input: { to: string; cc
   return input.fail
     ? { message: `Pengiriman gagal ke ${to}. Kirim ulang dari halaman quote.`, kind: 'bad' }
     : { message: `Quotation v${v.ver} terkirim ke ${to}`, kind: 'ok' }
+}
+
+export function recordFollowUp(db: Db, ctx: Ctx, cid: string): CommandResult {
+  requireRole(ctx, 'Sales')
+  const c = db.customers.find((x) => x.id === cid)
+  if (!c) throw new DomainError('Customer tidak ditemukan.')
+  c.acts.push({ date: iso(today(db)), what: 'Follow up (demo)' })
+  db.notifs = db.notifs.filter((n) => n.cid !== cid)
+  return { message: `Follow up ${c.name} dicatat sebagai Activity. Notifikasi dihapus.`, kind: 'ok' }
 }

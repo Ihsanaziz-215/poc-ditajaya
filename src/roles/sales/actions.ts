@@ -1,6 +1,6 @@
 'use server'
 
-import { decide, makeQuote, reviseForm, sendQuote, setQuoteDiscount, setQuoteField } from '@/domain/commands/sales'
+import { decide, makeQuote, recordFollowUp, reviseForm, sendQuote, setQuoteDiscount, setQuoteField } from '@/domain/commands/sales'
 import type { QuoteField } from '@/domain/commands/sales'
 import { run } from '@/server/run'
 import type { ActionResult } from '@/server/run'
@@ -23,4 +23,8 @@ export async function decideAction(fid: string, res: 'Disetujui' | 'Batal'): Pro
 }
 export async function reviseFormAction(fid: string): Promise<ActionResult> {
   return run((db, ctx) => reviseForm(db, ctx, fid))
+}
+
+export async function recordFollowUpAction(cid: string): Promise<ActionResult> {
+  return run((db, ctx) => recordFollowUp(db, ctx, cid))
 }
