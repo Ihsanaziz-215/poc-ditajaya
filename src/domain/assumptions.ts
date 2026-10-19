@@ -6,6 +6,7 @@ export const ASSUME: [string, string][] = [
   ['Class hanya hitung mesin', 'Status Active memakai semua jenis barang, Class hanya mesin (PRD A, TBC).'],
   ['Coret barang oleh Sales', 'Daftar teknisi tetap utuh. Sales mencoret barang yang tidak dibutuhkan customer, barang dicoret tidak ikut dibeli, tidak masuk quotation, dan tidak dihitung di total.'],
   ['Status pengadaan tanpa Dicari', 'Setelah Disetujui, tiap barang berstatus Belum Diproses sampai Purchasing memilih In Stock, Dibeli, atau Indent. Nama "Belum Diproses" adalah usulan.'],
+  ['Penerimaan disembunyikan dari Sales', 'Sales tidak melihat card, kolom, status, dan log Stock In. Sales tetap melihat status pengadaan.'],
   ['Stock In dari app existing', 'Tampilan Stock In di app live belum dilihat. Modal di prototype adalah placeholder.'],
   ['Labeling di Organizations', 'Status, Class, dan Follow Up jadi kolom di menu Organizations. Tampilan asli menu Organizations belum dilihat.'],
   ['Notifikasi follow up', 'Customer tanpa Activity di bulan berjalan memicu notifikasi ke Sales. Berlaku ke semua customer, termasuk Non Active. Perlu dipastikan.'],

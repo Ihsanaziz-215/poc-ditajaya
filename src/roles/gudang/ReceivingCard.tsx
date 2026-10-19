@@ -12,7 +12,7 @@ import { ReceiveModal } from './ReceiveModal'
 export function ReceivingCard({ form: f, role, today }: { form: Form; role: Role; today: string }) {
   const { run, pending } = useAction()
   const [open, setOpen] = useState<string | null>(null)
-  if (f.status !== 'Disetujui') return null
+  if (f.status !== 'Disetujui' || role === 'Sales') return null
   const items = active(f)
   const bad = items.filter((i) => i.proc === 'Perlu Follow Up')
   const isG = role === 'Gudang' && !f.done

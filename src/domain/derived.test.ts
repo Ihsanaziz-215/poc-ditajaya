@@ -20,19 +20,20 @@ describe('form state per seed form', () => {
     const f = F(n)
     expect(procOf(f)).toBe(proc)
     expect(recvOf(f)).toBe(recv)
-    expect(turnOf(f)?.role).toBe(turn)
+    expect(turnOf(f, 'Sales')?.role).toBe(turn)
     expect(stepOf(f, quoteOf(f)).cur).toBe(cur)
   })
   test('F5 done has no turn, F6 cancelled is a stop step', () => {
-    expect(turnOf(F(5))).toBeNull()
+    expect(turnOf(F(5), 'Sales')).toBeNull()
     expect(stepOf(F(5), quoteOf(F(5))).cur).toBe(8)
-    expect(turnOf(F(6))).toBeNull()
+    expect(turnOf(F(6), 'Sales')).toBeNull()
     expect(stepOf(F(6))).toEqual({ cur: 3, stop: true })
   })
-  test('Gudang turn is the same for every viewer (PRD B8/B11)', () => {
+  test('Gudang turn is shown to Sales as Purchasing', () => {
     const item = (o: Partial<Item>): Item => ({ id: 'x', name: 'n', qty: 2, price: 1, supplier: 's', proc: 'Dibeli', eta: '', pnote: '', good: 0, bad: 0, stock: 0, struck: false, ...o })
     const f: Form = { ...F(4), items: [item({}), item({ id: 'y' })], conf: 'Menunggu' }
-    expect(turnOf(f)?.role).toBe('Gudang')
+    expect(turnOf(f, 'Teknisi')?.role).toBe('Gudang')
+    expect(turnOf(f, 'Sales')).toEqual({ role: 'Purchasing', text: 'Pengadaan barang sedang berjalan.' })
   })
   test('F2 with a sent quote is at step 3', () => {
     const q = structuredClone(Q('Q3001'))

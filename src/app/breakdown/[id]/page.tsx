@@ -25,7 +25,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const f = db.forms.find((x) => x.id === id)
   if (!f) return <PageHead crumbs={[['Form Breakdown', '/breakdown'], ['Tidak ditemukan']]} title="Form tidak ditemukan" />
   const q = db.quotes.find((x) => x.formId === f.id)
-  const turn = turnOf(f)
+  const turn = turnOf(f, role)
   const hasProc = f.status === 'Disetujui'
   return (
     <FormUiProvider>
@@ -37,7 +37,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <div className="chips" style={{ marginBottom: 16 }}>
           <div className="sg"><small>Pengajuan</small><Badge v={f.done ? 'Selesai' : f.status} /></div>
           <div className="sg"><small>Pengadaan</small><Badge v={procOf(f)} /></div>
-          <div className="sg"><small>Penerimaan</small><Badge v={recvOf(f)} /></div>
+          {role !== 'Sales' && <div className="sg"><small>Penerimaan</small><Badge v={recvOf(f)} /></div>}
           <div className="sg"><small>Konfirmasi</small><Badge v={hasProc ? f.conf : '—'} /></div>
         </div>
         <Stepper step={stepOf(f, q)} role={role} />
@@ -54,7 +54,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <ConfirmationCard form={f} role={role} />
       <QuotationCard form={f} quote={q} role={role} today={todayOf(db)} />
       <CommentsCard fid={f.id} comments={f.comments} role={role} />
-      <LogCard form={f} />
+      <LogCard form={f} role={role} />
     </FormUiProvider>
   )
 }

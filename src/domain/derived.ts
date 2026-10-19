@@ -67,8 +67,10 @@ function turnRaw(f: Form): Turn | null {
   return { role: 'Teknisi', text: 'Cek barang lalu konfirmasi Sesuai atau Tidak Sesuai.' }
 }
 
-export function turnOf(f: Form): Turn | null {
-  return turnRaw(f)
+export function turnOf(f: Form, viewer: Role): Turn | null {
+  const t = turnRaw(f)
+  if (t && viewer === 'Sales' && t.role === 'Gudang') return { role: 'Purchasing', text: 'Pengadaan barang sedang berjalan.' }
+  return t
 }
 
 export function stepOf(f: Form, q?: Quote): { cur: number; stop?: boolean; warn?: boolean } {

@@ -7,6 +7,6 @@ export function filterForms(forms: Form[], opts: { q?: string; status?: string; 
     (f) =>
       (!q || (f.id + ' ' + f.cust).toLowerCase().includes(q)) &&
       (!opts.status || f.status === opts.status) &&
-      (!opts.mine || turnOf(f)?.role === role),
+      (!opts.mine || turnOf(f, role)?.role === role),
   )
 }
