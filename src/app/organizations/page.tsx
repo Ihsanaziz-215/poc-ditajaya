@@ -55,9 +55,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
       ) : (
         <div className="banner"><Icon name="info" /><div><b>Semua customer sudah di-follow up bulan ini</b></div></div>
       )}
-      <div className="hint" style={{ margin: '0 0 16px' }}>
-        <Icon name="info" />Aturan label: Active bila ada pembelian apa pun dalam 6 bulan terakhir (sejak {fd(cut)}). Class dari total kumulatif mesin: 1 sampai 2 = C, 3 sampai 5 = B, lebih dari 5 = A, tidak turun saat Non Active. Label tidak bisa diedit. Klik nama untuk melihat dasarnya.{' '}
-          <Tbc t="Class hanya menghitung mesin, TBC di PRD." />
+      <div className="banner warn">
+        <Icon name="info" />
+        <div>
+          <b>Aturan label (otomatis, tidak bisa diedit) <Tbc t="Class hanya menghitung mesin, TBC di PRD." /></b>
+          Active: ada pembelian dalam 6 bulan terakhir (sejak {fd(cut)}). Class dari total mesin: 1 sampai 2 = C, 3 sampai 5 = B, lebih dari 5 = A, tidak turun saat Non Active.
+        </div>
       </div>
       <div className="card">
         <Suspense><OrgFilters total={rows.length} /></Suspense>

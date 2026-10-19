@@ -98,6 +98,7 @@ label.l{display:block;font-weight:500;margin:0 0 6px}
 .sg small{display:block;color:var(--muted);font-size:12px;margin-bottom:3px}
 .banner{display:flex;gap:12px;align-items:flex-start;border-radius:12px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--line);background:var(--card)}
 .banner.turn{background:var(--pri-soft);border-color:var(--pri)}
+.banner.warn{background:var(--warn-soft);border-color:var(--warn)}
 .banner.stop{background:var(--bad-soft);border-color:var(--bad)}
 .banner svg{width:20px;height:20px;flex:none;margin-top:1px}
 .banner b{display:block}
