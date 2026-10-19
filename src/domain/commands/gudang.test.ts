@@ -30,7 +30,7 @@ describe('receive', () => {
     expect(it.bad).toBe(1)
     expect(it.proc).toBe('Perlu Follow Up')
     expect(f.log.at(-2)!.act).toBe('Stock In V-belt B52 ×1 — Rusak (Supplier: CV Sumber Teknik Udara) · penyok')
-    expect(f.log.at(-1)).toMatchObject({ act: 'Ubah status pengadaan — V-belt B52', o: 'Indent', n: 'Perlu Follow Up', user: 'Sistem', role: '—' })
+    expect(f.log.at(-1)).toMatchObject({ act: 'Ubah status pengadaan — V-belt B52', o: 'Dibeli', n: 'Perlu Follow Up', user: 'Sistem', role: '—' })
     expect(db.notifs[0]).toMatchObject({ roles: ['Purchasing'], text: 'Barang Diterima Rusak: V-belt B52 ×1 (Supplier CV Sumber Teknik Udara)' })
   })
   test('completing the last item notifies Teknisi', () => {

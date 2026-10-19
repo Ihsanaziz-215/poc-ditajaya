@@ -19,6 +19,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   return (
     <>
       <PageHead crumbs={[['Form Breakdown']]} title="Form Breakdown">
+        <Link className="btn sec" href="/breakdown/flow"><Icon name="flow" />Alur status</Link>
         {role === 'Teknisi' ? (
           <Link className="btn" href="/breakdown/new"><Icon name="plus" />Buat Form</Link>
         ) : (

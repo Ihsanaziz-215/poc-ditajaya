@@ -29,6 +29,15 @@ const PRC: Record<string, number> = { 'Perlu Follow Up': 5, 'Belum Diproses': 4,
 export type ProcView = ProcStatus | 'Belum Diproses' | '—'
 export type RecvView = 'Belum Diterima' | 'Diterima Baik' | 'Diterima Rusak' | 'Tidak Perlu' | '—'
 
+/**
+ * Status pengadaan per barang hanya maju: kosong → In Stock / Dibeli / Indent, lalu Indent → Dibeli.
+ * Satu-satunya jalan mundur adalah retur (Gudang melapor rusak → Perlu Follow Up → Dibeli), sesuai PRD.
+ */
+export function canSetProc(cur: ProcStatus | null, next: 'In Stock' | 'Dibeli' | 'Indent'): boolean {
+  if (cur === null) return true
+  return cur === 'Indent' && next === 'Dibeli'
+}
+
 export function procOf(f: Form): ProcView {
   if (f.status !== 'Disetujui') return '—'
   const ps = active(f).map((i) => i.proc || 'Belum Diproses')

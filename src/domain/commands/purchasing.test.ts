@@ -49,8 +49,9 @@ describe('procurement', () => {
     const ctx = as(db, 'Purchasing')
     const f4 = db.forms[3]
     f4.items[1].good = 0
+    f4.items[1].proc = null
     setProc(db, ctx, f4.id, f4.items[1].id, 'In Stock')
-    expect(f4.log.at(-1)).toMatchObject({ act: 'Ubah status pengadaan — Seal kit', o: 'Dibeli', n: 'In Stock' })
+    expect(f4.log.at(-1)).toMatchObject({ act: 'Ubah status pengadaan — Seal kit', o: 'Belum Diproses', n: 'In Stock' })
     expect(db.notifs[0]).toMatchObject({ roles: ['Teknisi'], text: 'Barang siap: BD-2610-004 bisa dikonfirmasi' })
   })
   test('setProcInfo logs eta and note changes', () => {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { useAction } from '@/components/ui/Providers'
-import { active } from '@/domain/derived'
+import { active, canSetProc } from '@/domain/derived'
 import type { Form, Role } from '@/domain/types'
 import { fd } from '@/lib/format'
 import { markAllBoughtAction, resolveFollowUpAction, setProcAction, setProcInfoAction } from './actions'
@@ -43,9 +43,9 @@ export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
                       {!f.done && <> <button className="btn sec sm" disabled={pending || !canAct} title={canAct ? undefined : 'Hanya Purchasing yang bisa menyelesaikan follow up'} onClick={() => run(resolveFollowUpAction(f.id, i.id))}>Selesai follow up</button></>}
                     </>
                   ) : canAct ? (
-                    <select value={i.proc ?? ''} aria-label="Status pengadaan" onChange={(e) => e.target.value && run(setProcAction(f.id, i.id, e.target.value as 'In Stock' | 'Dibeli' | 'Indent'))}>
+                    <select value={i.proc ?? ''} disabled={pending || i.good > 0 || i.bad > 0} title={i.good > 0 || i.bad > 0 ? 'Barang sudah diterima Gudang, status terkunci' : undefined} aria-label="Status pengadaan" onChange={(e) => e.target.value && run(setProcAction(f.id, i.id, e.target.value as 'In Stock' | 'Dibeli' | 'Indent'))}>
                       <option value="">Pilih status</option>
-                      {['In Stock', 'Dibeli', 'Indent'].map((x) => <option key={x}>{x}</option>)}
+                      {(['In Stock', 'Dibeli', 'Indent'] as const).map((x) => <option key={x} disabled={x !== i.proc && !canSetProc(i.proc, x)}>{x}</option>)}
                     </select>
                   ) : (
                     <Badge v={i.proc || 'Belum Diproses'} />

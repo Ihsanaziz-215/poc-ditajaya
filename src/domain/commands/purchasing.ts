@@ -1,4 +1,4 @@
-import { active, allGood } from '../derived'
+import { active, allGood, canSetProc } from '../derived'
 import type { Db, Form, Item, ProcStatus, Supplier } from '../types'
 import { addLog, DomainError, getForm, nextId, notify, requireRole } from './core'
 import type { CommandResult, Ctx } from './core'
@@ -31,6 +31,8 @@ export function setProc(db: Db, ctx: Ctx, fid: string, iid: string, v: 'In Stock
   if (!['In Stock', 'Dibeli', 'Indent'].includes(v)) throw new DomainError('Status pengadaan tidak valid.')
   if (it.proc === 'Perlu Follow Up') throw new DomainError('Selesaikan follow up retur dulu.')
   if (it.proc === v) return
+  if (it.good > 0 || it.bad > 0) throw new DomainError('Barang sudah diterima Gudang, status pengadaan terkunci.')
+  if (!canSetProc(it.proc, v)) throw new DomainError(`Status pengadaan sudah ${it.proc} dan tidak bisa mundur.`)
   addLog(ctx, f, `Ubah status pengadaan — ${it.name}`, it.proc || 'Belum Diproses', v)
   it.proc = v
   if (allGood(f)) return { message: notify(db, ctx, ['Teknisi'], f.id, `Barang siap: ${f.id} bisa dikonfirmasi`), kind: 'info' }
