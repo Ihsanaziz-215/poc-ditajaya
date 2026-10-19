@@ -3,25 +3,36 @@
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { markAllNotifsRead, markNotifRead } from '@/domain/commands/shared'
-import { PERSON } from '@/domain/types'
+import { ROLES } from '@/domain/types'
 import type { Role } from '@/domain/types'
-import { checkLogin, SESSION_COOKIE, SESSION_TTL_MS, signSession } from '@/lib/auth'
+import { checkLogin, DEFAULT_ROLE, SESSION_COOKIE, SESSION_TTL_MS, signSession } from '@/lib/auth'
+import { getSession } from '@/lib/role'
 import { run } from '../run'
 import type { ActionResult } from '../run'
 import { store } from '../store'
 
+const cookieOpts = {
+  path: '/',
+  maxAge: SESSION_TTL_MS / 1000,
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  secure: process.env.NODE_ENV === 'production',
+}
+
 export async function loginAction(email: string, password: string): Promise<ActionResult> {
-  const role = checkLogin(email, password)
-  if (!role) return { ok: false, error: 'Email atau password salah.' }
-  ;(await cookies()).set(SESSION_COOKIE, signSession(role), {
-    path: '/',
-    maxAge: SESSION_TTL_MS / 1000,
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-  })
+  if (!checkLogin(email, password)) return { ok: false, error: 'Email atau password salah.' }
+  ;(await cookies()).set(SESSION_COOKIE, signSession(DEFAULT_ROLE), cookieOpts)
   revalidatePath('/', 'layout')
-  return { ok: true, message: `Masuk sebagai ${PERSON[role]} (${role})`, redirect: '/breakdown' }
+  return { ok: true, message: 'Berhasil masuk', redirect: '/breakdown' }
+}
+
+/** Role tabs in the header: only a logged-in session can switch, and the role is re-signed into the session. */
+export async function switchRoleAction(role: Role): Promise<ActionResult> {
+  if (!(await getSession())) return { ok: false, error: 'Sesi berakhir. Login ulang.' }
+  if (!ROLES.includes(role)) return { ok: false, error: 'Role tidak dikenal.' }
+  ;(await cookies()).set(SESSION_COOKIE, signSession(role), cookieOpts)
+  revalidatePath('/', 'layout')
+  return { ok: true, message: `Tab ${role} aktif`, kind: 'info' }
 }
 
 export async function logoutAction(): Promise<ActionResult> {

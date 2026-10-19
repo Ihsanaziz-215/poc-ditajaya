@@ -1,13 +1,15 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { ROLES } from '@/domain/types'
 import type { Role } from '@/domain/types'
+import { ACCOUNT_EMAIL } from './accountEmail'
 
 export const SESSION_COOKIE = 'session'
 export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
-/** POC accounts: one login (email) per role. Override the shared password with DEMO_PASSWORD. */
+/** POC: one shared account. The role is picked with the tabs in the header, not by logging in. Override the password with DEMO_PASSWORD. */
 export const DEMO_PASSWORD = process.env.DEMO_PASSWORD ?? 'ditajaya123'
-export const ACCOUNTS: { email: string; role: Role }[] = ROLES.map((r) => ({ email: `${r.toLowerCase()}@ditajaya.test`, role: r }))
+/** Role the session starts with, the first step of the flow. */
+export const DEFAULT_ROLE: Role = ROLES[0]
 
 const secret = () => process.env.SESSION_SECRET ?? 'poc-ditajaya-dev-secret'
 const sign = (payload: string) => createHmac('sha256', secret()).update(payload).digest('base64url')
@@ -18,9 +20,8 @@ const same = (a: string, b: string) => {
   return x.length === y.length && timingSafeEqual(x, y)
 }
 
-export function checkLogin(email: string, password: string): Role | null {
-  const acc = ACCOUNTS.find((a) => a.email === email.trim().toLowerCase())
-  return acc && same(password, DEMO_PASSWORD) ? acc.role : null
+export function checkLogin(email: string, password: string): boolean {
+  return email.trim().toLowerCase() === ACCOUNT_EMAIL && same(password, DEMO_PASSWORD)
 }
 
 export function signSession(role: Role, now = Date.now()): string {

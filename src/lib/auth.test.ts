@@ -2,14 +2,15 @@ import { describe, expect, test } from 'vitest'
 import { checkLogin, DEMO_PASSWORD, SESSION_TTL_MS, signSession, verifySession } from './auth'
 
 describe('login', () => {
-  test.each([['teknisi@ditajaya.test', 'Teknisi'], ['Purchasing@Ditajaya.test', 'Purchasing'], [' sales@ditajaya.test ', 'Sales'], ['gudang@ditajaya.test', 'Gudang']])('%s logs in as its own role', (u, role) => {
-    expect(checkLogin(u, DEMO_PASSWORD)).toBe(role)
+  test('the single account logs in, case-insensitively and trimmed', () => {
+    expect(checkLogin('admin@ditajaya.test', DEMO_PASSWORD)).toBe(true)
+    expect(checkLogin(' Admin@Ditajaya.test ', DEMO_PASSWORD)).toBe(true)
   })
-  test('wrong password or unknown user is rejected', () => {
-    expect(checkLogin('sales@ditajaya.test', 'salah')).toBeNull()
-    expect(checkLogin('admin@ditajaya.test', DEMO_PASSWORD)).toBeNull()
-    expect(checkLogin('sales@ditajaya.test', '')).toBeNull()
-    expect(checkLogin('sales', DEMO_PASSWORD)).toBeNull()
+  test('wrong password, other emails and the old per-role accounts are rejected', () => {
+    expect(checkLogin('admin@ditajaya.test', 'salah')).toBe(false)
+    expect(checkLogin('admin@ditajaya.test', '')).toBe(false)
+    expect(checkLogin('sales@ditajaya.test', DEMO_PASSWORD)).toBe(false)
+    expect(checkLogin('admin', DEMO_PASSWORD)).toBe(false)
   })
 })
 

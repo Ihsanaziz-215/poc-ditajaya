@@ -26,7 +26,7 @@ export function Shell({ role, notifs, children }: { role: Role; notifs: Notif[];
           </div>
           <div className="sp" />
           <div className="demo">
-            <small>Demo · masuk sebagai</small>
+            <small>Demo · tab role</small>
             <UserMenu role={role} />
             <ResetButton />
             <AssumptionsButton />

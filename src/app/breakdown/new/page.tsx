@@ -16,7 +16,7 @@ export default async function Page() {
         <div className="card">
           <div className="banner stop" style={{ margin: 0 }}>
             <Icon name="lock" />
-            <div><b>Form baru hanya bisa dibuat oleh Teknisi</b>Anda login sebagai {role}. Keluar lalu login sebagai Teknisi untuk mengisi form analisa.</div>
+            <div><b>Form baru hanya bisa dibuat oleh Teknisi</b>Tab aktif: {role}. Pindah ke tab Teknisi di header untuk mengisi form analisa.</div>
           </div>
         </div>
       </>

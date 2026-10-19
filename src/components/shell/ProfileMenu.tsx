@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { useAction } from '@/components/ui/Providers'
-import { PERSON } from '@/domain/types'
+import { ACCOUNT_EMAIL } from '@/lib/accountEmail'
 import type { Role } from '@/domain/types'
 import { logoutAction } from '@/server/actions/app'
 
@@ -26,13 +26,13 @@ export function ProfileMenu({ role }: { role: Role }) {
   return (
     <div className="bellwrap" ref={ref}>
       <button className="avatar" style={{ border: 0, cursor: 'pointer' }} aria-label="Profil" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        {PERSON[role][0]}
+        {ACCOUNT_EMAIL[0].toUpperCase()}
       </button>
       {open && (
-        <div className="pop" role="menu" style={{ width: 220 }}>
+        <div className="pop" role="menu" style={{ width: 260 }}>
           <h4 style={{ display: 'block' }}>
-            {PERSON[role]}
-            <div style={{ fontWeight: 400, fontSize: 13, color: 'var(--muted)' }}>{role}</div>
+            {ACCOUNT_EMAIL}
+            <div style={{ fontWeight: 400, fontSize: 13, color: 'var(--muted)' }}>Tab aktif: {role}</div>
           </h4>
           <button
             className="it"

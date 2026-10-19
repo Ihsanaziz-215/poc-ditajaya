@@ -2,12 +2,29 @@
 
 import { Icon } from '@/components/ui/Icon'
 import { useAction, useUi } from '@/components/ui/Providers'
-import { PERSON } from '@/domain/types'
+import { ROLES } from '@/domain/types'
 import type { Role } from '@/domain/types'
-import { resetDemoAction } from '@/server/actions/app'
+import { resetDemoAction, switchRoleAction } from '@/server/actions/app'
 
+/** Role tabs: the active tab decides what this session can do (rules are enforced on the server). */
 export function UserMenu({ role }: { role: Role }) {
-  return <span className="rp on" title={PERSON[role]}>{PERSON[role]} · {role}</span>
+  const { run, pending } = useAction()
+  return (
+    <div className="roles" role="tablist" aria-label="Role aktif">
+      {ROLES.map((r) => (
+        <button
+          key={r}
+          role="tab"
+          aria-selected={r === role}
+          className={`rp ${r === role ? 'on' : ''}`}
+          disabled={pending}
+          onClick={() => r !== role && run(switchRoleAction(r))}
+        >
+          {r}
+        </button>
+      ))}
+    </div>
+  )
 }
 
 export function ResetButton() {
