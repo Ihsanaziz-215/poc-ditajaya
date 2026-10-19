@@ -1,0 +1,134 @@
+'use client'
+
+import { useState } from 'react'
+import { Icon } from '@/components/ui/Icon'
+import { useAction, useUi } from '@/components/ui/Providers'
+import { active, total } from '@/domain/derived'
+import type { Form, Role } from '@/domain/types'
+import { rp } from '@/lib/format'
+import { addItemAction, deleteItemAction, editItemAction, toggleStrikeAction } from '@/server/actions/shared'
+import { useFormUi } from './FormUi'
+
+export interface ItemsPerm { struct: boolean; price: boolean; sup: boolean }
+
+export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role: Role; perm: ItemsPerm; suppliers: { name: string; active: boolean }[] }) {
+  const { run } = useAction()
+  const { confirm } = useUi()
+  const { missing } = useFormUi()
+  const [rev, setRev] = useState(0)
+  const [nn, setNn] = useState('')
+  const [nq, setNq] = useState(1)
+  const nStr = f.items.filter((i) => i.struck).length
+  const tot = total(f)
+
+  const edit = async (iid: string, field: 'name' | 'qty' | 'price' | 'supplier', value: string) => {
+    await run(editItemAction(f.id, iid, field, value))
+    setRev((r) => r + 1)
+  }
+  const { struct: cs, price: cp, sup: csu } = perm
+
+  const lockHint = !cs && !cp ? (
+    <div className="hint"><Icon name="lock" />Isi form terkunci untuk {role} di tahap ini. {f.status === 'Draft' ? '' : 'Setiap perubahan oleh role berwenang tercatat di log.'}</div>
+  ) : cp && !cs ? (
+    <div className="hint"><Icon name="info" />{role === 'Purchasing' ? 'Purchasing hanya mengisi harga dan supplier. Nama dan qty barang tidak bisa diubah.' : ''}</div>
+  ) : null
+
+  return (
+    <div className="card">
+      <div className="ch">
+        <div>
+          <h3>Daftar barang</h3>
+          <p className="sub">{active(f).length} barang aktif{nStr ? ` · ${nStr} dicoret Sales` : ''}{tot ? ` · total ${rp(tot)}` : ''}</p>
+        </div>
+      </div>
+      <div className="wrapx">
+        <table className="tbl">
+          <thead>
+            <tr>
+              <th style={{ width: 44 }}>No</th><th>Nama barang</th><th className="num">Qty</th><th className="num">Harga</th><th>Supplier</th><th className="num">Total</th>
+              {cs && <th />}
+            </tr>
+          </thead>
+          <tbody>
+            {f.items.map((i, k) => {
+              const x = i.struck
+              return (
+                <tr key={`${i.id}-${rev}`} style={x ? { opacity: 0.65 } : undefined}>
+                  <td>{k + 1}</td>
+                  <td>
+                    {cs && !x ? (
+                      <input defaultValue={i.name} aria-label="Nama barang" onBlur={(e) => e.target.value !== i.name && edit(i.id, 'name', e.target.value)} />
+                    ) : x ? <><s>{i.name}</s> <span className="b gray">Dicoret</span></> : i.name}
+                  </td>
+                  <td className="num">
+                    {cs && !x ? (
+                      <input className="q" type="number" min={1} defaultValue={i.qty} aria-label="Qty" onBlur={(e) => e.target.value !== String(i.qty) && edit(i.id, 'qty', e.target.value)} />
+                    ) : x ? <s>{i.qty}</s> : i.qty}
+                  </td>
+                  <td className="num">
+                    {cp && !x ? (
+                      <input
+                        className={`p ${missing.has(`item:${i.id}`) && !(i.price > 0) ? 'miss' : ''}`}
+                        type="number" min={0} defaultValue={i.price || ''} placeholder="0" aria-label="Harga"
+                        onBlur={(e) => e.target.value !== String(i.price || '') && edit(i.id, 'price', e.target.value)}
+                      />
+                    ) : i.price ? (x ? <s>{rp(i.price)}</s> : rp(i.price)) : '—'}
+                  </td>
+                  <td>
+                    {csu && !x ? (
+                      <select
+                        className={missing.has(`item:${i.id}`) && !i.supplier ? 'miss' : ''}
+                        defaultValue={i.supplier} aria-label="Supplier"
+                        onChange={(e) => edit(i.id, 'supplier', e.target.value)}
+                      >
+                        <option value="">Pilih supplier</option>
+                        {suppliers.filter((s) => s.active || s.name === i.supplier).map((s) => <option key={s.name}>{s.name}</option>)}
+                      </select>
+                    ) : i.supplier || '—'}
+                  </td>
+                  <td className="num">{i.price && !x ? rp(i.price * i.qty) : '—'}</td>
+                  {cs && (
+                    <td>
+                      {role === 'Sales' ? (
+                        <button className="btn sec sm" onClick={() => run(toggleStrikeAction(f.id, i.id))}>{x ? 'Batal coret' : 'Coret'}</button>
+                      ) : (
+                        <button
+                          className="btn sec sm"
+                          aria-label="Hapus barang"
+                          onClick={async () => {
+                            if (await confirm({ title: 'Hapus barang?', text: `${i.name} akan dihapus dari form. Penghapusan tercatat di log perubahan.`, okLabel: 'Hapus' })) await run(deleteItemAction(f.id, i.id))
+                          }}
+                        >
+                          <Icon name="trash" />
+                        </button>
+                      )}
+                    </td>
+                  )}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+      {cs && (
+        <div className="addrow">
+          <input className="n" placeholder="Tambah barang: nama" aria-label="Nama barang baru" value={nn} onChange={(e) => setNn(e.target.value)} />
+          <input className="q" type="number" min={1} aria-label="Qty barang baru" value={nq} onChange={(e) => setNq(Number(e.target.value))} />
+          <button
+            className="btn info sm"
+            onClick={async () => {
+              const r = await run(addItemAction(f.id, { name: nn, qty: nq }))
+              if (r.ok) { setNn(''); setNq(1) }
+            }}
+          >
+            <Icon name="plus" />Tambah
+          </button>
+        </div>
+      )}
+      {lockHint}
+      {role === 'Sales' && f.status === 'Harga Terisi' && (
+        <div className="hint"><Icon name="info" />Barang yang tidak dibutuhkan customer dicoret, bukan dihapus. Tetap tampil di daftar, tapi tidak ikut dibeli dan tidak masuk quotation.</div>
+      )}
+    </div>
+  )
+}
