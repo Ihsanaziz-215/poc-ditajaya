@@ -67,11 +67,11 @@ export function markAllBought(db: Db, ctx: Ctx, fid: string): CommandResult {
   return n ? { message: `${n} barang ditandai Dibeli`, kind: 'ok' } : { message: 'Semua barang sudah punya status pengadaan' }
 }
 
-export function saveSupplier(db: Db, ctx: Ctx, input: { id?: string; name: string; contact: string; cats: string[]; active: boolean }): CommandResult {
+export function saveSupplier(db: Db, ctx: Ctx, input: { id?: string; name: string; contact: string; pic?: string; cats: string[]; active: boolean }): CommandResult {
   requireRole(ctx, 'Purchasing')
   const name = input.name.trim()
   if (!name) throw new DomainError('Nama supplier wajib diisi.')
-  const o = { name, contact: input.contact.trim(), cats: input.cats.map((c) => c.trim()).filter(Boolean), active: input.active }
+  const o = { name, contact: input.contact.trim(), pic: (input.pic ?? '').trim(), cats: input.cats.map((c) => c.trim()).filter(Boolean), active: input.active }
   if (input.id) {
     const s = db.suppliers.find((x) => x.id === input.id)
     if (!s) throw new DomainError('Supplier tidak ditemukan.')

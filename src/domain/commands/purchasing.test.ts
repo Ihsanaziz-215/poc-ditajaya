@@ -91,6 +91,8 @@ describe('suppliers', () => {
     expect(() => saveSupplier(db, ctx, { name: ' ', contact: '', cats: [], active: true })).toThrow('Nama supplier wajib diisi.')
     saveSupplier(db, ctx, { id: 's1', name: 'CV Baru', contact: 'x', cats: ['A'], active: false })
     expect(db.suppliers.find((s) => s.id === 's1')).toMatchObject({ name: 'CV Baru', active: false })
+    saveSupplier(db, ctx, { id: 's1', name: 'CV Baru', contact: '0812', pic: ' Pak Wawan ', cats: ['A'], active: false })
+    expect(db.suppliers.find((s) => s.id === 's1')).toMatchObject({ contact: '0812', pic: 'Pak Wawan' })
     saveSupplier(db, ctx, { name: 'Supplier Z', contact: '', cats: [], active: true })
     expect(db.suppliers[0].name).toBe('Supplier Z')
     expect(db.suppliers).toHaveLength(7)

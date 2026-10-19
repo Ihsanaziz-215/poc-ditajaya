@@ -10,16 +10,17 @@ export function SupplierModal({ supplier, onClose }: { supplier?: Supplier; onCl
   const { run, pending } = useAction()
   const [name, setName] = useState(supplier?.name ?? '')
   const [contact, setContact] = useState(supplier?.contact ?? '')
+  const [pic, setPic] = useState(supplier?.pic ?? '')
   const [cats, setCats] = useState(supplier?.cats.join(', ') ?? '')
   const [active, setActive] = useState(supplier?.active ?? true)
   const [err, setErr] = useState('')
   return (
     <Modal onClose={onClose}>
       <h3>{supplier ? 'Edit' : 'Tambah'} supplier</h3>
-      <p className="sub" style={{ color: 'var(--muted)' }}>Field masih usulan.</p>
-      <div className="grid2">
+            <div className="grid2">
         <div className="fld full"><label className="l">Nama supplier <span className="req">*</span></label><input value={name} onChange={(e) => setName(e.target.value)} /></div>
-        <div className="fld full"><label className="l">Kontak</label><input value={contact} placeholder="Nama · nomor telepon" onChange={(e) => setContact(e.target.value)} /></div>
+        <div className="fld"><label className="l">Kontak</label><input value={contact} placeholder="Nomor telepon atau email" onChange={(e) => setContact(e.target.value)} /></div>
+        <div className="fld"><label className="l">Nama PIC</label><input value={pic} placeholder="Contoh: Pak Wawan" onChange={(e) => setPic(e.target.value)} /></div>
         <div className="fld full">
           <label className="l">Kategori barang <small style={{ color: 'var(--muted)', fontWeight: 400 }}>pisahkan dengan koma</small></label>
           <input value={cats} onChange={(e) => setCats(e.target.value)} />
@@ -36,7 +37,7 @@ export function SupplierModal({ supplier, onClose }: { supplier?: Supplier; onCl
           className="btn"
           disabled={pending}
           onClick={async () => {
-            const r = await run(saveSupplierAction({ id: supplier?.id, name, contact, cats: cats.split(','), active }))
+            const r = await run(saveSupplierAction({ id: supplier?.id, name, contact, pic, cats: cats.split(','), active }))
             if (r.ok) onClose()
             else setErr(r.error)
           }}

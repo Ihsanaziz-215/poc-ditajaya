@@ -8,7 +8,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   const db = await store.read()
   const q = (sp.sq || '').toLowerCase()
   const rows = db.suppliers.filter(
-    (s) => (!q || (s.name + s.contact + s.cats.join(' ')).toLowerCase().includes(q)) && (!sp.ss || (sp.ss === 'Aktif') === s.active),
+    (s) => (!q || (s.name + s.contact + (s.pic ?? '') + s.cats.join(' ')).toLowerCase().includes(q)) && (!sp.ss || (sp.ss === 'Aktif') === s.active),
   )
   return <SuppliersView rows={rows} role={role} />
 }

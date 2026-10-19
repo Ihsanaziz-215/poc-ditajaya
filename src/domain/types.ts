@@ -63,7 +63,7 @@ export interface Notif {
   read: Partial<Record<Role, boolean>>
 }
 
-export interface Supplier { id: string; name: string; contact: string; cats: string[]; active: boolean }
+export interface Supplier { id: string; name: string; contact: string; pic?: string; cats: string[]; active: boolean }
 
 export interface Customer {
   id: string

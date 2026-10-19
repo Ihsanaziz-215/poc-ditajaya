@@ -20,7 +20,7 @@ export async function markAllBoughtAction(fid: string): Promise<ActionResult> {
   return run((db, ctx) => markAllBought(db, ctx, fid))
 }
 
-export async function saveSupplierAction(input: { id?: string; name: string; contact: string; cats: string[]; active: boolean }): Promise<ActionResult> {
+export async function saveSupplierAction(input: { id?: string; name: string; contact: string; pic?: string; cats: string[]; active: boolean }): Promise<ActionResult> {
   return run((db, ctx) => saveSupplier(db, ctx, input))
 }
 export async function toggleSupplierAction(id: string): Promise<ActionResult> {

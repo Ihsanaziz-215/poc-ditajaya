@@ -13,12 +13,12 @@ export function buildSeed(real: number): Db {
   const qno = (k: number) => `DMP/U/2026/X/QT${String(k).padStart(4, '0')}`
 
   const suppliers = [
-    { id: 's1', name: 'CV Sumber Teknik Udara', contact: 'Pak Wawan · 0812-1000-2001', cats: ['Kompresor', 'Sparepart mesin'], active: true },
-    { id: 's2', name: 'PT Cipta Refrigerasi Nusantara', contact: 'Bu Maya · 0813-2000-3002', cats: ['Refrigerasi', 'Freon'], active: true },
-    { id: 's3', name: 'Toko Listrik Mandiri', contact: 'Koh Aming · 0811-3000-4003', cats: ['Kelistrikan'], active: true },
-    { id: 's4', name: 'PT Filtra Indo Perkasa', contact: 'Pak Dedi · 0856-4000-5004', cats: ['Filter'], active: true },
-    { id: 's5', name: 'UD Gas Industri Jaya', contact: 'Pak Eko · 0878-5000-6005', cats: ['Gas industri'], active: true },
-    { id: 's6', name: 'CV Bearing Prima', contact: 'Bu Tia · 0852-6000-7006', cats: ['Bearing', 'Sparepart mesin'], active: false },
+    { id: 's1', name: 'CV Sumber Teknik Udara', contact: '0812-1000-2001', pic: 'Pak Wawan', cats: ['Kompresor', 'Sparepart mesin'], active: true },
+    { id: 's2', name: 'PT Cipta Refrigerasi Nusantara', contact: '0813-2000-3002', pic: 'Bu Maya', cats: ['Refrigerasi', 'Freon'], active: true },
+    { id: 's3', name: 'Toko Listrik Mandiri', contact: '0811-3000-4003', pic: 'Koh Aming', cats: ['Kelistrikan'], active: true },
+    { id: 's4', name: 'PT Filtra Indo Perkasa', contact: '0856-4000-5004', pic: 'Pak Dedi', cats: ['Filter'], active: true },
+    { id: 's5', name: 'UD Gas Industri Jaya', contact: '0878-5000-6005', pic: 'Pak Eko', cats: ['Gas industri'], active: true },
+    { id: 's6', name: 'CV Bearing Prima', contact: '0852-6000-7006', pic: 'Bu Tia', cats: ['Bearing', 'Sparepart mesin'], active: false },
   ]
   const pc = (date: string, type: 'mesin' | 'sparepart', what: string, qty = 1) => ({ date, type, what, qty })
   const base: Omit<Customer, 'acts'>[] = [
