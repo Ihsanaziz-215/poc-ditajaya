@@ -36,7 +36,7 @@ export async function buildQuotePdf(o: { quote: Quote; vi: number; cust: string 
     page = doc.addPage([W, H])
     y = H - M
     if (expired) {
-      page.drawText('KEDALUWARSA', { x: 130, y: 330, size: 70, font: bold, color: rgb(0.85, 0.1, 0.1), opacity: 0.18, rotate: degrees(30) })
+      page.drawText('KEDALUWARSA', { x: 105, y: 320, size: 58, font: bold, color: rgb(0.85, 0.1, 0.1), opacity: 0.18, rotate: degrees(30) })
     }
   }
   const text = (s: string, x: number, size = 10, f: PDFFont = font, color = INK) => page.drawText(clean(s), { x, y, size, font: f, color })
