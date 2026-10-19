@@ -7,6 +7,7 @@ import { PageHead } from '@/components/ui/PageHead'
 import { hasFollowUp, labelOf, today } from '@/domain/derived'
 import { fd, fdta } from '@/lib/format'
 import { getRole } from '@/lib/role'
+import { DeleteOrgButton } from '@/roles/sales/DeleteOrgButton'
 import { FollowUpButton } from '@/roles/sales/FollowUpButton'
 import { store } from '@/server/store'
 
@@ -46,6 +47,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
       ) : (
         <div className="banner"><Icon name="info" /><div><b>Semua customer sudah di-follow up bulan ini</b></div></div>
       )}
+      <div className="hint" style={{ margin: '0 0 16px' }}>
+        <Icon name="info" />Aturan label: Active bila ada pembelian apa pun dalam 6 bulan terakhir (sejak {fd(cut)}). Class dari total kumulatif mesin: 1 sampai 2 = C, 3 sampai 5 = B, lebih dari 5 = A, tidak turun saat Non Active. Label tidak bisa diedit. Klik nama untuk melihat dasarnya.{' '}
+          <Tbc t="Class hanya menghitung mesin, TBC di PRD." />
+      </div>
       <div className="card">
         <Suspense><OrgFilters total={rows.length} /></Suspense>
         <div className="wrapx">
@@ -56,7 +61,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                 <Fragment key={c.id}>
                   <tr className="row">
                   <td>{c.no ?? '—'}</td>
-                  <td><Link href={link(c.id)}>{c.name}</Link><br /><small style={{ color: 'var(--muted)' }}>{c.pic}</small></td>
+                  <td><Link href={link(c.id)}>{c.name}</Link></td>
                   <td className="num">{c.persons ?? 0}</td>
                   <td>{c.createdAt ? fdta(c.createdAt) : '—'}</td>
                   <td><Badge v={l.active ? 'Active' : 'Non Active'} /></td>
@@ -66,6 +71,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                   <td>{fu ? <span className="b ok">Sudah</span> : <span className="b bad">Belum follow up bulan ini</span>}</td>
                   <td style={{ whiteSpace: 'nowrap' }}>
                     <Link className="btn sec sm" href={`/organizations/${c.id}/edit`} aria-label={`Edit ${c.name}`}><Icon name="pen" /></Link>{' '}
+                    {role === 'Sales' && <><DeleteOrgButton cid={c.id} name={c.name} />{' '}</>}
                     {!fu && role === 'Sales' && <FollowUpButton cid={c.id} />}
                   </td>
                   </tr>
@@ -97,10 +103,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
               {!rows.length && <tr><td colSpan={10} className="empty">Tidak ada customer yang cocok.</td></tr>}
             </tbody>
           </table>
-        </div>
-        <div className="hint">
-          <Icon name="info" />Aturan label: Active bila ada pembelian apa pun dalam 6 bulan terakhir (sejak {fd(cut)}). Class dari total kumulatif mesin: 1 sampai 2 = C, 3 sampai 5 = B, lebih dari 5 = A, tidak turun saat Non Active. Label tidak bisa diedit. Klik nama untuk melihat dasarnya.{' '}
-          <Tbc t="Class hanya menghitung mesin, TBC di PRD." />
         </div>
       </div>
     </>

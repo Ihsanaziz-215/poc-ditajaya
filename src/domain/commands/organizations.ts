@@ -28,3 +28,15 @@ export function editOrganization(db: Db, ctx: Ctx, cid: string, input: OrgInput)
   Object.assign(c, v)
   return { message: 'Organization disimpan.', kind: 'ok', redirect: '/organizations' }
 }
+
+/** Delete Organization. Refused while forms still reference the customer, so no form loses its customer. */
+export function deleteOrganization(db: Db, ctx: Ctx, cid: string): CommandResult {
+  requireRole(ctx, 'Sales')
+  const c = db.customers.find((x) => x.id === cid)
+  if (!c) throw new DomainError('Organization tidak ditemukan.')
+  const n = db.forms.filter((f) => f.cust === c.name).length
+  if (n) throw new DomainError(`${c.name} masih punya ${n} form breakdown, jadi belum bisa dihapus.`)
+  db.customers = db.customers.filter((x) => x.id !== cid)
+  db.notifs = db.notifs.filter((x) => x.cid !== cid)
+  return { message: `${c.name} dihapus.`, kind: 'ok' }
+}
