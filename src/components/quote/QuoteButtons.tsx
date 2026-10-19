@@ -27,8 +27,8 @@ export function PreviewButton({ quote, cust, formId, vi, expired, canSend, class
           <div className="acts">
             <button className="btn sec" onClick={() => setOpen(false)}>Tutup</button>
             <a className="btn sec" href={pdfHref(quote, vi)} download><Icon name="file" />Unduh PDF</a>
-            {canSend && vi === quote.versions.length - 1 && (
-              <button className="btn" onClick={() => setSend(true)}><Icon name="send" />{last.sentAt ? 'Kirim ulang' : 'Kirim email'}</button>
+            {vi === quote.versions.length - 1 && (
+              <button className="btn" disabled={!canSend} title={canSend ? undefined : 'Hanya Sales yang bisa mengirim quotation'} onClick={() => setSend(true)}><Icon name="send" />{last.sentAt ? 'Kirim ulang' : 'Kirim email'}</button>
             )}
           </div>
         </Modal>
@@ -38,12 +38,12 @@ export function PreviewButton({ quote, cust, formId, vi, expired, canSend, class
   )
 }
 
-export function SendButton({ quote, cust, small, className = 'btn info' }: Common & { small?: boolean; className?: string }) {
+export function SendButton({ quote, cust, small, className = 'btn info', can = true }: Common & { small?: boolean; className?: string; can?: boolean }) {
   const [open, setOpen] = useState(false)
   const last = quote.versions[quote.versions.length - 1]
   return (
     <>
-      <button className={`${className}${small ? ' sm' : ''}`} onClick={() => setOpen(true)}><Icon name="send" />{last.sentAt ? 'Kirim ulang' : 'Kirim email'}</button>
+      <button className={`${className}${small ? ' sm' : ''}`} disabled={!can} title={can ? undefined : 'Hanya Sales yang bisa mengirim quotation'} onClick={() => setOpen(true)}><Icon name="send" />{last.sentAt ? 'Kirim ulang' : 'Kirim email'}</button>
       {open && <SendQuoteModal quote={quote} cust={cust} onClose={() => setOpen(false)} />}
     </>
   )

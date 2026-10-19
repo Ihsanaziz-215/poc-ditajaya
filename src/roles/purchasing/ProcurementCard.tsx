@@ -23,8 +23,8 @@ export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
           <h3>Pengadaan</h3>
           <p className="sub">Purchasing mengecek barang yang disetujui customer: In Stock bila sudah ada di gudang, Dibeli, atau Indent. Barang yang dicoret Sales tidak ikut.</p>
         </div>
-        {canAct && items.some((i) => !i.proc) && (
-          <button className="btn info sm" disabled={pending} onClick={() => run(markAllBoughtAction(f.id))}>Tandai semua Dibeli</button>
+        {!f.done && items.some((i) => !i.proc) && (
+          <button className="btn info sm" disabled={pending || !canAct} title={canAct ? undefined : 'Hanya Purchasing yang bisa mengubah status pengadaan'} onClick={() => run(markAllBoughtAction(f.id))}>Tandai semua Dibeli</button>
         )}
       </div>
       <div className="wrapx">
@@ -40,7 +40,7 @@ export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
                   {i.proc === 'Perlu Follow Up' ? (
                     <>
                       <Badge v={i.proc} />
-                      {canAct && <> <button className="btn sec sm" onClick={() => run(resolveFollowUpAction(f.id, i.id))}>Selesai follow up</button></>}
+                      {!f.done && <> <button className="btn sec sm" disabled={pending || !canAct} title={canAct ? undefined : 'Hanya Purchasing yang bisa menyelesaikan follow up'} onClick={() => run(resolveFollowUpAction(f.id, i.id))}>Selesai follow up</button></>}
                     </>
                   ) : canAct ? (
                     <select value={i.proc ?? ''} aria-label="Status pengadaan" onChange={(e) => e.target.value && run(setProcAction(f.id, i.id, e.target.value as 'In Stock' | 'Dibeli' | 'Indent'))}>

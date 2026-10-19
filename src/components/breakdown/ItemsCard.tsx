@@ -27,6 +27,8 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
     setRev((r) => r + 1)
   }
   const { struct: cs, price: cp, sup: csu } = perm
+  // the stages where someone can restructure the list (Teknisi on Draft, Sales on Harga Terisi); everyone else sees the actions disabled
+  const open = f.status === 'Draft' || f.status === 'Harga Terisi'
 
   const lockHint = !cs && !cp ? (
     <div className="hint"><Icon name="lock" />Isi form terkunci untuk {role} di tahap ini. {f.status === 'Draft' ? '' : 'Setiap perubahan oleh role berwenang tercatat di log.'}</div>
@@ -47,7 +49,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
           <thead>
             <tr>
               <th style={{ width: 44 }}>No</th><th>Nama barang</th><th>Part No</th><th className="num">Qty</th><th>Satuan</th><th className="num">Harga</th><th>Supplier</th><th className="num">Total</th>
-              {cs && <th />}
+              {open && <th />}
             </tr>
           </thead>
           <tbody>
@@ -106,14 +108,16 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
                     ) : i.supplier || '—'}
                   </td>
                   <td className="num">{i.price && !x ? rp(i.price * i.qty) : '—'}</td>
-                  {cs && (
+                  {open && (
                     <td>
-                      {role === 'Sales' ? (
-                        <button className="btn sec sm" disabled={pending} onClick={() => run(setStrikeAction(f.id, i.id, !x))}>{x ? 'Batal coret' : 'Coret'}</button>
+                      {f.status === 'Harga Terisi' ? (
+                        <button className="btn sec sm" disabled={pending || !cs} title={cs ? undefined : 'Hanya Sales yang bisa mencoret barang'} onClick={() => run(setStrikeAction(f.id, i.id, !x))}>{x ? 'Batal coret' : 'Coret'}</button>
                       ) : (
                         <button
                           className="btn sec sm"
                           aria-label="Hapus barang"
+                          disabled={pending || !cs}
+                          title={cs ? undefined : 'Hanya Teknisi yang bisa menghapus barang'}
                           onClick={async () => {
                             if (await confirm({ title: 'Hapus barang?', text: `${i.name} akan dihapus dari form. Penghapusan tercatat di log perubahan.`, okLabel: 'Hapus' })) await run(deleteItemAction(f.id, i.id))
                           }}
@@ -130,14 +134,15 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
           </tbody>
         </table>
       </div>
-      {cs && (
+      {open && (
         <div className="addrow">
-          <input className="n" placeholder="Tambah barang: nama" aria-label="Nama barang baru" value={nn} onChange={(e) => setNn(e.target.value)} />
-          <input className="q" type="number" min={1} aria-label="Qty barang baru" value={nq} onChange={(e) => setNq(Number(e.target.value))} />
-          <input list="units" placeholder="Satuan" aria-label="Satuan barang baru" style={{ width: 90 }} value={nu} onChange={(e) => setNu(e.target.value)} />
+          <input className="n" placeholder="Tambah barang: nama" aria-label="Nama barang baru" disabled={!cs} value={nn} onChange={(e) => setNn(e.target.value)} />
+          <input className="q" type="number" min={1} aria-label="Qty barang baru" disabled={!cs} value={nq} onChange={(e) => setNq(Number(e.target.value))} />
+          <input list="units" placeholder="Satuan" aria-label="Satuan barang baru" style={{ width: 90 }} disabled={!cs} value={nu} onChange={(e) => setNu(e.target.value)} />
           <button
             className="btn info sm"
-            disabled={pending}
+            disabled={pending || !cs}
+            title={cs ? undefined : 'Hanya Teknisi (Draft) atau Sales (Harga Terisi) yang bisa menambah barang'}
             onClick={async () => {
               const r = await run(addItemAction(f.id, { name: nn, qty: nq, unit: nu }))
               if (r.ok) { setNn(''); setNq(1); setNu('') }

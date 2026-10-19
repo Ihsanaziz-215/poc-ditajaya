@@ -12,10 +12,10 @@ import { ReceiveModal } from './ReceiveModal'
 export function ReceivingCard({ form: f, role, today }: { form: Form; role: Role; today: string }) {
   const { run, pending } = useAction()
   const [open, setOpen] = useState<string | null>(null)
-  if (f.status !== 'Disetujui') return null
+  if (f.status !== 'Disetujui' || role === 'Sales') return null
   const items = active(f)
   const bad = items.filter((i) => i.proc === 'Perlu Follow Up')
-  const isG = role === 'Gudang' && !f.done
+  const isG = role === 'Gudang'
   const target = items.find((i) => i.id === open)
   return (
     <div className="card">
@@ -24,7 +24,7 @@ export function ReceivingCard({ form: f, role, today }: { form: Form; role: Role
           <h3>Penerimaan barang (Stock In)</h3>
           <p className="sub">Gudang mencatat barang masuk lewat fitur Stock In yang sudah ada di app. Barang In Stock tidak perlu diterima lagi. Barang rusak otomatis mengubah status pengadaan ke Perlu Follow Up.</p>
         </div>
-        {isG && <button className="btn info sm" disabled={pending} title="Pintasan demo" onClick={() => run(receiveAllAction(f.id))}>Stock In semua (Baik)</button>}
+        {!f.done && <button className="btn info sm" disabled={pending || !isG} title={isG ? 'Pintasan demo' : 'Hanya Gudang yang bisa mencatat Stock In'} onClick={() => run(receiveAllAction(f.id))}>Stock In semua (Baik)</button>}
       </div>
       {bad.length > 0 && (
         <div className="banner stop">
@@ -50,7 +50,7 @@ export function ReceivingCard({ form: f, role, today }: { form: Form; role: Role
                   <td className="num">{fromStock ? '—' : i.bad || 0}</td>
                   <td><Badge v={stt} /></td>
                   <td>
-                    {isG && !fromStock && <button className="btn sec sm" disabled={!ready} title={why} onClick={() => setOpen(i.id)}>Stock In</button>}
+                    {!f.done && !fromStock && <button className="btn sec sm" disabled={!isG || !ready} title={isG ? why : 'Hanya Gudang yang bisa mencatat Stock In'} onClick={() => setOpen(i.id)}>Stock In</button>}
                   </td>
                 </tr>
               )

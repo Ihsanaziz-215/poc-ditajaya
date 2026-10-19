@@ -5,7 +5,7 @@ import { useAction, useUi } from '@/components/ui/Providers'
 import { decideAction, makeQuoteAction, reviseFormAction } from './actions'
 import { Icon } from '@/components/ui/Icon'
 
-export function DecisionButtons({ fid }: { fid: string }) {
+export function DecisionButtons({ fid, can = true }: { fid: string; can?: boolean }) {
   const { run, pending } = useAction()
   const { confirm } = useUi()
   const decide = async (res: 'Disetujui' | 'Batal') => {
@@ -18,20 +18,21 @@ export function DecisionButtons({ fid }: { fid: string }) {
   }
   return (
     <>
-      <button className="btn danger" disabled={pending} onClick={() => decide('Batal')}>Batal</button>
-      <button className="btn" disabled={pending} onClick={() => decide('Disetujui')}>Disetujui</button>
+      <button className="btn danger" disabled={pending || !can} title={can ? undefined : 'Hanya Sales yang bisa memutuskan'} onClick={() => decide('Batal')}>Batal</button>
+      <button className="btn" disabled={pending || !can} title={can ? undefined : 'Hanya Sales yang bisa memutuskan'} onClick={() => decide('Disetujui')}>Disetujui</button>
     </>
   )
 }
 
-export function ReviseButton({ fid }: { fid: string }) {
+export function ReviseButton({ fid, can = true }: { fid: string; can?: boolean }) {
   const { run, pending } = useAction()
   const { confirm } = useUi()
   return (
     <>
       <button
         className="btn"
-        disabled={pending}
+        disabled={pending || !can}
+        title={can ? undefined : 'Hanya Sales yang bisa merevisi form'}
         onClick={async () => {
           if (await confirm({ title: 'Revisi form?', text: 'Form kembali ke Sales untuk direvisi, konfirmasi teknisi di-reset ke Menunggu. Aturan revisi ini masih TBC di PRD.', okLabel: 'Revisi form' })) await run(reviseFormAction(fid))
         }}
@@ -43,7 +44,7 @@ export function ReviseButton({ fid }: { fid: string }) {
   )
 }
 
-export function MakeQuoteButton({ fid }: { fid: string }) {
+export function MakeQuoteButton({ fid, can = true }: { fid: string; can?: boolean }) {
   const { run, pending } = useAction()
-  return <button className="btn" disabled={pending} onClick={() => run(makeQuoteAction(fid))}><Icon name="file" />Buat Quotation</button>
+  return <button className="btn" disabled={pending || !can} title={can ? undefined : 'Hanya Sales yang bisa membuat quotation'} onClick={() => run(makeQuoteAction(fid))}><Icon name="file" />Buat Quotation</button>
 }

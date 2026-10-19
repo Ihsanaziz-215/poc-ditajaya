@@ -19,9 +19,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   return (
     <>
       <PageHead crumbs={[['Form Breakdown']]} title="Form Breakdown">
-        <Link className="btn" href="/breakdown/new" title={role !== 'Teknisi' ? 'Form baru hanya dibuat oleh Teknisi' : undefined}>
-          <Icon name="plus" />Buat Form
-        </Link>
+        {role === 'Teknisi' ? (
+          <Link className="btn" href="/breakdown/new"><Icon name="plus" />Buat Form</Link>
+        ) : (
+          <button className="btn" disabled title="Form baru hanya dibuat oleh Teknisi"><Icon name="plus" />Buat Form</button>
+        )}
       </PageHead>
       <div className="card">
         <Suspense>
@@ -56,9 +58,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                     </td>
                     <td>
                       {mine ? (
-                        <Link className="btn sm" href={`/breakdown/${f.id}`} title={turn.text}><Icon name="pen" />Edit</Link>
+                        <Link className="btn sm" href={`/breakdown/${f.id}`} title={turn.text}><Icon name="pen" />{turn.action}</Link>
                       ) : (
-                        <span style={{ color: 'var(--muted)' }} title={turn ? `Giliran ${turn.role}` : undefined}>—</span>
+                        <button className="btn sm" disabled title={turn ? `Giliran ${turn.role}` : 'Form sudah selesai atau dibatalkan'}><Icon name="pen" />{turn?.action ?? statusOf(f)}</button>
                       )}
                     </td>
                   </tr>

@@ -37,8 +37,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     <>
       <PageHead crumbs={[['Quotes', '/quotes'], [q.number]]} title={`Quote ${v.subject}`}>
         <PreviewButton {...common} vi={idx} expired={expired} canSend={role === 'Sales'} />
-        {role === 'Sales' && isLast && <SendButton {...common} />}
-        {editable && <SaveButton />}
+        {isLast && <SendButton {...common} can={role === 'Sales'} />}
+        <SaveButton can={editable} />
       </PageHead>
       <div className="card" style={{ padding: '12px 20px' }}>
         <div className="vers">

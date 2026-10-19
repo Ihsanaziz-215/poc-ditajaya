@@ -9,7 +9,8 @@ import { MakeQuoteButton } from './HeaderButtons'
 
 export function QuotationCard({ form: f, quote: q, role, today }: { form: Form; quote?: Quote; role: Role; today: Date }) {
   if (!((f.status !== 'Draft' && f.status !== 'Batal') || q)) return null
-  const canMake = role === 'Sales' && f.status === 'Harga Terisi' && !q
+  const canMake = f.status === 'Harga Terisi' && !q
+  const isSales = role === 'Sales'
   const v = q?.versions[q.versions.length - 1]
   const common = q ? { quote: q, cust: f.cust, formId: f.id } : null
   return (
@@ -19,7 +20,7 @@ export function QuotationCard({ form: f, quote: q, role, today }: { form: Form; 
           <h3>Quotation <Tbc t="Posisi quotation di alur (setelah edit harga dan qty, sebelum keputusan) adalah asumsi PRD, TBC nomor 5." /></h3>
           <p className="sub">Dibuat Sales dari data form setelah harga terisi, lalu dikirim ke customer lewat email.</p>
         </div>
-        {canMake && <MakeQuoteButton fid={f.id} />}
+        {canMake && <MakeQuoteButton fid={f.id} can={isSales} />}
       </div>
       {q && v && common ? (
         <>
@@ -32,8 +33,8 @@ export function QuotationCard({ form: f, quote: q, role, today }: { form: Form; 
           </div>
           <div className="acts" style={{ justifyContent: 'flex-start' }}>
             <Link className="btn sec sm" href={`/quotes/${q.id}`}><Icon name="eye" />Buka quote</Link>
-            <PreviewButton {...common} vi={q.versions.length - 1} expired={isExpired(v, today)} canSend={role === 'Sales'} small />
-            {role === 'Sales' && <SendButton {...common} small className="btn" />}
+            <PreviewButton {...common} vi={q.versions.length - 1} expired={isExpired(v, today)} canSend={isSales} small />
+            <SendButton {...common} small className="btn" can={isSales} />
           </div>
           {q.versions.length > 1 && (
             <div className="hint"><Icon name="info" />{q.versions.length} versi tersimpan: {q.versions.map((x) => `v${x.ver} (${x.status})`).join(', ')}</div>

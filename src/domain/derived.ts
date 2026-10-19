@@ -64,26 +64,27 @@ export function statusOf(f: Form): string {
   return f.conf
 }
 
-export interface Turn { role: Role; text: string }
+export interface Turn { role: Role; text: string; action: string }
 
 function turnRaw(f: Form): Turn | null {
   if (f.done || f.status === 'Batal') return null
-  if (f.status === 'Draft') return { role: 'Teknisi', text: 'Lengkapi daftar barang lalu ajukan form.' }
-  if (f.status === 'Diajukan') return { role: 'Purchasing', text: 'Isi harga dan supplier tiap barang, lalu kirim ke Sales.' }
+  if (f.status === 'Draft') return { role: 'Teknisi', action: 'Ajukan', text: 'Lengkapi daftar barang lalu ajukan form.' }
+  if (f.status === 'Diajukan') return { role: 'Purchasing', action: 'Isi Harga', text: 'Isi harga dan supplier tiap barang, lalu kirim ke Sales.' }
   if (f.status === 'Harga Terisi')
-    return { role: 'Sales', text: 'Sesuaikan harga dan qty, coret barang yang tidak dibutuhkan customer, kirim quotation, lalu putuskan Disetujui atau Batal.' }
+    return { role: 'Sales', action: 'Putuskan', text: 'Sesuaikan harga dan qty, coret barang yang tidak dibutuhkan customer, kirim quotation, lalu putuskan Disetujui atau Batal.' }
   const p = procOf(f)
   if (p === 'Belum Diproses' || p === 'Perlu Follow Up')
     return {
       role: 'Purchasing',
+      action: p === 'Belum Diproses' ? 'Cek Barang' : 'Follow Up',
       text: p === 'Belum Diproses'
         ? 'Cek barang yang disetujui customer: tandai In Stock, Dibeli, atau Indent.'
         : 'Follow up retur ke supplier, lalu kembali ke status Dibeli.',
     }
-  if (!allGood(f)) return { role: 'Gudang', text: 'Stock In barang yang datang beserta kondisinya.' }
-  if (f.conf === 'Tidak Sesuai') return { role: 'Sales', text: 'Pekerjaan terkunci. Revisi form bersama klien.' }
-  if (f.conf === 'Sesuai') return { role: 'Teknisi', text: 'Barang sesuai. Kerjakan breakdown.' }
-  return { role: 'Teknisi', text: 'Cek barang lalu konfirmasi Sesuai atau Tidak Sesuai.' }
+  if (!allGood(f)) return { role: 'Gudang', action: 'Stock In', text: 'Stock In barang yang datang beserta kondisinya.' }
+  if (f.conf === 'Tidak Sesuai') return { role: 'Sales', action: 'Revisi', text: 'Pekerjaan terkunci. Revisi form bersama klien.' }
+  if (f.conf === 'Sesuai') return { role: 'Teknisi', action: 'Kerjakan', text: 'Barang sesuai. Kerjakan breakdown.' }
+  return { role: 'Teknisi', action: 'Konfirmasi', text: 'Cek barang lalu konfirmasi Sesuai atau Tidak Sesuai.' }
 }
 
 export function turnOf(f: Form): Turn | null {
