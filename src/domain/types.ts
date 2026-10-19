@@ -67,6 +67,10 @@ export interface Supplier { id: string; name: string; contact: string; pic?: str
 
 export interface Customer {
   id: string
+  /** Kolom ID, Person Count dan Created At di halaman Organizations app live. */
+  no?: number
+  persons?: number
+  createdAt?: number
   name: string
   pic: string
   email: string

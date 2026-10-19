@@ -5,7 +5,7 @@ import { Badge, Tbc } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { PageHead } from '@/components/ui/PageHead'
 import { hasFollowUp, labelOf, today } from '@/domain/derived'
-import { fd } from '@/lib/format'
+import { fd, fdta } from '@/lib/format'
 import { getRole } from '@/lib/role'
 import { FollowUpButton } from '@/roles/sales/FollowUpButton'
 import { store } from '@/server/store'
@@ -16,11 +16,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   const db = await store.read()
   const t = today(db)
   const q = (sp.q || '').toLowerCase()
-  const all = db.customers.map((c) => ({ c, l: labelOf(c, t), fu: hasFollowUp(c, t) }))
+  const all = [...db.customers].sort((a, b) => (b.no ?? 0) - (a.no ?? 0)).map((c) => ({ c, l: labelOf(c, t), fu: hasFollowUp(c, t) }))
   const noFu = all.filter((x) => !x.fu).length
   const rows = all.filter(
     (x) =>
-      (!q || x.c.name.toLowerCase().includes(q)) &&
+      (!q || x.c.name.toLowerCase().includes(q) || String(x.c.no ?? '').includes(q)) &&
       (!sp.cs || (sp.cs === 'Active') === x.l.active) &&
       (!sp.cc || x.l.cls === sp.cc) &&
       (!sp.cf || !x.fu),
@@ -50,12 +50,15 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
         <Suspense><OrgFilters total={rows.length} /></Suspense>
         <div className="wrapx">
           <table className="tbl">
-            <thead><tr><th>Name</th><th>Status</th><th>Class</th><th className="num">Total Mesin</th><th>Pembelian Terakhir</th><th>Follow Up Bulan Ini</th><th>Actions</th></tr></thead>
+            <thead><tr><th>ID</th><th>Name</th><th className="num">Person Count</th><th>Created At</th><th>Status</th><th>Class</th><th className="num">Total Mesin</th><th>Pembelian Terakhir</th><th>Follow Up Bulan Ini</th><th>Actions</th></tr></thead>
             <tbody>
               {rows.map(({ c, l, fu }) => (
                 <Fragment key={c.id}>
                   <tr className="row">
+                  <td>{c.no ?? '—'}</td>
                   <td><Link href={link(c.id)}>{c.name}</Link><br /><small style={{ color: 'var(--muted)' }}>{c.pic}</small></td>
+                  <td className="num">{c.persons ?? 0}</td>
+                  <td>{c.createdAt ? fdta(c.createdAt) : '—'}</td>
                   <td><Badge v={l.active ? 'Active' : 'Non Active'} /></td>
                   <td>{l.cls === '—' ? '—' : <span className={`b ${{ A: 'ok', B: 'info', C: 'gray' }[l.cls]}`}>Class {l.cls}</span>}</td>
                   <td className="num">{l.mesin}</td>
@@ -65,7 +68,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                   </tr>
                   {sp.cx === c.id && (
                     <tr>
-                      <td colSpan={7} style={{ background: 'var(--th)' }}>
+                      <td colSpan={10} style={{ background: 'var(--th)' }}>
                         <div className="cols2">
                           <div>
                             <b>Riwayat pembelian (dasar Status dan Class)</b>
@@ -88,7 +91,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                   )}
                 </Fragment>
               ))}
-              {!rows.length && <tr><td colSpan={7} className="empty">Tidak ada customer yang cocok.</td></tr>}
+              {!rows.length && <tr><td colSpan={10} className="empty">Tidak ada customer yang cocok.</td></tr>}
             </tbody>
           </table>
         </div>

@@ -11,6 +11,13 @@ export const fdt = (d: number | string | Date): string => {
   return `${fd(x)} ${pad(x.getHours())}:${pad(x.getMinutes())}`
 }
 
+/** "23 Sep 2026 08:23AM", the Created At format of the live Organizations page. */
+export const fdta = (d: number | string | Date): string => {
+  const x = new Date(d)
+  const h = x.getHours()
+  return `${fd(x)} ${pad(h % 12 || 12)}:${pad(x.getMinutes())}${h < 12 ? 'AM' : 'PM'}`
+}
+
 export const iso = (d: number | string | Date): string => {
   const x = new Date(d)
   return `${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())}`
