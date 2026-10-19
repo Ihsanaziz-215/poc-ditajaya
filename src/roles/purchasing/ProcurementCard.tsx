@@ -21,7 +21,7 @@ export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
       <div className="ch">
         <div>
           <h3>Pengadaan</h3>
-          <p className="sub">Purchasing mengecek barang yang disetujui customer: In Stock bila sudah ada di gudang, Dibeli, atau Indent. Barang yang dicoret Sales tidak ikut.</p>
+          <p className="sub">Purchasing tanya Gudang dulu: In Stock bila barang sudah ada (tidak dibeli dan tidak perlu Stock In), Dibeli, atau Indent. Mur, lem, dan barang habis pakai lain cukup ditambah Sales di quotation. Barang yang dicoret Sales tidak ikut.</p>
         </div>
         {!f.done && items.some((i) => !i.proc) && (
           <button className="btn info sm" disabled={pending || !canAct} title={canAct ? undefined : 'Hanya Purchasing yang bisa mengubah status pengadaan'} onClick={() => run(markAllBoughtAction(f.id))}>Tandai semua Dibeli</button>

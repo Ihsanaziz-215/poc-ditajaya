@@ -1,5 +1,5 @@
 import { active } from '../derived'
-import type { Form, Quote, QuoteVersion } from '../types'
+import type { Form, Quote, QuoteItem, QuoteVersion } from '../types'
 import { addLog, getForm } from './core'
 import type { Ctx } from './core'
 import type { Db } from '../types'
@@ -33,6 +33,8 @@ export function syncQuote(db: Db, ctx: Ctx, f: Form): QuoteVersion | undefined {
   let branched: QuoteVersion | undefined
   if (v.status === 'Terkirim') v = branched = newVersion(db, ctx, q, 'revisi harga atau qty setelah terkirim')
   const old = v.items
-  v.items = active(f).map((i) => ({ iid: i.id, name: i.name, qty: i.qty, price: i.price, unit: i.unit, partNo: i.partNo, disc: old.find((o) => o.iid === i.id)?.disc || 0 }))
+  const extras = old.filter((o) => o.extra)
+  const mapped: QuoteItem[] = active(f).map((i) => ({ iid: i.id, name: i.name, qty: i.qty, price: i.price, unit: i.unit, partNo: i.partNo, disc: old.find((o) => o.iid === i.id)?.disc || 0 }))
+  v.items = [...mapped, ...extras]
   return branched
 }

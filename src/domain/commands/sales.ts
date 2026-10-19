@@ -2,7 +2,7 @@ import { iso } from '@/lib/format'
 import { active, today } from '../derived'
 import { PERSON } from '../types'
 import type { Db, Quote, QuoteVersion } from '../types'
-import { addLog, DomainError, getForm, notify, requireRole } from './core'
+import { addLog, DomainError, getForm, nextId, notify, requireRole } from './core'
 import type { CommandResult, Ctx } from './core'
 import { branchedMessage, lastVersion, newVersion, syncQuote } from './quoteSync'
 
@@ -104,6 +104,42 @@ export function setQuoteDiscount(db: Db, ctx: Ctx, qid: string, iid: string, val
   if (branch) v = newVersion(db, ctx, q, 'revisi diskon')
   v.items.find((i) => i.iid === iid)!.disc = n
   if (branch) return { message: branchedMessage(v), kind: 'info', redirect: `/quotes/${q.id}?tab=items` }
+}
+
+function quoteForm(db: Db, q: Quote) {
+  return q.formId ? db.forms.find((x) => x.id === q.formId) : undefined
+}
+
+/** Barang habis pakai (mur, lem) yang ditagih ke client: hanya ada di quotation, tidak masuk form, pengadaan, atau penerimaan. */
+export function addQuoteExtra(db: Db, ctx: Ctx, qid: string, input: { name: string; qty: number; price: number; unit?: string }): CommandResult {
+  requireRole(ctx, 'Sales')
+  const q = getQuote(db, qid)
+  const name = input.name.trim().slice(0, 200)
+  if (!name) throw new DomainError('Isi nama barang.')
+  if (!(Number.isInteger(input.qty) && input.qty >= 1)) throw new DomainError('Qty minimal 1.')
+  if (!(Number(input.price) >= 0)) throw new DomainError('Harga tidak valid.')
+  let v = lastVersion(q)
+  const branch = v.status === 'Terkirim'
+  if (branch) v = newVersion(db, ctx, q, 'tambah barang non-stok')
+  const unit = (input.unit ?? '').trim().slice(0, 50)
+  v.items.push({ iid: nextId(db), name, qty: input.qty, price: Number(input.price), disc: 0, unit: unit || undefined, extra: true })
+  const f = quoteForm(db, q)
+  if (f) addLog(ctx, f, `Tambah barang di quotation v${v.ver}`, '—', `${name} × ${input.qty}${unit ? ' ' + unit : ''}`)
+  return branch ? { message: branchedMessage(v), kind: 'info', redirect: `/quotes/${q.id}?tab=items` } : { message: 'Barang ditambahkan ke quotation. Tidak masuk pengadaan.', kind: 'ok' }
+}
+
+export function removeQuoteExtra(db: Db, ctx: Ctx, qid: string, iid: string): CommandResult {
+  requireRole(ctx, 'Sales')
+  const q = getQuote(db, qid)
+  let v = lastVersion(q)
+  const cur = v.items.find((i) => i.iid === iid)
+  if (!cur?.extra) throw new DomainError('Hanya barang tambahan quotation yang bisa dihapus.')
+  const branch = v.status === 'Terkirim'
+  if (branch) v = newVersion(db, ctx, q, 'hapus barang non-stok')
+  v.items = v.items.filter((i) => i.iid !== iid)
+  const f = quoteForm(db, q)
+  if (f) addLog(ctx, f, `Hapus barang di quotation v${v.ver}`, `${cur.name} × ${cur.qty}`, '—')
+  return branch ? { message: branchedMessage(v), kind: 'info', redirect: `/quotes/${q.id}?tab=items` } : { message: 'Barang dihapus dari quotation.' }
 }
 
 export function sendQuote(db: Db, ctx: Ctx, qid: string, input: { to: string; cc: string; fail: boolean }): CommandResult {

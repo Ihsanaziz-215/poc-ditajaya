@@ -7,10 +7,10 @@ import { calc } from '@/domain/derived'
 import type { QuoteField } from '@/domain/commands/sales'
 import type { Quote } from '@/domain/types'
 import { fd, rp } from '@/lib/format'
-import { setQuoteDiscountAction, setQuoteFieldAction } from '@/roles/sales/actions'
+import { addQuoteExtraAction, removeQuoteExtraAction, setQuoteDiscountAction, setQuoteFieldAction } from '@/roles/sales/actions'
 
 export function QuoteEditor({ quote: q, vi, tab, editable, owners, formId }: { quote: Quote; vi: number; tab: 'info' | 'items'; editable: boolean; owners: string[]; formId: string | null }) {
-  const { run } = useAction()
+  const { run, pending } = useAction()
   const [rev, setRev] = useState(0)
   const v = q.versions[vi]
   const c = calc(v)
@@ -37,7 +37,7 @@ export function QuoteEditor({ quote: q, vi, tab, editable, owners, formId }: { q
     return (
       <>
         <h3>Quote Items</h3>
-        <p className="sub">{formId ? `Item dan harga mengikuti Form Breakdown ${formId}. Ubah harga atau qty di form, bukan di sini.` : 'Quote lama tanpa Form Breakdown.'}</p>
+        <p className="sub">{formId ? `Item dan harga mengikuti Form Breakdown ${formId}. Ubah harga atau qty di form, bukan di sini. Barang habis pakai (mur, lem) yang tidak ada di gudang bisa ditambah di bawah tabel.` : 'Quote lama tanpa Form Breakdown.'}</p>
         <div className="wrapx">
           <table className="tbl">
             <thead><tr><th>Product Name</th><th className="num">Quantity</th><th className="num">Price</th><th className="num">Amount</th><th className="num">Discount</th><th className="num">Total</th></tr></thead>
@@ -46,7 +46,7 @@ export function QuoteEditor({ quote: q, vi, tab, editable, owners, formId }: { q
                 const a = i.qty * i.price
                 return (
                   <tr key={i.iid + k}>
-                    <td>{i.name}</td><td className="num">{i.qty}</td><td className="num">{rp(i.price)}</td><td className="num">{rp(a)}</td>
+                    <td>{i.name}{i.extra && <> <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', border: '1px solid var(--line, #ddd)', borderRadius: 5, padding: '1px 6px' }} title="Hanya di quotation, tidak masuk pengadaan">Non-stok</span> {!dis && <button className="btn sec sm" disabled={pending} onClick={async () => { await run(removeQuoteExtraAction(q.id, i.iid)); setRev((r) => r + 1) }}>Hapus</button>}</>}</td><td className="num">{i.qty}{i.unit ? ` ${i.unit}` : ''}</td><td className="num">{rp(i.price)}</td><td className="num">{rp(a)}</td>
                     <td className="num">
                       <input
                         className="p" type="number" min={0} disabled={dis} defaultValue={i.disc || 0} aria-label="Diskon"
@@ -60,6 +60,22 @@ export function QuoteEditor({ quote: q, vi, tab, editable, owners, formId }: { q
             </tbody>
           </table>
         </div>
+        <form
+          style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}
+          onSubmit={async (e) => {
+            e.preventDefault()
+            const fm = e.currentTarget
+            const d = new FormData(fm)
+            const r = await run(addQuoteExtraAction(q.id, { name: String(d.get('name')), qty: Number(d.get('qty')), unit: String(d.get('unit')), price: Number(d.get('price')) }))
+            if (r?.ok) { fm.reset(); setRev((x) => x + 1) }
+          }}
+        >
+          <input name="name" placeholder="Barang tambahan (mis. Lem, Mur)" aria-label="Nama barang tambahan" disabled={dis} style={{ flex: '1 1 220px' }} />
+          <input name="qty" type="number" min={1} defaultValue={1} aria-label="Qty" disabled={dis} style={{ width: 70 }} />
+          <input name="unit" placeholder="Satuan" aria-label="Satuan" disabled={dis} style={{ width: 90 }} />
+          <input name="price" type="number" min={0} placeholder="Harga" aria-label="Harga" disabled={dis} style={{ width: 120 }} />
+          <button className="btn sec sm" type="submit" disabled={dis || pending} title={dis ? 'Hanya Sales yang bisa menambah barang' : undefined}>Tambah barang</button>
+        </form>
         <div className="sum" style={{ marginTop: 14 }}>
           <div><span>Subtotal</span><span>{rp(c.sub)}</span></div>
           <div><span>Diskon</span><span>- {rp(c.disc)}</span></div>

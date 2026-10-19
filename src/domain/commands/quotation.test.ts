@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import { as, freshDb } from '../testing'
 import { DomainError } from './core'
-import { makeQuote, sendQuote, setQuoteDiscount, setQuoteField } from './sales'
+import { editItem } from './shared'
+import { addQuoteExtra, makeQuote, removeQuoteExtra, sendQuote, setQuoteDiscount, setQuoteField } from './sales'
 
 describe('makeQuote', () => {
   test('creates Q3004 for a Harga Terisi form with defaults', () => {
@@ -95,5 +96,26 @@ describe('editing quotes', () => {
     const db = freshDb()
     expect(() => setQuoteField(db, as(db, 'Purchasing'), 'Q3001', 'termin', 'x')).toThrow(DomainError)
     expect(() => setQuoteDiscount(db, as(db, 'Teknisi'), 'Q3001', 'x', 1)).toThrow(DomainError)
+  })
+})
+
+describe('barang non-stok di quotation', () => {
+  test('Sales menambah barang habis pakai tanpa menyentuh form dan pengadaan, dan tetap ada setelah sinkron', () => {
+    const db = freshDb()
+    const f = db.forms.find((x) => x.status === 'Harga Terisi')!
+    const S = as(db, 'Sales')
+    makeQuote(db, S, f.id)
+    const q = db.quotes.find((x) => x.formId === f.id)!
+    const before = f.items.length
+    addQuoteExtra(db, S, q.id, { name: 'Lem', qty: 2, price: 15000, unit: 'tube' })
+    const v = q.versions.at(-1)!
+    expect(v.items.at(-1)).toMatchObject({ name: 'Lem', extra: true, qty: 2, price: 15000 })
+    expect(f.items.length).toBe(before)
+    editItem(db, S, f.id, f.items[0].id, 'qty', f.items[0].qty + 1)
+    expect(q.versions.at(-1)!.items.some((i) => i.extra && i.name === 'Lem')).toBe(true)
+    expect(() => addQuoteExtra(db, as(db, 'Purchasing'), q.id, { name: 'Mur', qty: 1, price: 1 })).toThrow()
+    removeQuoteExtra(db, S, q.id, v.items.at(-1)!.iid)
+    expect(q.versions.at(-1)!.items.some((i) => i.extra)).toBe(false)
+    expect(() => removeQuoteExtra(db, S, q.id, f.items[0].id)).toThrow()
   })
 })

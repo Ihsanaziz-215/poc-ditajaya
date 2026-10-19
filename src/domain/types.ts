@@ -85,7 +85,7 @@ export interface Customer {
   acts: { date: string; what: string }[]
 }
 
-export interface QuoteItem { iid: string; name: string; qty: number; price: number; disc: number; unit?: string; partNo?: string }
+export interface QuoteItem { iid: string; name: string; qty: number; price: number; disc: number; unit?: string; partNo?: string; /** Barang habis pakai (mur, lem) yang ditagih ke client tapi tidak ada di form dan tidak masuk pengadaan. */ extra?: boolean }
 
 export interface QuoteVersion {
   ver: number

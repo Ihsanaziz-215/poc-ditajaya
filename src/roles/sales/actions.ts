@@ -1,6 +1,6 @@
 'use server'
 
-import { decide, makeQuote, recordFollowUp, reviseForm, sendQuote, setQuoteDiscount, setQuoteField } from '@/domain/commands/sales'
+import { addQuoteExtra, decide, makeQuote, recordFollowUp, removeQuoteExtra, reviseForm, sendQuote, setQuoteDiscount, setQuoteField } from '@/domain/commands/sales'
 import { createOrganization, deleteOrganization, editOrganization, importOrganizations } from '@/domain/commands/organizations'
 import type { OrgInput } from '@/domain/commands/organizations'
 import type { QuoteField } from '@/domain/commands/sales'
@@ -27,6 +27,12 @@ export async function setQuoteFieldAction(qid: string, key: QuoteField, value: s
 }
 export async function setQuoteDiscountAction(qid: string, iid: string, value: number | string): Promise<ActionResult> {
   return run((db, ctx) => setQuoteDiscount(db, ctx, qid, iid, value))
+}
+export async function addQuoteExtraAction(qid: string, input: { name: string; qty: number; price: number; unit?: string }): Promise<ActionResult> {
+  return run((db, ctx) => addQuoteExtra(db, ctx, qid, input))
+}
+export async function removeQuoteExtraAction(qid: string, iid: string): Promise<ActionResult> {
+  return run((db, ctx) => removeQuoteExtra(db, ctx, qid, iid))
 }
 export async function sendQuoteAction(qid: string, input: { to: string; cc: string; fail: boolean }): Promise<ActionResult> {
   return run((db, ctx) => sendQuote(db, ctx, qid, input))
