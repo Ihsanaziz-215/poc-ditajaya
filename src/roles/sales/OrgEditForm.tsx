@@ -4,28 +4,28 @@ import { useState } from 'react'
 import { PageHead } from '@/components/ui/PageHead'
 import { useAction } from '@/components/ui/Providers'
 import type { Customer } from '@/domain/types'
-import { editOrganizationAction } from './actions'
+import { createOrganizationAction, editOrganizationAction } from './actions'
 
 const COUNTRIES = ['Indonesia', 'Malaysia', 'Singapore', 'Thailand', 'Vietnam', 'Philippines']
 
 /** Same fields as the live Edit Organization page. Only Sales can save. */
-export function OrgEditForm({ customer: c, owners, canEdit }: { customer: Customer; owners: string[]; canEdit: boolean }) {
+export function OrgEditForm({ customer: c, owners, canEdit }: { customer?: Customer; owners: string[]; canEdit: boolean }) {
   const { run, pending } = useAction()
   const [v, setV] = useState({
-    name: c.name, addr: c.addr, country: c.country ?? 'Indonesia', city: c.city ?? '', province: c.province ?? '', postal: c.postal ?? '', owner: c.owner ?? '',
+    name: c?.name ?? '', addr: c?.addr ?? '', country: c?.country ?? 'Indonesia', city: c?.city ?? '', province: c?.province ?? '', postal: c?.postal ?? '', owner: c?.owner ?? '',
   })
   const [err, setErr] = useState<Record<string, string>>({})
   const set = (k: keyof typeof v, val: string) => setV((x) => ({ ...x, [k]: val }))
   const ro = !canEdit
   return (
     <>
-      <PageHead crumbs={[['Contacts'], ['Organizations', '/organizations'], ['Edit Organization']]} title="Edit Organization">
+      <PageHead crumbs={[['Contacts'], ['Organizations', '/organizations'], [c ? 'Edit Organization' : 'Create Organization']]} title={c ? 'Edit Organization' : 'Create Organization'}>
         <button
           className="btn"
           disabled={pending || ro}
-          title={ro ? 'Hanya Sales yang bisa mengubah organization' : undefined}
+          title={ro ? 'Hanya Sales yang bisa membuat atau mengubah organization' : undefined}
           onClick={async () => {
-            const r = await run(editOrganizationAction(c.id, v))
+            const r = await run(c ? editOrganizationAction(c.id, v) : createOrganizationAction(v))
             setErr(r.ok ? {} : r.fields ?? {})
           }}
         >
@@ -33,7 +33,7 @@ export function OrgEditForm({ customer: c, owners, canEdit }: { customer: Custom
         </button>
       </PageHead>
       <div className="card">
-        {ro && <div className="hint" style={{ marginTop: 0 }}>Role ini hanya melihat. Hanya Sales yang bisa mengubah organization.</div>}
+        {ro && <div className="hint" style={{ marginTop: 0 }}>Role ini hanya melihat. Hanya Sales yang bisa membuat atau mengubah organization.</div>}
         <div className="fld">
           <label className="l" htmlFor="o-name">Name <span className="req">*</span></label>
           <input id="o-name" className={err.name ? 'miss' : ''} disabled={ro} value={v.name} onChange={(e) => set('name', e.target.value)} />

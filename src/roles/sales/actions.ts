@@ -1,7 +1,7 @@
 'use server'
 
 import { decide, makeQuote, recordFollowUp, reviseForm, sendQuote, setQuoteDiscount, setQuoteField } from '@/domain/commands/sales'
-import { deleteOrganization, editOrganization } from '@/domain/commands/organizations'
+import { createOrganization, deleteOrganization, editOrganization, importOrganizations } from '@/domain/commands/organizations'
 import type { OrgInput } from '@/domain/commands/organizations'
 import type { QuoteField } from '@/domain/commands/sales'
 import { run } from '@/server/run'
@@ -9,6 +9,12 @@ import type { ActionResult } from '@/server/run'
 
 export async function editOrganizationAction(cid: string, input: OrgInput): Promise<ActionResult> {
   return run((db, ctx) => editOrganization(db, ctx, cid, input))
+}
+export async function createOrganizationAction(input: OrgInput): Promise<ActionResult> {
+  return run((db, ctx) => createOrganization(db, ctx, input))
+}
+export async function importOrganizationsAction(rows: OrgInput[]): Promise<ActionResult> {
+  return run((db, ctx) => importOrganizations(db, ctx, rows))
 }
 export async function deleteOrganizationAction(cid: string): Promise<ActionResult> {
   return run((db, ctx) => deleteOrganization(db, ctx, cid))

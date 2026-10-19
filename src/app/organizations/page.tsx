@@ -9,6 +9,7 @@ import { fd, fdta } from '@/lib/format'
 import { getRole } from '@/lib/role'
 import { DeleteOrgButton } from '@/roles/sales/DeleteOrgButton'
 import { FollowUpButton } from '@/roles/sales/FollowUpButton'
+import { ImportOrgButton } from '@/roles/sales/ImportOrgButton'
 import { store } from '@/server/store'
 
 export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
@@ -35,7 +36,14 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   }
   return (
     <>
-      <PageHead crumbs={[['Organizations']]} title="Organizations" />
+      <PageHead crumbs={[['Contacts'], ['Organizations']]} title="Organizations">
+        <ImportOrgButton canEdit={role === 'Sales'} />
+        {role === 'Sales' ? (
+          <Link className="btn" href="/organizations/new">Create Organization</Link>
+        ) : (
+          <button className="btn" disabled title="Hanya Sales yang bisa membuat organization">Create Organization</button>
+        )}
+      </PageHead>
       {noFu ? (
         <div className="banner turn">
           <Icon name="alert" />
