@@ -7,9 +7,13 @@ import { InfoCard } from '@/components/breakdown/InfoCard'
 import { ItemsCard } from '@/components/breakdown/ItemsCard'
 import { LogCard } from '@/components/breakdown/LogCard'
 import { Stepper } from '@/components/breakdown/Stepper'
-import { procOf, recvOf, stepOf, turnOf } from '@/domain/derived'
+import { today as todayOf, procOf, recvOf, stepOf, turnOf } from '@/domain/derived'
 import { canPrice, canStruct, canSup } from '@/domain/permissions'
+import { iso } from '@/lib/format'
 import { getRole } from '@/lib/role'
+import { ProcurementCard } from '@/roles/purchasing/ProcurementCard'
+import { SendToSalesButton } from '@/roles/purchasing/SendToSalesButton'
+import { ReceivingCard } from '@/roles/gudang/ReceivingCard'
 import { store } from '@/server/store'
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
@@ -23,7 +27,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const hasProc = f.status === 'Disetujui'
   return (
     <FormUiProvider>
-      <PageHead crumbs={[['Form Breakdown', '/breakdown'], [f.id]]} title={`${f.id} · ${f.cust}`} />
+      <PageHead crumbs={[['Form Breakdown', '/breakdown'], [f.id]]} title={`${f.id} · ${f.cust}`}>
+        {role === 'Purchasing' && f.status === 'Diajukan' && <SendToSalesButton fid={f.id} />}
+      </PageHead>
       <Banner form={f} role={role} turn={turn} />
       <div className="card">
         <div className="chips" style={{ marginBottom: 16 }}>
@@ -41,6 +47,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         perm={{ struct: canStruct(f, role), price: canPrice(f, role), sup: canSup(f, role) }}
         suppliers={db.suppliers.map((s) => ({ name: s.name, active: s.active }))}
       />
+      <ProcurementCard form={f} role={role} />
+      <ReceivingCard form={f} role={role} today={iso(todayOf(db))} />
       <CommentsCard fid={f.id} comments={f.comments} />
       <LogCard form={f} role={role} />
     </FormUiProvider>
