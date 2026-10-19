@@ -1,10 +1,10 @@
 import { Icon } from '@/components/ui/Icon'
 import { RoleBadge } from '@/components/ui/Badge'
-import type { Form, Role } from '@/domain/types'
+import type { Form } from '@/domain/types'
 import { fdt } from '@/lib/format'
 
-export function LogCard({ form, role }: { form: Form; role: Role }) {
-  const lg = [...form.log].filter((l) => !(role === 'Sales' && l.act.startsWith('Stock In'))).sort((a, b) => b.t - a.t)
+export function LogCard({ form }: { form: Form }) {
+  const lg = [...form.log].sort((a, b) => b.t - a.t)
   return (
     <div className="card">
       <div className="ch">
