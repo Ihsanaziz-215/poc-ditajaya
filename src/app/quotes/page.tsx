@@ -7,10 +7,12 @@ import { PageHead } from '@/components/ui/PageHead'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { calc, isExpired, today } from '@/domain/derived'
 import { fd, rp } from '@/lib/format'
+import { getRole } from '@/lib/role'
 import { store } from '@/server/store'
 
 export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams
+  const role = await getRole()
   const db = await store.read()
   const t = today(db)
   const qs = (sp.q || '').toLowerCase()
@@ -20,7 +22,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   })
   return (
     <>
-      <PageHead crumbs={[['Quotes']]} title="Quotes"><CreateQuoteButton /></PageHead>
+      <PageHead crumbs={[['Quotes']]} title="Quotes"><CreateQuoteButton can={role === 'Sales'} /></PageHead>
       <div className="banner" style={{ marginBottom: 16 }}>
         <Icon name="info" />
         <div><b>Menu Quotes yang sudah live, ditambah flow baru dari PRD</b>Kolom Versi, Status Kirim, Kedaluwarsa, dan Form Breakdown adalah tambahan. Dua quote berlabel Q-LIVE adalah data testing yang sudah ada.</div>
