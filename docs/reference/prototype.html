@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prototype Modul Form Breakdown</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F4F6;--card:#fff;--text:#1F2430;--muted:#6B7280;--line:#E5E7EB;--th:#F8F9FB;--pri:#D8485A;--link:#D8485A;--pri-h:#C23B4D;--pri-soft:#FCE9EB;--info:#1D6FB8;--info-soft:#DDEBF9;--ok:#15803D;--ok-soft:#DCF3E4;--warn:#A64B0A;--warn-soft:#FDEBCB;--bad:#B91C1C;--bad-soft:#FBE3E3;--gray:#4B5563;--gray-soft:#ECEEF1;--input:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121418;--card:#1B1E24;--text:#E6E8EC;--muted:#9AA1AD;--line:#2B2F37;--th:#20242B;--pri:#D4485A;--link:#F0808C;--pri-h:#E0596B;--pri-soft:#3A2227;--info:#7DBBF3;--info-soft:#1F3347;--ok:#6AD596;--ok-soft:#1B3326;--warn:#F2B35C;--warn-soft:#3B2E17;--bad:#F29A9A;--bad-soft:#3C2224;--gray:#B4BAC4;--gray-soft:#2A2E36;--input:#161920;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121418;--card:#1B1E24;--text:#E6E8EC;--muted:#9AA1AD;--line:#2B2F37;--th:#20242B;--pri:#D4485A;--link:#F0808C;--pri-h:#E0596B;--pri-soft:#3A2227;--info:#7DBBF3;--info-soft:#1F3347;--ok:#6AD596;--ok-soft:#1B3326;--warn:#F2B35C;--warn-soft:#3B2E17;--bad:#F29A9A;--bad-soft:#3C2224;--gray:#B4BAC4;--gray-soft:#2A2E36;--input:#161920;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:60}
+button{font:inherit;cursor:pointer}
+a{color:var(--link);text-decoration:none;cursor:pointer}
+.shell{display:flex;min-height:100vh}
+.side{width:64px;flex:none;position:sticky;top:env(safe-area-inset-top,0px);height:100vh;background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 0;z-index:30;overflow:visible}
+.side a{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;color:var(--text);position:relative}
+.side a svg{width:21px;height:21px}
+.side a.active{background:var(--pri);color:#fff}
+.side a:hover:not(.active){background:var(--gray-soft)}
+.side a::after{content:attr(data-tip);position:absolute;left:50px;top:50%;transform:translateY(-50%);background:#111827;color:#fff;font-size:12px;padding:4px 9px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;z-index:80}
+.side a:hover::after,.side a:focus-visible::after{opacity:1}
+.side hr{width:28px;border:0;border-top:1px solid var(--line);margin:6px 0}
+.main{flex:1;min-width:0}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;min-height:60px;background:var(--card);display:flex;align-items:center;gap:12px;padding:8px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{width:42px;height:34px;border:2.5px solid var(--pri);border-radius:5px;color:var(--pri);font-weight:700;display:grid;place-items:center;font-size:17px;letter-spacing:-1px}
+.spill{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:0 14px;height:40px;width:min(440px,38vw);color:var(--muted)}
+.spill input{border:0;outline:0;background:transparent;color:var(--text);width:100%;font:inherit;padding:0}
+.spill svg{width:18px;height:18px;flex:none}
+.fab{width:38px;height:38px;border-radius:50%;background:var(--pri);color:#fff;border:0;display:grid;place-items:center}
+.fab svg{width:20px;height:20px}
+.sp{flex:1}
+.demo{display:flex;align-items:center;gap:8px;border:1px dashed var(--muted);border-radius:12px;padding:4px 6px 4px 10px;background:var(--bg)}
+.demo small{color:var(--muted);font-size:12px}
+.roles{display:flex;gap:3px;background:var(--card);padding:3px;border-radius:9px;border:1px solid var(--line)}
+.rp{border:0;background:transparent;color:var(--text);padding:5px 11px;border-radius:7px;font-size:13px;font-weight:500}
+.rp.on{background:var(--pri);color:#fff;font-weight:600}
+.ib{width:38px;height:38px;border-radius:10px;border:0;background:transparent;color:var(--text);display:grid;place-items:center;position:relative}
+.ib:hover{background:var(--gray-soft)}
+.ib svg{width:20px;height:20px}
+.dot{position:absolute;top:3px;right:3px;min-width:17px;height:17px;border-radius:9px;background:var(--pri);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.avatar{width:38px;height:38px;border-radius:50%;background:#E27BB0;color:#fff;font-weight:700;display:grid;place-items:center}
+.bellwrap{position:relative}
+.pop{position:absolute;right:0;top:46px;width:340px;max-height:420px;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);z-index:70}
+.pop h4{margin:0;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.pop .it{padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.pop .it:hover{background:var(--th)}
+.pop .it.un{border-left:3px solid var(--pri)}
+.pop .it small{color:var(--muted)}
+.page{padding:20px 24px 48px;max-width:1440px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;min-width:0}
+.card h3{margin:0 0 2px;font-size:16px;font-weight:700}
+.card .sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.ch .sub{margin-bottom:0}
+.phead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.crumb{font-size:15px;color:var(--text)}
+.crumb a{color:var(--link)}
+.phead h1{margin:6px 0 0;font-size:25px;font-weight:700;letter-spacing:-.3px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:0;border-radius:8px;padding:9px 16px;font-weight:600;font-size:14px;background:var(--pri);color:#fff;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover{background:var(--pri-h)}
+.btn svg{width:16px;height:16px}
+.btn.sec{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.btn.sec:hover{background:var(--th)}
+.btn.info{background:var(--info-soft);color:var(--info)}
+.btn.danger{background:var(--bad-soft);color:var(--bad)}
+.btn.sm{padding:5px 11px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+input,select,textarea{font:inherit;color:var(--text);background:var(--input);border:1px solid var(--line);border-radius:8px;padding:9px 12px;width:100%;min-width:0}
+input[type=checkbox],input[type=radio]{width:auto}
+textarea{resize:vertical;min-height:80px}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+input[disabled],select[disabled],textarea[disabled]{opacity:.7;background:var(--th)}
+label.l{display:block;font-weight:500;margin:0 0 6px}
+.req{color:var(--pri)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 20px}
+.fld.full{grid-column:1/-1}
+.err{color:var(--bad);font-size:12.5px;margin-top:4px}
+.tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.tools .spill{width:260px;height:38px;border-radius:8px}
+.pager{margin-left:auto;display:flex;align-items:center;gap:10px;color:var(--muted)}
+.pager select{width:64px;padding:6px 8px}
+.filt{display:flex;gap:12px;flex-wrap:wrap;background:var(--th);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;align-items:end}
+.filt>div{min-width:170px}
+.wrapx{overflow-x:auto;border-top:1px solid var(--line)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{background:var(--th);text-align:left;font-weight:500;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr.row{cursor:pointer}
+.tbl tr.row:hover td{background:var(--th)}
+.tbl td.num,.tbl th.num{text-align:right;white-space:nowrap}
+.tbl input,.tbl select{padding:6px 9px;min-width:90px}
+.tbl input.q{width:80px;min-width:0;text-align:right}
+.tbl input.p{width:140px;text-align:right}
+.miss{border-color:var(--pri)!important;background:var(--pri-soft)!important}
+.b{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.b.ok{background:var(--ok-soft);color:var(--ok)}.b.warn{background:var(--warn-soft);color:var(--warn)}.b.bad{background:var(--bad-soft);color:var(--bad)}.b.info{background:var(--info-soft);color:var(--info)}.b.gray{background:var(--gray-soft);color:var(--gray)}.b.pri{background:var(--pri-soft);color:var(--pri)}
+.tbc{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:5px;background:var(--warn-soft);color:var(--warn);font-size:11.5px;font-weight:700;cursor:help;vertical-align:middle}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.sg{border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:150px;background:var(--card)}
+.sg small{display:block;color:var(--muted);font-size:12px;margin-bottom:3px}
+.banner{display:flex;gap:12px;align-items:flex-start;border-radius:12px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--line);background:var(--card)}
+.banner.turn{background:var(--pri-soft);border-color:var(--pri)}
+.banner.stop{background:var(--bad-soft);border-color:var(--bad)}
+.banner svg{width:20px;height:20px;flex:none;margin-top:1px}
+.banner b{display:block}
+.steps{display:flex;gap:0;overflow-x:auto;padding-bottom:4px}
+.st{flex:1;min-width:104px;text-align:center;position:relative;padding:0 4px}
+.st::before{content:"";position:absolute;top:15px;left:-50%;width:100%;height:2px;background:var(--line);z-index:0}
+.st:first-child::before{display:none}
+.st.done::before,.st.cur::before{background:var(--ok)}
+.st.stop::before{background:var(--ok)}
+.st i{position:relative;z-index:1;width:32px;height:32px;border-radius:50%;margin:0 auto 6px;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:13px;background:var(--card);border:2px solid var(--line);color:var(--muted)}
+.st.done i{background:var(--ok);border-color:var(--ok);color:#fff}
+.st.cur i{border-color:var(--pri);color:var(--pri);background:var(--pri-soft)}
+.st.stop i{background:var(--bad);border-color:var(--bad);color:#fff}
+.st.warn i{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+.st b{display:block;font-size:13px;font-weight:600}
+.st small{color:var(--muted);font-size:12px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 24px}
+.kv small{display:block;color:var(--muted);margin-bottom:2px}
+.kv div.w{grid-column:1/-1}
+.hint{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-top:10px}
+.hint svg{width:15px;height:15px;flex:none}
+.addrow{display:flex;gap:10px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.addrow input.n{flex:1;min-width:200px}
+.addrow input.q{width:90px}
+.tot{display:flex;justify-content:flex-end;gap:24px;padding:12px 14px;font-weight:700}
+.sum{margin-left:auto;width:min(360px,100%)}
+.sum div{display:flex;justify-content:space-between;padding:6px 0}
+.sum div.g{border-top:1px solid var(--line);margin-top:4px;padding-top:10px;font-weight:700;font-size:15px}
+.cm{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:320px;overflow:auto}
+.cmi{border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.cmi small{color:var(--muted)}
+.cmi p{margin:4px 0 0;white-space:pre-wrap}
+.logbox{max-height:380px;overflow:auto;border-top:1px solid var(--line)}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin:-4px -20px 16px;padding:0 20px}
+.tab{padding:12px 16px;border:0;background:transparent;color:var(--text);font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--pri);border-bottom-color:var(--pri)}
+.vers{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.vb{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:8px;padding:4px 11px;font-weight:600;font-size:13px}
+.vb.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.ov{position:fixed;inset:0;background:rgba(10,12,16,.55);z-index:90;display:grid;place-items:center;padding:16px}
+.mod{background:var(--card);border-radius:16px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:22px;border:1px solid var(--line)}
+.mod.wide{width:min(820px,100%)}
+.mod h3{margin:0 0 4px;font-size:18px}
+.mod .acts{justify-content:flex-end;margin-top:18px}
+#toasts{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;z-index:120;max-width:min(380px,calc(100vw - 36px))}
+.toast{background:#1F2430;color:#fff;padding:11px 15px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13.5px;border-left:4px solid var(--pri)}
+.toast.ok{border-left-color:#34C26B}.toast.info{border-left-color:#4DA3F0}.toast.bad{border-left-color:#F26B6B}
+.paper{background:#fff;color:#111;font:12.5px/1.5 Arial,Helvetica,sans-serif;padding:26px 28px;border:1px solid #d9d9d9;position:relative}
+.paper h2{margin:0;font-size:17px;letter-spacing:.3px}
+.paper table{width:100%;border-collapse:collapse;margin-top:12px}
+.paper th,.paper td{border:1px solid #444;padding:4px 7px;text-align:left;font-size:12px}
+.paper td.r,.paper th.r{text-align:right}
+.paper .hd{display:flex;gap:14px;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:12px}
+.paper .lg{width:56px;height:46px;border:3px solid #D8485A;border-radius:6px;color:#D8485A;font-weight:700;display:grid;place-items:center;font-size:20px;flex:none}
+.paper .meta{display:grid;grid-template-columns:1fr 1fr;gap:2px 20px;margin:10px 0}
+.paper .stamp{position:absolute;right:30px;top:90px;border:3px solid #B91C1C;color:#B91C1C;font-weight:700;font-size:20px;padding:2px 12px;transform:rotate(-8deg);letter-spacing:1px}
+.paper ol{margin:4px 0 0 18px;padding:0}
+.empty{text-align:center;color:var(--muted);padding:28px}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}
+.lbl-rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px}
+.lbl-rule div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.lbl-rule b{display:block;margin-bottom:2px}
+@media (max-width:820px){
+ .shell{flex-direction:column}
+ .side{position:fixed;bottom:0;top:auto;left:0;right:0;width:auto;height:58px;flex-direction:row;justify-content:flex-start;overflow-x:auto;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));border-right:0;border-top:1px solid var(--line);gap:4px}
+ .side a::after{display:none}
+ .side hr{width:0;height:26px;border-top:0;border-left:1px solid var(--line);margin:0 4px}
+ .page{padding:14px 12px 90px}
+ .grid2,.grid3{grid-template-columns:1fr}
+ .spill{display:none}
+ .top{padding:8px 12px}
+ .pop{position:fixed;left:12px;right:12px;width:auto;top:70px}
+ #toasts{bottom:78px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toasts" aria-live="polite"></div>
+<script>
+'use strict';
+/* ===== util ===== */
+const ROLES=['Teknisi','Purchasing','Sales','Gudang'];
+const PERSON={Teknisi:'Ari Dwi',Purchasing:'Sari',Sales:'Rully',Gudang:'Joko'};
+const t0=Date.now(),BASE=new Date(2026,9,15,16,10).getTime();
+const now=()=>new Date(BASE+(Date.now()-t0));
+const TODAY=()=>{const d=now();return new Date(d.getFullYear(),d.getMonth(),d.getDate())};
+const MON=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const pad=n=>String(n).padStart(2,'0');
+const fd=d=>{d=new Date(d);return `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}`};
+const fdt=d=>{d=new Date(d);return `${fd(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+const iso=d=>{d=new Date(d);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+const rp=n=>'IDR '+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const rn=n=>Number(n||0).toLocaleString('id-ID');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let _n=100;const uid=()=>'i'+(++_n);
+const $=s=>document.querySelector(s);
+const IC={
+gauge:'<path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l3-5"/><circle cx="12" cy="17" r="1.4"/>',
+leads:'<circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M10 12h4"/>',
+quotes:'<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6M9 12h4"/>',
+mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 8l9 6 9-6"/>',
+clip:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 3h6v3H9zM9 11h6M9 15h4"/>',
+contact:'<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="2.5"/><path d="M8 17c1-2 7-2 8 0"/>',
+box:'<path d="M4 8h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM3 4h18v4H3zM10 12h4"/>',
+flow:'<circle cx="6" cy="6" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="6" cy="18" r="2"/><path d="M6 8v8M8 6h4a4 4 0 0 1 4 4"/>',
+tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.2"/>',
+truck:'<path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+pack:'<path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M4 7l8 4 8-4M12 11v10"/>',
+bell:'<path d="M6 16v-5a6 6 0 1 1 12 0v5l2 2H4zM10 21h4"/>',
+moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>',
+search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',
+eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+pen:'<path d="M4 20l1-5L16 4l4 4L9 19z"/>',
+file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
+send:'<path d="M21 3L3 11l7 3 3 7z"/>',
+reset:'<path d="M4 12a8 8 0 1 0 3-6"/><path d="M4 4v5h5"/>',
+info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 15-5 16 0"/>',
+alert:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>'};
+const ic=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||''}</svg>`;
+const tbc=(t)=>`<span class="tbc" title="${esc(t)}">TBC</span>`;
+const BCOL={'Disetujui':'ok','Diterima Baik':'ok','Sesuai':'ok','Selesai':'ok','Dibeli':'ok','Terkirim':'ok','Active':'ok','Aktif':'ok',
+'Batal':'bad','Diterima Rusak':'bad','Tidak Sesuai':'bad','Perlu Follow Up':'bad','Gagal Kirim':'bad','Kedaluwarsa':'bad',
+'Indent':'warn','Non Active':'gray','Nonaktif':'gray','Belum Dikirim':'gray','Draft':'gray','Menunggu':'gray','Belum Diterima':'gray','—':'gray',
+'Diajukan':'info','Harga Terisi':'info','In Stock':'info','Belum Diproses':'gray','Dicoret':'gray','Tidak Perlu':'gray'};
+const badge=(v)=>`<span class="b ${BCOL[v]||'gray'}">${esc(v)}</span>`;
+const roleB=r=>`<span class="b ${{Teknisi:'info',Purchasing:'warn',Sales:'pri',Gudang:'ok'}[r]||'gray'}">${esc(r)}</span>`;
+
+/* ===== state ===== */
+const S={role:'Sales',forms:[],quotes:[],suppliers:[],customers:[],notifs:[],modal:null,ui:{},qseq:0,fseq:6};
+const getF=id=>S.forms.find(f=>f.id===id);
+const getQ=fid=>S.quotes.find(q=>q.formId===fid);
+const getQid=id=>S.quotes.find(q=>q.id===id);
+const lastV=q=>q.versions[q.versions.length-1];
+const custBy=n=>S.customers.find(c=>c.name===n)||{};
+const qno=n=>`DMP/U/2026/X/QT${String(n).padStart(4,'0')}`;
+const act=f=>f.items.filter(i=>!i.struck);
+const total=f=>act(f).reduce((s,i)=>s+i.qty*i.price,0);
+const calc=v=>{const sub=v.items.reduce((s,i)=>s+i.qty*i.price,0),disc=v.items.reduce((s,i)=>s+(Number(i.disc)||0),0),base=Math.max(sub-disc,0),tax=Math.round(base*0.11);return{sub,disc,tax,grand:base+tax}};
+const expired=v=>v.expiry&&new Date(v.expiry+'T00:00:00')<TODAY();
+
+/* ===== seed ===== */
+function seed(){
+ const D=(m,d,h=9,mi=0)=>new Date(2026,m-1,d,h,mi).getTime();
+ const P=PERSON;
+ S.qseq=3000;S.fseq=6;S.notifs=[];S.quotes=[];S.modal=null;S.ui={};
+ S.suppliers=[
+  {id:'s1',name:'CV Sumber Teknik Udara',contact:'Pak Wawan · 0812-1000-2001',cats:['Kompresor','Sparepart mesin'],active:true},
+  {id:'s2',name:'PT Cipta Refrigerasi Nusantara',contact:'Bu Maya · 0813-2000-3002',cats:['Refrigerasi','Freon'],active:true},
+  {id:'s3',name:'Toko Listrik Mandiri',contact:'Koh Aming · 0811-3000-4003',cats:['Kelistrikan'],active:true},
+  {id:'s4',name:'PT Filtra Indo Perkasa',contact:'Pak Dedi · 0856-4000-5004',cats:['Filter'],active:true},
+  {id:'s5',name:'UD Gas Industri Jaya',contact:'Pak Eko · 0878-5000-6005',cats:['Gas industri'],active:true},
+  {id:'s6',name:'CV Bearing Prima',contact:'Bu Tia · 0852-6000-7006',cats:['Bearing','Sparepart mesin'],active:false}];
+ const pc=(date,type,what,qty=1)=>({date,type,what,qty});
+ S.customers=[
+  {id:'c1',name:'PT Sarana Sentra',pic:'Bapak Hendra',email:'hendra@saranasentra.example',addr:'Jl. Industri Raya No. 12, Bekasi',purchases:[pc('2025-03-10','mesin','Kompresor screw',2),pc('2025-11-02','mesin','Dryer',2),pc('2026-08-14','sparepart','Filter element',3)]},
+  {id:'c2',name:'PT Dunia Mega Raya',pic:'Ibu Wulan',email:'wulan@duniamegaraya.example',addr:'Kawasan MM2100 Blok C-5, Cikarang',purchases:[pc('2024-05-20','mesin','Kompresor',3),pc('2025-09-01','mesin','Kompresor',3),pc('2026-09-18','sparepart','Contactor',2)]},
+  {id:'c3',name:'PT Jati Karya',pic:'Bapak Rahmat',email:'rahmat@jatikarya.example',addr:'Jl. Raya Narogong Km 9, Bogor',purchases:[pc('2025-04-04','mesin','Kompresor',2),pc('2025-12-15','sparepart','V-belt',4)]},
+  {id:'c4',name:'PT ABC',pic:'Bapak Andi',email:'andi@abc.example',addr:'Jl. Gatot Subroto 88, Jakarta',purchases:[pc('2026-01-22','mesin','Kompresor',1)]},
+  {id:'c5',name:'PT Dharma Polimetal',pic:'Ibu Sinta',email:'sinta@dharmapolimetal.example',addr:'Jl. Pegangsaan Dua Km 1, Jakarta Utara',purchases:[pc('2025-06-12','mesin','Dryer',3),pc('2026-07-05','sparepart','Oil separator',1)]},
+  {id:'c6',name:'PT Mitra Kompresor Abadi',pic:'Bapak Yusuf',email:'yusuf@mitrakompresor.example',addr:'Jl. Daan Mogot Km 14, Jakarta Barat',purchases:[pc('2026-10-01','sparepart','Coupling element',1)]},
+  {id:'c7',name:'PT Karya Logam Utama',pic:'Ibu Lestari',email:'lestari@karyalogam.example',addr:'Jl. Tambak Aji 5, Semarang',purchases:[pc('2024-08-08','mesin','Kompresor',2),pc('2025-02-17','mesin','Kompresor',3),pc('2026-04-10','sparepart','Filter',2)]},
+  {id:'c8',name:'PT Nusa Pangan Makmur',pic:'Bapak Dodi',email:'dodi@nusapangan.example',addr:'Jl. Raya Serang Km 12, Tangerang',purchases:[pc('2026-09-30','mesin','Kompresor',1)]}];
+ const ACTS={c1:[['2026-09-10','Call follow up penawaran dryer'],['2026-10-14','Meeting online bahas form breakdown']],c2:[['2026-09-20','Call follow up kontak panel']],c3:[['2026-09-05','Call follow up penawaran V-belt']],c4:[['2026-08-28','Meeting online penawaran']],c5:[['2026-10-09','Call follow up oil separator']],c6:[['2026-10-03','Kunjungan ke workshop']],c7:[['2026-07-15','Call follow up filter']],c8:[['2026-09-30','Call pengenalan produk']]};
+ S.customers.forEach(c=>{c.acts=(ACTS[c.id]||[]).map(a=>({date:a[0],what:a[1]}))});
+ S.customers.forEach(c=>{if(!c.acts.some(a=>a.date.slice(0,7)==='2026-10'))S.notifs.push({id:uid(),roles:['Sales'],fid:null,cid:c.id,link:'#/organizations',text:'Belum follow up bulan ini: '+c.name,t:D(10,15,8,0),read:{}})});
+ const it=(name,qty,price=0,sup='',proc=null,o={})=>Object.assign({id:uid(),name,qty,price,supplier:sup,proc,eta:'',pnote:'',good:0,bad:0,stock:0,struck:false},o);
+ const mk=(id,cust,date,analysis,items,status,x={})=>Object.assign({id,cust,tech:P.Teknisi,date,analysis,note:'',items,status,conf:'Menunggu',confNote:'',done:false,log:[],comments:[]},x);
+ const L=(f,t,user,role,act,o='',n='')=>f.log.push({t,user,role,act,o,n});
+ const C=(f,t,role,text)=>f.comments.push({t,role,user:P[role],text});
+ const price=(f,t,list)=>{f.items.forEach((i,k)=>{i.price=list[k][0];i.supplier=list[k][1];L(f,t+k*60000,P.Purchasing,'Purchasing',`Isi harga — ${i.name}`,'—',rn(i.price));});};
+ const submit=(f,t)=>L(f,t,P.Teknisi,'Teknisi','Ubah status pengajuan','Draft','Diajukan');
+ const priced=(f,t)=>{L(f,t,P.Purchasing,'Purchasing','Ubah status pengajuan','Diajukan','Harga Terisi');};
+ /* F1 diajukan */
+ const f1=mk('BD-2610-001','PT Sarana Sentra','2026-10-14','Kompresor refrigerasi dryer Harland HRND 930 tidak mendingin. Kompresor, filter dryer dan katup ekspansi perlu diganti.',[
+  it('Compressor refrigran Daikin single phase JT90GBBV1L',1),it('Filter dryer DML 163s',1),it('Thermostatic expansion valve Danfoss TUBE',1),it('Hotgas by pas valve Danfoss TCHE',1),it('Freon R134a',1),it('Freon R11',1),it('Evaporator',1),it('Contactor LC1D25M7',1)],'Diajukan');
+ submit(f1,D(10,14,16,2));f1.items[4].stock=3;f1.items[1].stock=1;C(f1,D(10,14,16,10),'Teknisi','Unit di lokasi, bisa dicek ulang kalau ada pertanyaan soal spesifikasi.');
+ /* F2 harga terisi */
+ const f2=mk('BD-2610-002','PT Dunia Mega Raya','2026-10-12','Panel kontrol kompresor Kaeser AS 36 perlu penggantian timer, contactor dan komponen kelistrikan.',[
+  it('Timer type DZT 410909/230V',1),it('Contactor Schneider LC1D50A 220V',1),it('Skun Y 2,5 mm',50),it('Skun Y 4,0 mm',25),it('Push bottom type KG5-BE 102c (merah)',1),it('Push bottom type KG5-BE 101c (hijau)',1),it('Kabel tunggal NYAF 1,5 mm',20)],'Harga Terisi');
+ submit(f2,D(10,12,10,0));
+ price(f2,D(10,13,9,0),[[650000,'Toko Listrik Mandiri'],[1250000,'Toko Listrik Mandiri'],[3500,'Toko Listrik Mandiri'],[4500,'Toko Listrik Mandiri'],[85000,'Toko Listrik Mandiri'],[85000,'Toko Listrik Mandiri'],[6500,'Toko Listrik Mandiri']]);
+ priced(f2,D(10,13,9,30));
+ C(f2,D(10,13,9,35),'Purchasing','Harga sudah terisi semua, supplier kelistrikan satu pintu.');
+ S.notifs.push({id:uid(),roles:['Sales'],fid:'BD-2610-002',text:'Harga terisi: BD-2610-002 PT Dunia Mega Raya',t:D(10,13,9,30),read:{}});
+ /* F3 pengadaan, ada barang rusak */
+ const f3=mk('BD-2610-003','PT Jati Karya','2026-10-06','Bearing motor kompresor aus, filter oli tersumbat, V-belt retak.',[
+  it('Bearing 6309 ZZ',4,185000,'CV Sumber Teknik Udara','Perlu Follow Up',{good:2,bad:2}),it('Oil filter element',2,420000,'PT Filtra Indo Perkasa','Dibeli'),it('V-belt B52',3,95000,'CV Sumber Teknik Udara','Indent',{eta:'2026-10-25',pnote:'Stok supplier habis, indent 10 hari'}),it('Grease SKF LGMT 2',1,280000,'CV Sumber Teknik Udara','In Stock',{stock:5}),it('Pressure gauge',1,350000,'CV Sumber Teknik Udara',null,{struck:true})],'Disetujui');
+ submit(f3,D(10,6,9,0));
+ f3.items.forEach((i,k)=>L(f3,D(10,7,9,k),P.Purchasing,'Purchasing',`Isi harga — ${i.name}`,'—',rn(i.price)));
+ priced(f3,D(10,7,9,20));
+ L(f3,D(10,8,10,0),P.Sales,'Sales','Ubah Harga — Oil filter element',rn(450000),rn(420000));
+ L(f3,D(10,8,10,10),P.Sales,'Sales','Coret barang — Pressure gauge','Aktif','Dicoret');
+ L(f3,D(10,8,10,30),P.Sales,'Sales','Buat Quotation v1','—','Belum Dikirim');
+ L(f3,D(10,8,11,0),P.Sales,'Sales','Kirim Quotation v1 ke rahmat@jatikarya.example','Belum Dikirim','Terkirim');
+ L(f3,D(10,9,9,0),P.Sales,'Sales','Ubah status pengajuan','Harga Terisi','Disetujui');
+ L(f3,D(10,9,13,0),P.Purchasing,'Purchasing','Ubah status pengadaan — Grease SKF LGMT 2','Belum Diproses','In Stock');
+ L(f3,D(10,9,14,0),P.Purchasing,'Purchasing','Ubah status pengadaan — Bearing 6309 ZZ','Belum Diproses','Dibeli');
+ L(f3,D(10,9,14,5),P.Purchasing,'Purchasing','Ubah status pengadaan — V-belt B52','Belum Diproses','Indent');
+ L(f3,D(10,12,10,0),P.Gudang,'Gudang','Stock In Bearing 6309 ZZ ×2 — Baik (Supplier: CV Sumber Teknik Udara)','','2 Baik');
+ L(f3,D(10,12,10,5),P.Gudang,'Gudang','Stock In Bearing 6309 ZZ ×2 — Rusak (Supplier: CV Sumber Teknik Udara)','','2 Rusak');
+ L(f3,D(10,12,10,5),'Sistem','—','Ubah status pengadaan — Bearing 6309 ZZ','Dibeli','Perlu Follow Up');
+ C(f3,D(10,12,11,0),'Purchasing','Bearing 2 pcs diretur ke supplier, menunggu pengganti.');
+ S.notifs.push({id:uid(),roles:['Purchasing'],fid:'BD-2610-003',text:'Barang Diterima Rusak: Bearing 6309 ZZ ×2 (BD-2610-003)',t:D(10,12,10,5),read:{}});
+ /* F4 siap konfirmasi */
+ const f4=mk('BD-2610-004','PT Mitra Kompresor Abadi','2026-10-01','Coupling element aus dan seal kit bocor pada kompresor screw.',[
+  it('Coupling element',1,2150000,'CV Sumber Teknik Udara','Dibeli',{good:1}),it('Seal kit',1,1350000,'CV Sumber Teknik Udara','Dibeli',{good:1})],'Disetujui');
+ submit(f4,D(10,1,9,0));priced(f4,D(10,2,9,0));
+ L(f4,D(10,3,9,0),P.Sales,'Sales','Ubah status pengajuan','Harga Terisi','Disetujui');
+ L(f4,D(10,9,13,0),P.Gudang,'Gudang','Stock In Coupling element ×1 — Baik (Supplier: CV Sumber Teknik Udara)','','1 Baik');
+ L(f4,D(10,9,13,2),P.Gudang,'Gudang','Stock In Seal kit ×1 — Baik (Supplier: CV Sumber Teknik Udara)','','1 Baik');
+ S.notifs.push({id:uid(),roles:['Teknisi'],fid:'BD-2610-004',text:'Barang Diterima Baik: BD-2610-004, siap dikonfirmasi',t:D(10,9,13,2),read:{}});
+ /* F5 selesai */
+ const f5=mk('BD-2609-005','PT Dharma Polimetal','2026-09-08','Filter element dan oil separator sudah melewati jam service.',[
+  it('Filter element',2,780000,'PT Filtra Indo Perkasa','Dibeli',{good:2}),it('Oil separator',1,2900000,'PT Filtra Indo Perkasa','Dibeli',{good:1})],'Disetujui',{conf:'Sesuai',done:true});
+ L(f5,D(9,8,9,0),P.Teknisi,'Teknisi','Ubah status pengajuan','Draft','Diajukan');
+ L(f5,D(9,17,9,0),P.Sales,'Sales','Ubah status pengajuan','Harga Terisi','Disetujui');
+ L(f5,D(9,25,15,0),P.Teknisi,'Teknisi','Ubah status konfirmasi','Menunggu','Sesuai');
+ L(f5,D(9,26,9,0),P.Teknisi,'Teknisi','Ubah status pekerjaan','Dikerjakan','Selesai');
+ /* F6 batal */
+ const f6=mk('BD-2610-006','PT ABC','2026-10-02','Penggantian kopling, klien menunda anggaran.',[it('Coupling flexible',1,1800000,'CV Sumber Teknik Udara')],'Batal');
+ L(f6,D(10,2,10,0),P.Teknisi,'Teknisi','Ubah status pengajuan','Draft','Diajukan');
+ L(f6,D(10,6,16,0),P.Sales,'Sales','Ubah status pengajuan','Harga Terisi','Batal');
+ S.forms=[f1,f2,f3,f4,f5,f6];
+ /* quotes */
+ const mkq=(f,over,sent)=>{
+  S.qseq++;const c=custBy(f.cust);
+  const v=Object.assign({ver:1,date:D(10,8,10,30),expiry:'2026-10-29',subject:`Penawaran ${f.cust}`,desc:'',owner:P.Sales,pic:c.pic,email:c.email,addr:c.addr,lead:'',termin:'DP 50% setelah PO, pelunasan setelah pekerjaan selesai',estimasi:'7-14 hari kerja setelah barang diterima',catatan:'',status:'Belum Dikirim',sentTo:'',cc:'',sentAt:null,items:act(f).map(i=>({iid:i.id,name:i.name,qty:i.qty,price:i.price,disc:0}))},over||{});
+  if(sent){v.status='Terkirim';v.sentTo=c.email;v.sentAt=v.date+3600000}
+  S.quotes.push({id:'Q'+S.qseq,number:qno(S.qseq),formId:f.id,versions:[v]});
+ };
+ mkq(f3,{},true);
+ mkq(f4,{date:D(10,3,9,30),expiry:'2026-10-20'},true);
+ mkq(f5,{date:D(9,12,9,0),expiry:'2026-09-30'},true);
+ /* quote legacy (sudah ada di app live) */
+ const leg=(id,n,subj,pic,email,price)=>S.quotes.push({id,number:n,formId:null,versions:[{ver:1,date:D(9,23,9,0),expiry:'2026-09-30',subject:subj,desc:'',owner:'Sales',pic,email,addr:'',lead:'',termin:'',estimasi:'',catatan:'',status:'Belum Dikirim',sentTo:'',cc:'',sentAt:null,items:[{iid:uid(),name:'Jasa testing',qty:1,price,disc:0}]}]});
+ leg('QL1','Q-LIVE-001','Testing penawaran PT jati karya','Andi (HO) - Jakarta','',3000000);
+ leg('QL2','Q-LIVE-002','testing penawaran PT ABC','John','',100000);
+}
+
+/* ===== derived ===== */
+const PRC={'Perlu Follow Up':5,'Belum Diproses':4,'Indent':3,'Dibeli':2,'In Stock':1};
+function procOf(f){if(f.status!=='Disetujui')return'—';const ps=act(f).map(i=>i.proc||'Belum Diproses');if(!ps.length)return'—';return ps.sort((a,b)=>PRC[b]-PRC[a])[0]}
+const okItem=i=>i.proc==='In Stock'||(!!i.proc&&i.good>=i.qty);
+const allGood=f=>act(f).length>0&&act(f).every(okItem);
+function recvOf(f){if(procOf(f)==='—')return'—';const a=act(f);if(a.some(i=>i.proc==='Perlu Follow Up'))return'Diterima Rusak';if(a.every(i=>i.proc==='In Stock'))return'Tidak Perlu';if(allGood(f))return'Diterima Baik';return'Belum Diterima'}
+function turnRaw(f){
+ if(f.done||f.status==='Batal')return null;
+ if(f.status==='Draft')return{role:'Teknisi',text:'Lengkapi daftar barang lalu ajukan form.'};
+ if(f.status==='Diajukan')return{role:'Purchasing',text:'Isi harga dan supplier tiap barang, lalu kirim ke Sales.'};
+ if(f.status==='Harga Terisi')return{role:'Sales',text:'Sesuaikan harga dan qty, coret barang yang tidak dibutuhkan customer, kirim quotation, lalu putuskan Disetujui atau Batal.'};
+ const p=procOf(f);
+ if(p==='Belum Diproses'||p==='Perlu Follow Up')return{role:'Purchasing',text:p==='Belum Diproses'?'Cek barang yang disetujui customer: tandai In Stock, Dibeli, atau Indent.':'Follow up retur ke supplier, lalu kembali ke status Dibeli.'};
+ if(!allGood(f))return{role:'Gudang',text:'Stock In barang yang datang beserta kondisinya.'};
+ if(f.conf==='Tidak Sesuai')return{role:'Sales',text:'Pekerjaan terkunci. Revisi form bersama klien.'};
+ if(f.conf==='Sesuai')return{role:'Teknisi',text:'Barang sesuai. Kerjakan breakdown.'};
+ return{role:'Teknisi',text:'Cek barang lalu konfirmasi Sesuai atau Tidak Sesuai.'};
+}
+function turnOf(f){const t=turnRaw(f);if(t&&S.role==='Sales'&&t.role==='Gudang')return{role:'Purchasing',text:'Pengadaan barang sedang berjalan.'};return t}
+function stepOf(f){
+ const q=getQ(f.id);
+ if(f.status==='Draft')return{cur:0};
+ if(f.status==='Diajukan')return{cur:1};
+ if(f.status==='Harga Terisi')return{cur:(q&&lastV(q).status==='Terkirim')?3:2};
+ if(f.status==='Batal')return{cur:3,stop:true};
+ if(f.done)return{cur:8};
+ if(f.conf==='Sesuai')return{cur:7};
+ if(allGood(f))return{cur:6,warn:f.conf==='Tidak Sesuai'};
+ const p=procOf(f);
+ if(p==='Belum Diproses'||p==='Perlu Follow Up')return{cur:4};
+ return{cur:5};
+}
+const STEPS=[['Ajukan form','Teknisi'],['Isi harga','Purchasing'],['Edit & quotation','Sales'],['Keputusan','Sales'],['Pengadaan','Purchasing'],['Penerimaan','Gudang'],['Konfirmasi','Teknisi'],['Kerjakan','Teknisi']];
+const canStruct=f=>(S.role==='Teknisi'&&f.status==='Draft')||(S.role==='Sales'&&f.status==='Harga Terisi');
+const canPrice=f=>(S.role==='Purchasing'&&f.status==='Diajukan')||(S.role==='Sales'&&f.status==='Harga Terisi');
+const canSup=f=>S.role==='Purchasing'&&f.status==='Diajukan';
+
+/* ===== side effects ===== */
+function toast(msg,kind){const d=document.createElement('div');d.className='toast '+(kind||'');d.textContent=msg;$('#toasts').appendChild(d);setTimeout(()=>d.remove(),kind==='bad'?5200:3600)}
+function log(f,act,o,n,sys){f.log.push({t:now().getTime(),user:sys?'Sistem':PERSON[S.role],role:sys?'—':S.role,act,o:o==null?'':o,n:n==null?'':n})}
+function notify(roles,fid,text){S.notifs.unshift({id:uid(),roles,fid,text,t:now().getTime(),read:{}});toast(`Notifikasi ke ${roles.join(' & ')}: ${text}`,'info')}
+const FL={name:'Nama Barang',qty:'Qty',price:'Harga',supplier:'Supplier',eta:'Estimasi Tiba',pnote:'Catatan Purchasing'};
+const fv=(k,v)=>k==='price'?(v?rn(v):'—'):(v===''||v==null?'—':String(v));
+
+function newVersion(q,why){
+ const lv=lastV(q),v=JSON.parse(JSON.stringify(lv));
+ v.ver=lv.ver+1;v.date=now().getTime();v.status='Belum Dikirim';v.sentTo='';v.cc='';v.sentAt=null;
+ q.versions.push(v);(S.ui.qv=S.ui.qv||{})[q.id]=q.versions.length-1;
+ const f=q.formId&&getF(q.formId);
+ if(f)log(f,`Buat Quotation v${v.ver} (${why})`,'—','Belum Dikirim');
+ toast(`Versi baru dibuat: Quotation v${v.ver}. Versi lama tetap tersimpan.`,'info');
+ return v;
+}
+function syncQuote(f){
+ const q=getQ(f.id);if(!q)return;
+ let v=lastV(q);
+ if(v.status==='Terkirim')v=newVersion(q,'revisi harga atau qty setelah terkirim');
+ const old=v.items;
+ v.items=act(f).map(i=>({iid:i.id,name:i.name,qty:i.qty,price:i.price,disc:(old.find(o=>o.iid===i.id)||{}).disc||0}));
+}
+
+/* ===== actions ===== */
+const A={};
+A.go=h=>{location.hash=h};
+A.setRole=r=>{S.role=r;S.ui.bell=false;toast(`Masuk sebagai ${PERSON[r]} (${r})`);render()};
+A.reset=()=>{seed();location.hash='#/breakdown';render();toast('Data demo dikembalikan ke awal','ok')};
+A.dark=()=>{const r=document.documentElement,d=r.getAttribute('data-theme')==='dark'||(!r.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches);r.setAttribute('data-theme',d?'light':'dark');render()};
+A.live=n=>toast(`Menu ${n} sudah live di app dan tidak dibuat ulang di prototype ini.`);
+A.bell=()=>{S.ui.bell=!S.ui.bell;render()};
+A.readAll=()=>{S.notifs.forEach(n=>{if(n.roles.includes(S.role))n.read[S.role]=true});render()};
+A.openN=id=>{const n=S.notifs.find(x=>x.id===id);if(!n)return;n.read[S.role]=true;S.ui.bell=false;A.go(n.link||('#/breakdown/'+n.fid));render()};
+A.strike=(fid,iid)=>{const f=getF(fid),it=f.items.find(i=>i.id===iid);if(S.role!=='Sales'||f.status!=='Harga Terisi')return;
+ if(!it.struck&&act(f).length<2){toast('Minimal satu barang harus tetap aktif.','bad');return}
+ it.struck=!it.struck;log(f,`${it.struck?'Coret':'Batal coret'} barang — ${it.name}`,it.struck?'Aktif':'Dicoret',it.struck?'Dicoret':'Aktif');syncQuote(f);
+ toast(it.struck?'Barang dicoret. Tidak ikut dibeli dan tidak masuk quotation.':'Coret dibatalkan.',it.struck?'info':'');render()};
+A.followUp=cid=>{const c=S.customers.find(x=>x.id===cid);c.acts.push({date:iso(TODAY()),what:'Follow up (demo)'});S.notifs=S.notifs.filter(n=>n.cid!==cid);toast(`Follow up ${c.name} dicatat sebagai Activity. Notifikasi dihapus.`,'ok');render()};
+A.close=()=>{S.modal=null;render()};
+A.modal=(type,data)=>{S.modal=Object.assign({type},data||{});render()};
+A.ask=(title,text,ok,fn)=>{S.modal={type:'confirm',title,text,okLabel:ok,fn};render()};
+A.okAsk=()=>{const fn=S.modal&&S.modal.fn;S.modal=null;if(fn)fn();render()};
+A.setUI=(k,v)=>{S.ui[k]=v;render()};
+A.tog=k=>{S.ui[k]=!S.ui[k];render()};
+
+/* create form */
+A.nfInit=()=>{S.ui.nf={cust:'',date:iso(TODAY()),analysis:'',note:'',items:[{name:'',qty:1}]};S.ui.nfErr=null};
+A.nf=(k,v)=>{S.ui.nf[k]=v};
+A.nfItem=(i,k,v)=>{S.ui.nf.items[i][k]=k==='qty'?Number(v):v};
+A.nfAdd=()=>{S.ui.nf.items.push({name:'',qty:1});render()};
+A.nfDel=i=>{if(S.ui.nf.items.length>1){S.ui.nf.items.splice(i,1);render()}};
+A.nfSave=submit=>{
+ const n=S.ui.nf,e={};
+ if(submit){
+  if(!n.cust)e.cust='Pilih customer.';
+  if(!n.date)e.date='Isi tanggal analisa.';
+  if(!n.analysis.trim())e.analysis='Hasil analisa wajib diisi.';
+  if(!n.items.some(i=>i.name.trim()&&i.qty>0))e.items='Isi minimal satu barang dengan nama dan qty.';
+  else if(n.items.some(i=>(i.name.trim()&&!(i.qty>0))||(!i.name.trim()&&i.qty>0&&n.items.length>1&&false)))e.items='Qty harus lebih dari 0.';
+ }else if(!n.cust){e.cust='Pilih customer untuk menyimpan draft.'}
+ if(Object.keys(e).length){S.ui.nfErr=e;render();toast('Form belum lengkap. Cek field yang ditandai.','bad');return}
+ S.fseq++;
+ const id=`BD-2610-${String(S.fseq).padStart(3,'0')}`;
+ const f={id,cust:n.cust,tech:PERSON.Teknisi,date:n.date,analysis:n.analysis.trim(),note:n.note.trim(),items:n.items.filter(i=>i.name.trim()&&i.qty>0).map(i=>({id:uid(),name:i.name.trim(),qty:i.qty,price:0,supplier:'',proc:null,eta:'',pnote:'',good:0,bad:0})),status:submit?'Diajukan':'Draft',conf:'Menunggu',confNote:'',done:false,log:[],comments:[]};
+ S.forms.unshift(f);
+ log(f,'Buat form','—','Draft');
+ if(submit){log(f,'Ubah status pengajuan','Draft','Diajukan');notify(['Purchasing'],id,`Form Diajukan: ${id} ${f.cust}`)}
+ else toast('Draft tersimpan','ok');
+ S.ui.nf=null;A.go('#/breakdown/'+id);render();
+};
+A.submitDraft=fid=>{
+ const f=getF(fid);
+ if(!f.items.length||f.items.some(i=>!i.name.trim()||!(i.qty>0))){toast('Lengkapi nama dan qty semua barang dulu.','bad');return}
+ f.status='Diajukan';log(f,'Ubah status pengajuan','Draft','Diajukan');notify(['Purchasing'],f.id,`Form Diajukan: ${f.id} ${f.cust}`);render();
+};
+
+/* items */
+A.editItem=(fid,iid,k,val)=>{
+ const f=getF(fid),it=f.items.find(i=>i.id===iid);if(!it)return;
+ if(k==='price'&&!canPrice(f))return;
+ if((k==='name'||k==='qty')&&!canStruct(f))return;
+ if(k==='supplier'&&!canSup(f))return;
+ let nv=(k==='qty'||k==='price')?Number(val):String(val).trim();
+ if(k==='qty'&&!(nv>=1)){toast('Qty minimal 1.','bad');render();return}
+ if(k==='price'&&!(nv>=0)){toast('Harga tidak valid.','bad');render();return}
+ if(k==='name'&&!nv){toast('Nama barang tidak boleh kosong.','bad');render();return}
+ const ov=it[k];if(ov===nv)return;
+ it[k]=nv;
+ log(f,`Ubah ${FL[k]} — ${k==='name'?ov:it.name}`,fv(k,ov),fv(k,nv));
+ if(S.role==='Sales')syncQuote(f);
+ render();
+};
+A.addItem=fid=>{
+ const f=getF(fid),nm=($('#ai-name')||{}).value||'',q=Number(($('#ai-qty')||{}).value);
+ if(!nm.trim()||!(q>=1)){toast('Isi nama barang dan qty minimal 1.','bad');return}
+ f.items.push({id:uid(),name:nm.trim(),qty:q,price:0,supplier:'',proc:null,eta:'',pnote:'',good:0,bad:0});
+ log(f,'Tambah barang','—',`${nm.trim()} × ${q}`);
+ if(S.role==='Sales')syncQuote(f);
+ render();
+};
+A.delItem=(fid,iid)=>{
+ const f=getF(fid),it=f.items.find(i=>i.id===iid);
+ if(f.items.length<2){toast('Form harus punya minimal satu barang.','bad');return}
+ A.ask('Hapus barang?',`${it.name} akan dihapus dari form. Penghapusan tercatat di log perubahan.`,'Hapus',()=>{
+  f.items=f.items.filter(i=>i.id!==iid);log(f,'Hapus barang',`${it.name} × ${it.qty}`,'—');if(S.role==='Sales')syncQuote(f);});
+};
+
+/* pricing */
+A.sendToSales=fid=>{
+ const f=getF(fid);
+ if(f.items.some(i=>!(i.price>0)||!i.supplier)){S.ui.attempt=fid;render();toast('Harga dan supplier wajib terisi untuk semua barang.','bad');return}
+ f.status='Harga Terisi';log(f,'Ubah status pengajuan','Diajukan','Harga Terisi');notify(['Sales'],f.id,`Harga Terisi: ${f.id} ${f.cust}`);S.ui.attempt=null;render();
+};
+A.decide=(fid,res)=>{
+ const f=getF(fid);
+ A.ask(res==='Disetujui'?'Tandai Disetujui?':'Batalkan form?',
+  res==='Disetujui'?'Form masuk ke antrean pengadaan Purchasing. Isi form terkunci setelah keputusan.':'Form ditutup dan tidak masuk antrean Purchasing.',
+  res==='Disetujui'?'Disetujui':'Batalkan form',()=>{
+   const old=f.status;f.status=res;log(f,'Ubah status pengajuan',old,res);
+   
+   notify(['Purchasing','Teknisi'],f.id,`${res}: ${f.id} ${f.cust}`);});
+};
+A.reviseForm=fid=>{
+ const f=getF(fid);
+ A.ask('Revisi form?','Form kembali ke Sales untuk direvisi, konfirmasi teknisi di-reset ke Menunggu. Aturan revisi ini masih TBC di PRD.','Revisi form',()=>{
+  f.status='Harga Terisi';f.conf='Menunggu';log(f,'Ubah status pengajuan','Disetujui','Harga Terisi');log(f,'Ubah status konfirmasi','Tidak Sesuai','Menunggu');toast('Form kembali ke Sales untuk direvisi','info');});
+};
+
+/* procurement */
+A.setProc=(fid,iid,v)=>{
+ const f=getF(fid),it=f.items.find(i=>i.id===iid);if(S.role!=='Purchasing'||!v||it.proc===v)return;
+ log(f,`Ubah status pengadaan — ${it.name}`,it.proc||'Belum Diproses',v);it.proc=v;if(allGood(f))notify(['Teknisi'],f.id,`Barang siap: ${f.id} bisa dikonfirmasi`);render();
+};
+A.procInfo=(fid,iid,k,v)=>{
+ const f=getF(fid),it=f.items.find(i=>i.id===iid);if(S.role!=='Purchasing'||it[k]===v.trim())return;
+ log(f,`Ubah ${FL[k]} — ${it.name}`,fv(k,it[k]),fv(k,v.trim()));it[k]=v.trim();render();
+};
+A.resolveFU=(fid,iid)=>{
+ const f=getF(fid),it=f.items.find(i=>i.id===iid);
+ log(f,`Follow up retur selesai — ${it.name} ×${it.bad} dikembalikan ke ${it.supplier}`,'Perlu Follow Up','Dibeli');
+ it.bad=0;it.proc='Dibeli';toast('Barang dibeli ulang. Gudang bisa mencatat penerimaan lagi.','ok');render();
+};
+A.allBought=fid=>{
+ const f=getF(fid);let n=0;
+ act(f).forEach(i=>{if(!i.proc){log(f,`Ubah status pengadaan — ${i.name}`,'Belum Diproses','Dibeli');i.proc='Dibeli';n++}});
+ toast(n?`${n} barang ditandai Dibeli`:'Semua barang sudah punya status pengadaan',n?'ok':'');render();
+};
+
+/* receiving */
+const remain=i=>Math.max(i.qty-i.good-i.bad,0);
+A.recv=(fid,iid)=>{const it=getF(fid).items.find(i=>i.id===iid);A.modal('receive',{fid,iid,date:iso(TODAY()),qty:remain(it)})};
+A.saveRecv=()=>{
+ const m=S.modal,f=getF(m.fid),it=f.items.find(i=>i.id===m.iid);
+ const q=Number($('#rv-qty').value),cond=$('#rv-cond').value,date=$('#rv-date').value,note=$('#rv-note').value.trim();
+ const er=$('#rv-err');
+ if(!date||!(q>=1)){er.textContent='Isi tanggal terima dan qty minimal 1.';return}
+ if(q>remain(it)){er.textContent=`Qty melebihi sisa pesanan (${remain(it)}).`;return}
+ S.modal=null;
+ log(f,`Stock In ${it.name} ×${q} — ${cond} (Supplier: ${it.supplier})${note?` · ${note}`:''}`,'',`${q} ${cond}`);
+ if(cond==='Baik'){it.good+=q;it.stock=(it.stock||0)+q;if(allGood(f))notify(['Teknisi'],f.id,`Barang Diterima Baik: ${f.id} siap dikonfirmasi`)}
+ else{it.bad+=q;const ov=it.proc;it.proc='Perlu Follow Up';log(f,`Ubah status pengadaan — ${it.name}`,ov,'Perlu Follow Up',true);notify(['Purchasing'],f.id,`Barang Diterima Rusak: ${it.name} ×${q} (Supplier ${it.supplier})`)}
+ render();
+};
+A.recvAll=fid=>{
+ const f=getF(fid);let n=0;
+ act(f).forEach(i=>{if((i.proc==='Dibeli'||i.proc==='Indent')&&remain(i)>0){const q=remain(i);i.good+=q;log(f,`Stock In ${i.name} ×${q} — Baik (Supplier: ${i.supplier})`,'',`${q} Baik`);n++}});
+ if(!n){toast('Tidak ada barang yang siap diterima (harus berstatus Dibeli atau Indent).','bad');return}
+ toast(`${n} barang dicatat Diterima Baik`,'ok');if(allGood(f))notify(['Teknisi'],f.id,`Barang Diterima Baik: ${f.id} siap dikonfirmasi`);render();
+};
+
+/* confirm & finish */
+A.confirm=(fid,res)=>{
+ const f=getF(fid),note=(($('#cf-note')||{}).value||'').trim();
+ if(res==='Tidak Sesuai'&&!note){S.ui.cfErr=true;render();toast('Tulis catatan alasan Tidak Sesuai.','bad');return}
+ S.ui.cfErr=false;f.confNote=note;log(f,'Ubah status konfirmasi'+(note?` · ${note}`:''),f.conf,res);f.conf=res;
+ if(res==='Tidak Sesuai')notify(['Sales','Purchasing'],f.id,`Konfirmasi Tidak Sesuai: ${f.id} ${f.cust}`);else toast('Konfirmasi Sesuai. Tombol kerjakan breakdown aktif.','ok');
+ render();
+};
+A.finish=fid=>{const f=getF(fid);A.ask('Kerjakan breakdown?','Prototype: pekerjaan langsung ditandai Selesai.','Tandai Selesai',()=>{f.done=true;log(f,'Ubah status pekerjaan','Dikerjakan','Selesai');toast('Breakdown selesai','ok')})};
+
+/* comments */
+A.comment=fid=>{
+ const f=getF(fid),t=($('#cm-in')||{}).value||'';if(!t.trim())return;
+ f.comments.push({t:now().getTime(),role:S.role,user:PERSON[S.role],text:t.trim()});
+ const others=ROLES.filter(r=>r!==S.role);
+ S.notifs.unshift({id:uid(),roles:others,fid,text:`Comment baru dari ${S.role}: ${f.id}`,t:now().getTime(),read:{}});
+ toast(`Comment terkirim. Role lain di form ini dinotifikasi.`,'ok');render();
+};
+
+/* quotation */
+A.makeQuote=fid=>{
+ const f=getF(fid),c=custBy(f.cust);
+ S.qseq++;const id='Q'+S.qseq;
+ const exp=new Date(TODAY());exp.setDate(exp.getDate()+14);
+ S.quotes.push({id,number:qno(S.qseq),formId:fid,versions:[{ver:1,date:now().getTime(),expiry:iso(exp),subject:`Penawaran ${f.cust}`,desc:'',owner:PERSON.Sales,pic:c.pic||'',email:c.email||'',addr:c.addr||'',lead:'',termin:'DP 50% setelah PO, pelunasan setelah pekerjaan selesai',estimasi:'7-14 hari kerja setelah barang diterima',catatan:'',status:'Belum Dikirim',sentTo:'',cc:'',sentAt:null,items:act(f).map(i=>({iid:i.id,name:i.name,qty:i.qty,price:i.price,disc:0}))}]});
+ log(f,'Buat Quotation v1','—','Belum Dikirim');toast('Quotation dibuat dari Form Breakdown. Item dan harga terisi otomatis.','ok');
+ S.ui.qtab='info';A.go('#/quotes/'+id);
+};
+function editableQ(q){return S.role==='Sales'&&((S.ui.qv&&S.ui.qv[q.id]!=null)?S.ui.qv[q.id]:q.versions.length-1)===q.versions.length-1}
+A.qset=(qid,k,val)=>{
+ const q=getQid(qid);if(!q||!editableQ(q))return;
+ let v=lastV(q);if(v[k]===val)return;
+ if(v.status==='Terkirim')v=newVersion(q,'revisi isi quotation');
+ v[k]=val;render();
+};
+A.qdisc=(qid,iid,val)=>{
+ const q=getQid(qid);if(!q||!editableQ(q))return;
+ let v=lastV(q);const n=Math.max(Number(val)||0,0);
+ const cur=v.items.find(i=>i.iid===iid);if(cur.disc===n)return;
+ if(v.status==='Terkirim')v=newVersion(q,'revisi diskon');
+ v.items.find(i=>i.iid===iid).disc=n;render();
+};
+A.qver=(qid,i)=>{(S.ui.qv=S.ui.qv||{})[qid]=i;render()};
+A.qtab=t=>{S.ui.qtab=t;render()};
+A.saveQ=()=>toast('Quote disimpan.','ok');
+A.send=qid=>{const q=getQid(qid),v=lastV(q);A.modal('send',{qid,to:v.sentTo||v.email,cc:v.cc||''})};
+A.doSend=()=>{
+ const m=S.modal,q=getQid(m.qid),v=lastV(q),f=q.formId&&getF(q.formId);
+ const to=$('#sd-to').value.trim(),cc=$('#sd-cc').value.trim(),fail=$('#sd-fail').checked,er=$('#sd-err');
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)){er.textContent='Email tujuan belum valid. Email PIC wajib untuk pengiriman.';return}
+ const resend=!!v.sentAt||v.status==='Gagal Kirim',old=v.status;
+ v.sentTo=to;v.cc=cc;v.sentAt=now().getTime();v.status=fail?'Gagal Kirim':'Terkirim';
+ S.modal=null;
+ if(f)log(f,`${resend?'Kirim ulang':'Kirim'} Quotation v${v.ver} ke ${to}${cc?` (CC ${cc})`:''}`,old,v.status);
+ toast(fail?`Pengiriman gagal ke ${to}. Kirim ulang dari halaman quote.`:`Quotation v${v.ver} terkirim ke ${to}`,fail?'bad':'ok');render();
+};
+A.preview=(qid,i)=>A.modal('preview',{qid,vi:i});
+
+/* suppliers */
+A.supEdit=id=>A.modal('supplier',{id});
+A.supSave=()=>{
+ const m=S.modal,name=$('#sp-name').value.trim(),er=$('#sp-err');
+ if(!name){er.textContent='Nama supplier wajib diisi.';return}
+ const o={name,contact:$('#sp-contact').value.trim(),cats:$('#sp-cats').value.split(',').map(s=>s.trim()).filter(Boolean),active:$('#sp-active').value==='1'};
+ if(m.id){Object.assign(S.suppliers.find(s=>s.id===m.id),o)}else S.suppliers.unshift(Object.assign({id:uid()},o));
+ S.modal=null;toast('Supplier disimpan.','ok');render();
+};
+A.supTog=id=>{const s=S.suppliers.find(x=>x.id===id);s.active=!s.active;toast(`${s.name} ${s.active?'diaktifkan':'dinonaktifkan'}`);render()};
+
+/* ===== views ===== */
+const pager=n=>`<div class="pager">Per Page <select aria-label="Per page"><option>10</option></select> 1 - ${n} of ${n}</div>`;
+const head=(crumbs,title,acts)=>`<div class="card"><div class="phead"><div><div class="crumb"><a href="#/breakdown">Dashboard</a>${crumbs.map(c=>` / ${c[1]?`<a href="${c[1]}">${esc(c[0])}</a>`:esc(c[0])}`).join('')}</div><h1>${esc(title)}</h1></div><div class="acts">${acts||''}</div></div></div>`;
+const turnB=f=>{const t=turnOf(f);return t?roleB(t.role):'<span class="b gray">—</span>'};
+
+function pgList(){
+ const u=S.ui,q=(u.lq||'').toLowerCase();
+ const rows=S.forms.filter(f=>(!q||(f.id+' '+f.cust).toLowerCase().includes(q))&&(!u.lst||f.status===u.lst)&&(!u.mine||(turnOf(f)&&turnOf(f).role===S.role)));
+ const mineN=S.forms.filter(f=>turnOf(f)&&turnOf(f).role===S.role).length;
+ return head([['Form Breakdown']],'Form Breakdown',`<button class="btn" onclick="A.go('#/breakdown/new')" ${S.role!=='Teknisi'?'title="Form baru hanya dibuat oleh Teknisi"':''}>${ic('plus')}Buat Form</button>`)+
+ `<div class="card"><div class="tools"><div class="spill">${ic('search')}<input data-keep="lq" placeholder="Search" aria-label="Search" value="${esc(u.lq||'')}" oninput="A.setUI('lq',this.value)"></div>
+ <button class="btn info" onclick="A.tog('lf')">Filter</button>
+ <label style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" ${u.mine?'checked':''} onchange="A.setUI('mine',this.checked)"> Giliran ${esc(S.role)} <span class="b ${mineN?'pri':'gray'}">${mineN}</span></label>
+ ${pager(rows.length)}</div>
+ ${u.lf?`<div class="filt"><div><label class="l">Status pengajuan</label><select onchange="A.setUI('lst',this.value)"><option value="">Semua</option>${['Draft','Diajukan','Harga Terisi','Disetujui','Batal'].map(s=>`<option ${u.lst===s?'selected':''}>${s}</option>`).join('')}</select></div></div>`:''}
+ <div class="wrapx"><table class="tbl"><thead><tr><th>No. Form</th><th>Customer</th><th>Teknisi</th><th>Tanggal Analisa</th><th>Pengajuan</th><th>Pengadaan</th>${S.role==='Sales'?'':'<th>Penerimaan</th>'}<th>Konfirmasi</th><th>Giliran</th><th class="num">Total Harga</th><th>Quotation</th></tr></thead><tbody>
+ ${rows.map(f=>{const qq=getQ(f.id),v=qq&&lastV(qq);return `<tr class="row" onclick="A.go('#/breakdown/${f.id}')"><td><a>${f.id}</a></td><td>${esc(f.cust)}</td><td>${esc(f.tech)}</td><td>${fd(f.date)}</td><td>${badge(f.done?'Selesai':f.status)}</td><td>${badge(procOf(f))}</td>${S.role==='Sales'?'':`<td>${badge(recvOf(f))}</td>`}<td>${badge(f.status==='Batal'||f.status==='Draft'||f.status==='Diajukan'||f.status==='Harga Terisi'?'—':f.conf)}</td><td>${turnB(f)}</td><td class="num">${total(f)?rp(total(f)):'—'}</td><td>${v?`v${v.ver} ${badge(v.status)}${expired(v)?' '+badge('Kedaluwarsa'):''}`:'—'}</td></tr>`}).join('')||`<tr><td colspan="11" class="empty">Tidak ada form yang cocok dengan filter.</td></tr>`}
+ </tbody></table></div></div>`;
+}
+
+function pgNew(){
+ if(S.role!=='Teknisi')return head([['Form Breakdown','#/breakdown'],['Buat Form']],'Buat Form Breakdown')+`<div class="card"><div class="banner stop" style="margin:0">${ic('lock')}<div><b>Form baru hanya bisa dibuat oleh Teknisi</b>Anda login sebagai ${esc(S.role)}. Ganti role untuk mencoba mengisi form analisa.</div></div><div class="acts" style="margin-top:14px"><button class="btn" onclick="A.setRole('Teknisi')">Masuk sebagai Teknisi</button></div></div>`;
+ if(!S.ui.nf)A.nfInit();
+ const n=S.ui.nf,e=S.ui.nfErr||{};
+ return head([['Form Breakdown','#/breakdown'],['Buat Form']],'Buat Form Breakdown',`<button class="btn sec" onclick="A.nfSave(false)">Simpan draft</button><button class="btn" onclick="A.nfSave(true)">Ajukan form</button>`)+
+ `<div class="card"><h3>Hasil analisa</h3><p class="sub">Catat hasil analisa lapangan. Setelah diajukan, form tidak bisa diedit teknisi.</p>
+ <div class="grid2">
+ <div class="fld"><label class="l">Customer <span class="req">*</span></label><select class="${e.cust?'miss':''}" onchange="A.nf('cust',this.value)"><option value="">Click to add</option>${S.customers.map(c=>`<option ${n.cust===c.name?'selected':''}>${esc(c.name)}</option>`).join('')}</select>${e.cust?`<div class="err">${e.cust}</div>`:''}</div>
+ <div class="fld"><label class="l">Tanggal analisa <span class="req">*</span></label><input type="date" class="${e.date?'miss':''}" value="${n.date}" oninput="A.nf('date',this.value)">${e.date?`<div class="err">${e.date}</div>`:''}</div>
+ <div class="fld"><label class="l">Teknisi</label><input value="${PERSON.Teknisi}" disabled></div>
+ <div class="fld full"><label class="l">Hasil analisa <span class="req">*</span></label><textarea class="${e.analysis?'miss':''}" oninput="A.nf('analysis',this.value)">${esc(n.analysis)}</textarea>${e.analysis?`<div class="err">${e.analysis}</div>`:''}</div>
+ </div></div>
+ <div class="card"><h3>Daftar barang <span class="req">*</span></h3><p class="sub">Nama dan qty barang yang dibutuhkan. Purchasing mengisi harga dan supplier di tahap berikutnya.</p>
+ <div class="wrapx"><table class="tbl"><thead><tr><th style="width:50px">No</th><th>Nama barang</th><th class="num" style="width:120px">Qty</th><th style="width:60px"></th></tr></thead><tbody>
+ ${n.items.map((i,k)=>`<tr><td>${k+1}</td><td><input value="${esc(i.name)}" placeholder="Contoh: Filter dryer DML 163s" oninput="A.nfItem(${k},'name',this.value)" aria-label="Nama barang ${k+1}"></td><td class="num"><input class="q" type="number" min="1" value="${i.qty}" oninput="A.nfItem(${k},'qty',this.value)" aria-label="Qty ${k+1}"></td><td><button class="btn sec sm" onclick="A.nfDel(${k})" aria-label="Hapus baris ${k+1}">${ic('trash')}</button></td></tr>`).join('')}
+ </tbody></table></div>${e.items?`<div class="err">${e.items}</div>`:''}
+ <div class="acts" style="margin-top:12px"><button class="btn info sm" onclick="A.nfAdd()">${ic('plus')}Tambah barang</button></div></div>
+ <div class="card"><h3>Catatan</h3><textarea oninput="A.nf('note',this.value)" placeholder="Opsional">${esc(n.note)}</textarea></div>`;
+}
+
+function stepper(f){
+ const s=stepOf(f),sales=S.role==='Sales';
+ const list=STEPS.map((x,i)=>({x,i})).filter(o=>!(sales&&o.i===5));
+ const cur=(sales&&s.cur===5)?4:s.cur;
+ return `<div class="steps" role="list">${list.map((o,pos)=>{
+  const i=o.i;let c='';if(s.cur===8||i<cur)c='done';else if(i===cur)c=s.stop?'stop':(s.warn?'warn':'cur');
+  const lab=c==='done'?'✓':(c==='stop'?'✕':pos+1);
+  const nm=(i===3&&s.stop)?'Batal':o.x[0];
+  return `<div class="st ${c}" role="listitem"><i>${lab}</i><b>${nm}</b><small>${o.x[1]}</small></div>`}).join('')}</div>`;
+}
+
+function pgDetail(id){
+ const f=getF(id);if(!f)return head([['Form Breakdown','#/breakdown'],['Tidak ditemukan']],'Form tidak ditemukan');
+ const r=S.role,q=getQ(f.id),v=q&&lastV(q),turn=turnOf(f),st=stepOf(f);
+ const att=S.ui.attempt===f.id;
+ /* header actions */
+ let acts='';
+ if(r==='Teknisi'&&f.status==='Draft')acts=`<button class="btn" onclick="A.submitDraft('${f.id}')">Ajukan form</button>`;
+ if(r==='Purchasing'&&f.status==='Diajukan')acts=`<button class="btn" onclick="A.sendToSales('${f.id}')">${ic('send')}Kirim ke Sales</button>`;
+ if(r==='Sales'&&f.status==='Harga Terisi')acts=`<button class="btn danger" onclick="A.decide('${f.id}','Batal')">Batal</button><button class="btn" onclick="A.decide('${f.id}','Disetujui')">Disetujui</button>`;
+ if(r==='Sales'&&f.status==='Disetujui'&&f.conf==='Tidak Sesuai'&&!f.done)acts=`<button class="btn" onclick="A.reviseForm('${f.id}')">Revisi form</button>`+tbc('Aturan revisi saat Tidak Sesuai masih TBC di PRD (jalur pengecualian).');
+ if(r==='Teknisi'&&f.conf==='Sesuai'&&!f.done&&f.status==='Disetujui')acts=`<button class="btn" onclick="A.finish('${f.id}')">Kerjakan breakdown</button>`;
+ /* banner */
+ let ban;
+ if(f.status==='Batal')ban=`<div class="banner stop">${ic('alert')}<div><b>Form dibatalkan</b>Sales menutup form setelah negosiasi. Form tidak masuk antrean Purchasing.</div></div>`;
+ else if(f.done)ban=`<div class="banner">${ic('info')}<div><b>Breakdown selesai</b>Semua tahap sudah dilalui. Log perubahan tetap bisa dilihat.</div></div>`;
+ else if(turn&&turn.role===r)ban=`<div class="banner turn">${ic('user')}<div><b>Giliran Anda (${r})</b>${turn.text}</div></div>`;
+ else ban=`<div class="banner">${ic('lock')}<div><b>Menunggu ${turn?turn.role:'—'}</b>${turn?turn.text+' ':''}Sebagai ${r}, Anda bisa melihat form, menulis comment, dan membaca log di tahap ini.</div></div>`;
+ /* items card */
+ const cs=canStruct(f),cp=canPrice(f),csu=canSup(f),showPrice=f.status!=='Draft'&&f.status!=='Diajukan'||r==='Purchasing'||f.status==='Diajukan';
+ const nStr=f.items.filter(i=>i.struck).length;
+ const salesHint=(r==='Sales'&&f.status==='Harga Terisi')?`<div class="hint">${ic('info')}Barang yang tidak dibutuhkan customer dicoret, bukan dihapus. Tetap tampil di daftar, tapi tidak ikut dibeli dan tidak masuk quotation.</div>`:'';
+ const itemsRows=f.items.map((i,k)=>{
+  const x=!!i.struck;
+  const nameC=(cs&&!x)?`<input value="${esc(i.name)}" onchange="A.editItem('${f.id}','${i.id}','name',this.value)" aria-label="Nama barang">`:(x?`<s>${esc(i.name)}</s> <span class="b gray">Dicoret</span>`:esc(i.name));
+  const qtyC=(cs&&!x)?`<input class="q" type="number" min="1" value="${i.qty}" onchange="A.editItem('${f.id}','${i.id}','qty',this.value)" aria-label="Qty">`:(x?`<s>${i.qty}</s>`:i.qty);
+  const prC=(cp&&!x)?`<input class="p ${att&&!(i.price>0)?'miss':''}" type="number" min="0" value="${i.price||''}" placeholder="0" onchange="A.editItem('${f.id}','${i.id}','price',this.value)" aria-label="Harga">`:(i.price?(x?`<s>${rp(i.price)}</s>`:rp(i.price)):'—');
+  const suC=(csu&&!x)?`<select class="${att&&!i.supplier?'miss':''}" onchange="A.editItem('${f.id}','${i.id}','supplier',this.value)" aria-label="Supplier"><option value="">Pilih supplier</option>${S.suppliers.filter(s=>s.active||s.name===i.supplier).map(s=>`<option ${s.name===i.supplier?'selected':''}>${esc(s.name)}</option>`).join('')}</select>`:(esc(i.supplier)||'—');
+  const actC=cs?`<td>${r==='Sales'?`<button class="btn sec sm" onclick="A.strike('${f.id}','${i.id}')">${x?'Batal coret':'Coret'}</button>`:`<button class="btn sec sm" onclick="A.delItem('${f.id}','${i.id}')" aria-label="Hapus barang">${ic('trash')}</button>`}</td>`:'';
+  return `<tr style="${x?'opacity:.65':''}"><td>${k+1}</td><td>${nameC}</td><td class="num">${qtyC}</td><td class="num">${prC}</td><td>${suC}</td><td class="num">${i.price&&!x?rp(i.price*i.qty):'—'}</td>${actC}</tr>`}).join('');
+ const lockHint=!cs&&!cp?`<div class="hint">${ic('lock')}Isi form terkunci untuk ${r} di tahap ini. ${f.status==='Draft'?'':'Setiap perubahan oleh role berwenang tercatat di log.'}</div>`:(cp&&!cs?`<div class="hint">${ic('info')}${r==='Purchasing'?'Purchasing hanya mengisi harga dan supplier. Nama dan qty barang tidak bisa diubah.':''}</div>`:'');
+ const itemsCard=`<div class="card"><div class="ch"><div><h3>Daftar barang</h3><p class="sub">${act(f).length} barang aktif${nStr?` · ${nStr} dicoret Sales`:''}${total(f)?` · total ${rp(total(f))}`:''}</p></div></div>
+ <div class="wrapx"><table class="tbl"><thead><tr><th style="width:44px">No</th><th>Nama barang</th><th class="num">Qty</th><th class="num">Harga</th><th>Supplier</th><th class="num">Total</th>${cs?'<th></th>':''}</tr></thead><tbody>${itemsRows}</tbody></table></div>
+ ${cs?`<div class="addrow"><input class="n" id="ai-name" placeholder="Tambah barang: nama" aria-label="Nama barang baru"><input class="q" id="ai-qty" type="number" min="1" value="1" aria-label="Qty barang baru"><button class="btn info sm" onclick="A.addItem('${f.id}')">${ic('plus')}Tambah</button></div>`:''}${lockHint}${salesHint}</div>`;
+ /* procurement */
+ const hasProc=f.status==='Disetujui';
+ const procCard=hasProc?`<div class="card"><div class="ch"><div><h3>Pengadaan</h3><p class="sub">Purchasing mengecek barang yang disetujui customer: In Stock bila sudah ada di gudang, Dibeli, atau Indent. Barang yang dicoret Sales tidak ikut.</p></div>${r==='Purchasing'&&!f.done&&act(f).some(i=>!i.proc)?`<button class="btn info sm" onclick="A.allBought('${f.id}')">Tandai semua Dibeli</button>`:''}</div>
+ <div class="wrapx"><table class="tbl"><thead><tr><th>Barang</th><th>Supplier</th><th class="num">Stok saat ini</th><th>Status</th><th>Estimasi tiba</th><th>Catatan purchasing</th></tr></thead><tbody>${act(f).map(i=>{
+  const ed=r==='Purchasing'&&!f.done;
+  const stC=i.proc==='Perlu Follow Up'?`${badge(i.proc)}${ed?` <button class="btn sec sm" onclick="A.resolveFU('${f.id}','${i.id}')">Selesai follow up</button>`:''}`:(ed?`<select onchange="A.setProc('${f.id}','${i.id}',this.value)" aria-label="Status pengadaan"><option value="">Pilih status</option>${['In Stock','Dibeli','Indent'].map(x=>`<option ${i.proc===x?'selected':''}>${x}</option>`).join('')}</select>`:badge(i.proc||'Belum Diproses'));
+  const stk=i.stock||0;
+  return `<tr><td>${esc(i.name)}</td><td>${esc(i.supplier)||'—'}</td><td class="num">${stk}${stk<i.qty?` <small style="color:var(--muted)">(butuh ${i.qty})</small>`:''}</td><td>${stC}</td><td>${(ed&&i.proc!=='In Stock')?`<input type="date" value="${i.eta}" onchange="A.procInfo('${f.id}','${i.id}','eta',this.value)" aria-label="Estimasi tiba">`:(i.eta?fd(i.eta):'—')}</td><td>${ed?`<input value="${esc(i.pnote)}" onchange="A.procInfo('${f.id}','${i.id}','pnote',this.value)" aria-label="Catatan" placeholder="Opsional">`:(esc(i.pnote)||'—')}</td></tr>`}).join('')}</tbody></table></div>
+ <div class="hint">${ic('info')}Stok mengacu ke data Products (In Stock dan On Hand) di app live. Angka di prototype adalah mock.</div></div>`:'';
+ /* receiving */
+ const bad=act(f).filter(i=>i.proc==='Perlu Follow Up');
+ const recvCard=(hasProc&&r!=='Sales')?`<div class="card"><div class="ch"><div><h3>Penerimaan barang (Stock In)</h3><p class="sub">Gudang mencatat barang masuk lewat fitur Stock In yang sudah ada di app. Barang In Stock tidak perlu diterima lagi. Barang rusak otomatis mengubah status pengadaan ke Perlu Follow Up.</p></div>${r==='Gudang'&&!f.done?`<button class="btn info sm" onclick="A.recvAll('${f.id}')" title="Pintasan demo">Stock In semua (Baik)</button>`:''}</div>
+ ${bad.length?`<div class="banner stop">${ic('alert')}<div><b>Barang rusak, Purchasing sudah dinotifikasi</b>${bad.map(i=>`${esc(i.name)} ×${i.bad} · Supplier ${esc(i.supplier)}`).join('; ')}</div></div>`:''}
+ <div class="wrapx"><table class="tbl"><thead><tr><th>Barang</th><th>Supplier asal</th><th class="num">Dipesan</th><th class="num">Masuk baik</th><th class="num">Rusak</th><th>Status</th><th></th></tr></thead><tbody>${act(f).map(i=>{
+  const rem=remain(i),ready=(i.proc==='Dibeli'||i.proc==='Indent')&&rem>0,fromStock=i.proc==='In Stock';
+  const stt=fromStock?'Tidak Perlu':(i.proc==='Perlu Follow Up'?'Diterima Rusak':(i.proc&&i.good>=i.qty?'Diterima Baik':'Belum Diterima'));
+  const why=ready?'':(fromStock?'Barang dari stok':(i.proc==='Perlu Follow Up'?'Menunggu follow up Purchasing':(!i.proc?'Menunggu Purchasing mengecek barang':'Sudah lengkap')));
+  const btn=r==='Gudang'&&!f.done&&!fromStock?`<button class="btn sec sm" ${ready?'':'disabled'} title="${why}" onclick="A.recv('${f.id}','${i.id}')">Stock In</button>`:'';
+  return `<tr><td>${esc(i.name)}</td><td>${esc(i.supplier)||'—'}</td><td class="num">${fromStock?'—':i.qty}</td><td class="num">${fromStock?'—':i.good}</td><td class="num">${fromStock?'—':(i.bad||0)}</td><td>${badge(stt)}</td><td>${btn}</td></tr>`}).join('')}</tbody></table></div>
+ ${r==='Gudang'?`<div class="hint">${ic('lock')}Gudang tidak bisa mengubah isi form.</div>`:''}</div>`:'';
+ /* confirmation */
+ const showConf=hasProc&&allGood(f);
+ const confCard=showConf?`<div class="card"><h3>Konfirmasi teknisi</h3><p class="sub">Pastikan barang sesuai sebelum pekerjaan dimulai.</p>
+ <div class="chips" style="margin-bottom:10px"><div class="sg"><small>Status konfirmasi</small>${badge(f.conf)}</div></div>
+ ${f.confNote?`<p style="margin:0 0 10px"><small style="color:var(--muted)">Catatan teknisi</small><br>${esc(f.confNote)}</p>`:''}
+ ${r==='Teknisi'&&!f.done&&f.conf!=='Sesuai'&&f.status==='Disetujui'?`<label class="l">Catatan ${S.ui.cfErr?'<span class="err">wajib untuk Tidak Sesuai</span>':'(wajib untuk Tidak Sesuai)'}</label><textarea id="cf-note" class="${S.ui.cfErr?'miss':''}" style="min-height:64px" placeholder="Contoh: Freon yang datang R404A, form minta R134a"></textarea>
+ <div class="acts" style="margin-top:12px;justify-content:flex-start"><button class="btn" style="background:var(--ok)" onclick="A.confirm('${f.id}','Sesuai')">Sesuai</button><button class="btn danger" onclick="A.confirm('${f.id}','Tidak Sesuai')">Tidak Sesuai</button></div>
+ <div class="hint">${ic('info')}Sesuai mengaktifkan tombol kerjakan breakdown. Tidak Sesuai mengunci pekerjaan dan menotifikasi Sales dan Purchasing.</div>`:''}</div>`:'';
+ /* quotation */
+ let qc='';
+ if(f.status!=='Draft'&&f.status!=='Batal'||q){
+  const canMake=r==='Sales'&&f.status==='Harga Terisi'&&!q;
+  qc=`<div class="card"><div class="ch"><div><h3>Quotation ${tbc('Posisi quotation di alur (setelah edit harga dan qty, sebelum keputusan) adalah asumsi PRD, TBC nomor 5.')}</h3><p class="sub">Dibuat Sales dari data form setelah harga terisi, lalu dikirim ke customer lewat email.</p></div>
+  ${canMake?`<button class="btn" onclick="A.makeQuote('${f.id}')">${ic('file')}Buat Quotation</button>`:''}</div>`;
+  if(q){const c=calc(v);
+   qc+=`<div class="chips" style="margin-bottom:12px"><div class="sg"><small>Nomor</small><b>${esc(q.number)}</b></div><div class="sg"><small>Versi terbaru</small><b>v${v.ver}</b></div><div class="sg"><small>Status kirim</small>${badge(v.status)}${expired(v)?' '+badge('Kedaluwarsa'):''}</div><div class="sg"><small>Berlaku sampai</small>${fd(v.expiry)}</div><div class="sg"><small>Grand total (incl. PPN 11%)</small><b>${rp(c.grand)}</b></div></div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn sec sm" onclick="A.go('#/quotes/${q.id}')">${ic('eye')}Buka quote</button><button class="btn sec sm" onclick="A.preview('${q.id}',${q.versions.length-1})">${ic('file')}Preview PDF</button>${r==='Sales'?`<button class="btn sm" onclick="A.send('${q.id}')">${ic('send')}${v.sentAt?'Kirim ulang':'Kirim email'}</button>`:''}</div>
+   ${q.versions.length>1?`<div class="hint">${ic('info')}${q.versions.length} versi tersimpan: ${q.versions.map(x=>`v${x.ver} (${x.status})`).join(', ')}</div>`:''}`;
+  }else if(!canMake){qc+=`<div class="hint">${ic('info')}${f.status==='Diajukan'?'Quotation bisa dibuat setelah Purchasing mengisi harga.':(r==='Sales'?'Quotation belum dibuat.':'Quotation belum dibuat. Hanya Sales yang bisa membuat dan mengirim quotation.')}</div>`}
+  qc+='</div>';
+ }
+ /* comments + log */
+ const cmCard=`<div class="card"><h3>Comment</h3><p class="sub">Komunikasi antar role tetap di dalam form. Aktif di semua tahap.</p><div class="cm">${f.comments.length?f.comments.map(c=>`<div class="cmi"><small>${roleB(c.role)} <b style="color:var(--text)">${esc(c.user)}</b> · ${fdt(c.t)}</small><p>${esc(c.text)}</p></div>`).join(''):'<div class="empty" style="padding:12px">Belum ada comment.</div>'}</div>
+ <textarea id="cm-in" style="min-height:64px" placeholder="Tulis comment untuk role lain" aria-label="Comment"></textarea><div class="acts" style="margin-top:10px"><button class="btn sm" onclick="A.comment('${f.id}')">Kirim comment</button></div></div>`;
+ const lg=[...f.log].filter(l=>!(r==='Sales'&&l.act.startsWith('Stock In'))).sort((a,b)=>b.t-a.t);
+ const logCard=`<div class="card"><div class="ch"><div><h3>Log perubahan ${ic('lock').replace('<svg','<svg style="width:15px;height:15px;vertical-align:-2px"')}</h3><p class="sub">Tercatat otomatis, tidak bisa diedit atau dihapus role mana pun. Comment tidak masuk log.</p></div><span class="b gray">${lg.length} kejadian</span></div>
+ <div class="logbox"><table class="tbl"><thead><tr><th>Waktu</th><th>Pengguna</th><th>Aktivitas</th><th>Nilai lama</th><th>Nilai baru</th></tr></thead><tbody>${lg.map(l=>`<tr><td style="white-space:nowrap">${fdt(l.t)}</td><td>${esc(l.user)} ${l.role!=='—'?roleB(l.role):''}</td><td>${esc(l.act)}</td><td>${esc(l.o)}</td><td>${esc(l.n)}</td></tr>`).join('')}</tbody></table></div></div>`;
+ return head([['Form Breakdown','#/breakdown'],[f.id]],`${f.id} · ${f.cust}`,acts)+ban+
+ `<div class="card"><div class="chips" style="margin-bottom:16px">
+  <div class="sg"><small>Pengajuan</small>${badge(f.done?'Selesai':f.status)}</div><div class="sg"><small>Pengadaan</small>${badge(procOf(f))}</div>${r==='Sales'?'':`<div class="sg"><small>Penerimaan</small>${badge(recvOf(f))}</div>`}<div class="sg"><small>Konfirmasi</small>${badge(hasProc?f.conf:'—')}</div></div>${stepper(f)}</div>
+ <div class="card"><div class="kv"><div><small>Customer</small>${esc(f.cust)}</div><div><small>Teknisi</small>${esc(f.tech)}</div><div><small>Tanggal analisa</small>${fd(f.date)}</div><div class="w"><small>Hasil analisa</small>${esc(f.analysis)}</div>${f.note?`<div class="w"><small>Catatan</small>${esc(f.note)}</div>`:''}</div></div>`+
+ itemsCard+procCard+recvCard+confCard+qc+cmCard+logCard;
+}
+
+/* ===== quotes ===== */
+function pgQuotes(){
+ const u=S.ui,qs=(u.qq||'').toLowerCase();
+ const rows=S.quotes.filter(q=>!qs||(lastV(q).subject+' '+q.number+' '+(q.formId||'')).toLowerCase().includes(qs));
+ return head([['Quotes']],'Quotes',`<button class="btn" onclick="toast('Di modul ini quote dibuat dari detail Form Breakdown (tombol Buat Quotation).','info')">Create Quote</button>`)+
+ `<div class="banner" style="margin-bottom:16px">${ic('info')}<div><b>Menu Quotes yang sudah live, ditambah flow baru dari PRD</b>Kolom Versi, Status Kirim, Kedaluwarsa, dan Form Breakdown adalah tambahan. Dua quote berlabel Q-LIVE adalah data testing yang sudah ada.</div></div>
+ <div class="card"><div class="tools"><div class="spill">${ic('search')}<input data-keep="qq" placeholder="Search" aria-label="Search" value="${esc(u.qq||'')}" oninput="A.setUI('qq',this.value)"></div><button class="btn info" onclick="toast('Filter: di luar prototype','')">Filter</button>${pager(rows.length)}</div>
+ <div class="wrapx"><table class="tbl"><thead><tr><th>Subject</th><th>Sales Person</th><th>Expired Quote</th><th>Person</th><th class="num">Subtotal</th><th class="num">Discount</th><th class="num">Tax</th><th class="num">Grand Total</th><th>Versi</th><th>Status Kirim</th><th>Form Breakdown</th></tr></thead><tbody>
+ ${rows.map(q=>{const v=lastV(q),c=calc(v);return `<tr class="row" onclick="A.go('#/quotes/${q.id}')"><td><b>${esc(v.subject)}</b><br><small style="color:var(--muted)">${esc(q.number)}</small></td><td>${esc(v.owner)}</td><td>${fd(v.expiry)}${expired(v)?'<br>'+badge('Kedaluwarsa'):''}</td><td><a>${esc(v.pic)||'—'}</a></td><td class="num">${rp(c.sub)}</td><td class="num">${rp(c.disc)}</td><td class="num">${rp(c.tax)}</td><td class="num">${rp(c.grand)}</td><td>${q.formId?`v${v.ver}${q.versions.length>1?` <small style="color:var(--muted)">(${q.versions.length} versi)</small>`:''}`:'—'}</td><td>${q.formId?badge(v.status):'—'}</td><td>${q.formId?`<a onclick="event.stopPropagation();A.go('#/breakdown/${q.formId}')">${q.formId}</a>`:'—'}</td></tr>`}).join('')}
+ </tbody></table></div></div>`;
+}
+
+function pgQuote(id){
+ const q=getQid(id);if(!q)return head([['Quotes','#/quotes'],['Tidak ditemukan']],'Quote tidak ditemukan');
+ const idx=(S.ui.qv&&S.ui.qv[id]!=null)?S.ui.qv[id]:q.versions.length-1,v=q.versions[idx],isLast=idx===q.versions.length-1;
+ const ed=S.role==='Sales'&&isLast,tab=S.ui.qtab||'info',c=calc(v),f=q.formId&&getF(q.formId);
+ const dis=ed?'':'disabled';
+ const sentLocked=ed&&v.status==='Terkirim';
+ const owners=[...new Set([PERSON.Sales,'Sales',v.owner])];
+ const acts=`<button class="btn sec" onclick="A.preview('${q.id}',${idx})">${ic('file')}Preview PDF</button>${S.role==='Sales'&&isLast?`<button class="btn info" onclick="A.send('${q.id}')">${ic('send')}${v.sentAt?'Kirim ulang':'Kirim email'}</button>`:''}${ed?`<button class="btn" onclick="A.saveQ()">Save Quote</button>`:''}`;
+ const info=`<h3>Quote Information</h3><p class="sub">Put the basic information of the quote.</p>
+ <div class="grid2" style="max-width:980px">
+ <div class="fld full"><label class="l">Subject <span class="req">*</span></label><input ${dis} value="${esc(v.subject)}" onchange="A.qset('${q.id}','subject',this.value)"></div>
+ <div class="fld full"><label class="l">Description</label><textarea ${dis} onchange="A.qset('${q.id}','desc',this.value)">${esc(v.desc)}</textarea></div>
+ <div class="fld"><label class="l">Sales Owner <span class="req">*</span></label><select ${dis} onchange="A.qset('${q.id}','owner',this.value)">${owners.map(o=>`<option ${o===v.owner?'selected':''}>${esc(o)}</option>`).join('')}</select></div>
+ <div class="fld"><label class="l">Expired At <span class="req">*</span></label><input type="date" ${dis} value="${v.expiry}" onchange="A.qset('${q.id}','expiry',this.value)"></div>
+ <div class="fld"><label class="l">Person <span class="req">*</span></label><input ${dis} value="${esc(v.pic)}" placeholder="Nama PIC" onchange="A.qset('${q.id}','pic',this.value)"></div>
+ <div class="fld"><label class="l">Link to lead</label><select disabled><option>Click to add</option></select></div>
+ </div>
+ <h3 style="margin-top:24px">Data pengiriman dan dokumen ${tbc('Field tambahan D1 di PRD adalah usulan.')}</h3><p class="sub">Tambahan dari PRD D1 agar data cukup untuk membentuk dokumen quotation.</p>
+ <div class="grid2" style="max-width:980px">
+ <div class="fld"><label class="l">Email PIC <span class="req">*</span> <small style="color:var(--muted);font-weight:400">wajib untuk kirim</small></label><input type="email" ${dis} value="${esc(v.email)}" placeholder="pic@customer.com" onchange="A.qset('${q.id}','email',this.value)"></div>
+ <div class="fld"><label class="l">Alamat</label><input ${dis} value="${esc(v.addr)}" onchange="A.qset('${q.id}','addr',this.value)"></div>
+ <div class="fld"><label class="l">Nomor quotation <small style="color:var(--muted);font-weight:400">otomatis</small></label><input disabled value="${esc(q.number)}"></div>
+ <div class="fld"><label class="l">Tanggal <small style="color:var(--muted);font-weight:400">otomatis</small></label><input disabled value="${fd(v.date)}"></div>
+ <div class="fld"><label class="l">Termin pembayaran</label><input ${dis} value="${esc(v.termin)}" onchange="A.qset('${q.id}','termin',this.value)"></div>
+ <div class="fld"><label class="l">Estimasi pengiriman</label><input ${dis} value="${esc(v.estimasi)}" onchange="A.qset('${q.id}','estimasi',this.value)"></div>
+ <div class="fld full"><label class="l">Catatan</label><textarea ${dis} style="min-height:64px" onchange="A.qset('${q.id}','catatan',this.value)">${esc(v.catatan)}</textarea></div>
+ </div>`;
+ const items=`<h3>Quote Items</h3><p class="sub">${f?`Item dan harga mengikuti Form Breakdown ${f.id}. Ubah harga atau qty di form, bukan di sini.`:'Quote lama tanpa Form Breakdown.'}</p>
+ <div class="wrapx"><table class="tbl"><thead><tr><th>Product Name</th><th class="num">Quantity</th><th class="num">Price</th><th class="num">Amount</th><th class="num">Discount</th><th class="num">Total</th></tr></thead><tbody>
+ ${v.items.map(i=>{const a=i.qty*i.price;return `<tr><td>${esc(i.name)}</td><td class="num">${i.qty}</td><td class="num">${rp(i.price)}</td><td class="num">${rp(a)}</td><td class="num"><input class="p" type="number" min="0" ${dis} value="${i.disc||0}" onchange="A.qdisc('${q.id}','${i.iid}',this.value)" aria-label="Diskon"></td><td class="num">${rp(Math.max(a-(i.disc||0),0))}</td></tr>`}).join('')}</tbody></table></div>
+ <div class="sum" style="margin-top:14px"><div><span>Subtotal</span><span>${rp(c.sub)}</span></div><div><span>Diskon</span><span>- ${rp(c.disc)}</span></div><div><span>PPN 11% ${tbc('PRD D1 menambahkan PPN ke total. Contoh quotation Ditajaya memakai harga excl. PPN. Perlu dipastikan.')}</span><span>${rp(c.tax)}</span></div><div class="g"><span>Grand Total</span><span>${rp(c.grand)}</span></div></div>`;
+ const hist=`<div class="card"><h3>Riwayat versi dan pengiriman</h3><p class="sub">Versi lama tetap tersimpan. Setiap pembuatan versi dan pengiriman juga tercatat di log Form Breakdown.</p><div class="wrapx"><table class="tbl"><thead><tr><th>Versi</th><th>Dibuat</th><th>Status kirim</th><th>Tujuan</th><th>Waktu kirim</th><th></th></tr></thead><tbody>${q.versions.map((x,k)=>`<tr><td><b>v${x.ver}</b>${k===q.versions.length-1?' <span class="b pri">terbaru</span>':''}</td><td>${fdt(x.date)}</td><td>${badge(x.status)}${expired(x)?' '+badge('Kedaluwarsa'):''}</td><td>${esc(x.sentTo)||'—'}${x.cc?`<br><small style="color:var(--muted)">CC ${esc(x.cc)}</small>`:''}</td><td>${x.sentAt?fdt(x.sentAt):'—'}</td><td><button class="btn sec sm" onclick="A.qver('${q.id}',${k})">Lihat</button> <button class="btn sec sm" onclick="A.preview('${q.id}',${k})">PDF</button></td></tr>`).join('')}</tbody></table></div></div>`;
+ return head([['Quotes','#/quotes'],[q.number]],`Quote ${v.subject}`,acts)+
+ `<div class="card" style="padding:12px 20px"><div class="vers"><b style="margin-right:6px">Versi</b>${q.versions.map((x,k)=>`<button class="vb ${k===idx?'on':''}" onclick="A.qver('${q.id}',${k})">v${x.ver}</button>`).join('')}<span style="margin-left:8px">${badge(v.status)}${expired(v)?' '+badge('Kedaluwarsa'):''}</span>${f?`<span style="margin-left:auto">Dibuat dari <a onclick="A.go('#/breakdown/${f.id}')">${f.id}</a></span>`:''}</div></div>`+
+ (!isLast?`<div class="banner">${ic('lock')}<div><b>Versi lama, hanya bisa dilihat</b>Versi terbaru adalah v${lastV(q).ver}.</div></div>`:(S.role!=='Sales'?`<div class="banner">${ic('lock')}<div><b>Hanya Sales yang bisa membuat dan mengirim quotation</b>Role ${S.role} bisa melihat dokumen dan riwayatnya.</div></div>`:(sentLocked?`<div class="banner turn">${ic('info')}<div><b>Versi ini sudah terkirim</b>Perubahan apa pun disimpan sebagai v${v.ver+1}. Versi ${v.ver} tetap tersimpan.</div></div>`:'')))+
+ `<div class="card"><div class="tabs"><button class="tab ${tab==='info'?'on':''}" onclick="A.qtab('info')">Quote Information</button><button class="tab ${tab==='items'?'on':''}" onclick="A.qtab('items')">Quote Items</button></div>${tab==='info'?info:items}</div>`+hist;
+}
+
+function docHtml(q,vi){
+ const v=q.versions[vi],c=calc(v),cu=custBy(((q.formId&&getF(q.formId))||{}).cust)||{},f=q.formId&&getF(q.formId);
+ return `<div class="paper">${expired(v)?'<div class="stamp">KEDALUWARSA</div>':''}
+ <div class="hd"><div class="lg">dp</div><div><h2>PT. DITAJAYA MITRA PERKASA</h2><div>Rukan Grand Aries Niaga, Jl. Taman Aries Blok E1 No. 5R<br>Jakarta Barat 11620 INDONESIA</div></div></div>
+ <div class="meta"><div><b>Kepada</b> : ${esc(f?f.cust:'—')}</div><div><b>No. Penawaran</b> : ${esc(q.number)}</div><div><b>Up.</b> : ${esc(v.pic)||'—'}</div><div><b>Tanggal</b> : ${fd(v.date)}</div><div><b>Alamat</b> : ${esc(v.addr)||'—'}</div><div><b>Marketing</b> : ${esc(v.owner)}</div><div><b>Perihal</b> : ${esc(v.subject)}</div><div><b>Versi</b> : v${v.ver}</div></div>
+ <div>Dengan hormat, bersama ini kami sampaikan penawaran harga untuk kebutuhan Bapak/Ibu sebagai berikut:</div>
+ <table><thead><tr><th>No</th><th>Keterangan</th><th class="r">Qty</th><th class="r">Harga/Unit</th><th class="r">Diskon</th><th class="r">Jumlah</th></tr></thead><tbody>
+ ${v.items.map((i,k)=>`<tr><td>${k+1}</td><td>${esc(i.name)}</td><td class="r">${i.qty}</td><td class="r">${rn(i.price)}</td><td class="r">${rn(i.disc||0)}</td><td class="r">${rn(Math.max(i.qty*i.price-(i.disc||0),0))}</td></tr>`).join('')}
+ <tr><td colspan="5" class="r">Subtotal</td><td class="r">${rn(c.sub-c.disc)}</td></tr><tr><td colspan="5" class="r">PPN 11%</td><td class="r">${rn(c.tax)}</td></tr><tr><td colspan="5" class="r"><b>TOTAL</b></td><td class="r"><b>${rn(c.grand)}</b></td></tr></tbody></table>
+ <div style="margin-top:12px"><b>Syarat dan kondisi</b><ol><li>Masa berlaku penawaran sampai ${fd(v.expiry)}</li><li>Termin pembayaran: ${esc(v.termin)||'—'}</li><li>Estimasi pengiriman: ${esc(v.estimasi)||'—'}</li>${v.catatan?`<li>${esc(v.catatan)}</li>`:''}</ol></div>
+ <div style="margin-top:16px">Hormat kami,<br><b>${esc(v.owner)}</b><br>PT Ditajaya Mitra Perkasa</div>
+ <div style="margin-top:12px;color:#777;font-size:11px">Dokumen dibuat otomatis dari ${f?`Form Breakdown ${f.id}`:'data quote'}. Tata letak mengacu pada contoh penawaran Ditajaya, syarat dan kondisi lengkap menyusul di putaran berikutnya.</div></div>`;
+}
+
+/* ===== labeling ===== */
+function labelOf(c){
+ const last=c.purchases.reduce((m,p)=>p.date>m?p.date:m,'');
+ const t=TODAY(),cut=iso(new Date(t.getFullYear(),t.getMonth()-6,t.getDate()));
+ const mesin=c.purchases.filter(p=>p.type==='mesin').reduce((s,p)=>s+p.qty,0);
+ return{last,cut,active:last>=cut,mesin,cls:mesin===0?'—':mesin<=2?'C':mesin<=5?'B':'A'};
+}
+const fuOf=c=>c.acts.some(a=>a.date.slice(0,7)===iso(TODAY()).slice(0,7));
+function pgOrgs(){
+ const u=S.ui,q=(u.cq||'').toLowerCase();
+ const all=S.customers.map(c=>({c,l:labelOf(c),fu:fuOf(c)}));
+ const noFu=all.filter(x=>!x.fu).length;
+ const rows=all.filter(x=>(!q||x.c.name.toLowerCase().includes(q))&&(!u.cs||(u.cs==='Active')===x.l.active)&&(!u.cc||x.l.cls===u.cc)&&(!u.cf||!x.fu));
+ return head([['Organizations']],'Organizations')+
+ (noFu?`<div class="banner turn">${ic('alert')}<div><b>${noFu} customer belum di-follow up bulan ini</b>Notifikasi dikirim ke Sales. Follow up dihitung dari Activities (call, meeting, kunjungan) di bulan berjalan. <a onclick="A.setUI('cf',true)">Tampilkan hanya yang belum</a></div></div>`:`<div class="banner">${ic('info')}<div><b>Semua customer sudah di-follow up bulan ini</b></div></div>`)+
+ `<div class="card"><div class="tools"><div class="spill">${ic('search')}<input data-keep="cq" placeholder="Search nama customer" aria-label="Search" value="${esc(u.cq||'')}" oninput="A.setUI('cq',this.value)"></div>
+ <select style="width:150px" onchange="A.setUI('cs',this.value)" aria-label="Filter status"><option value="">Semua status</option>${['Active','Non Active'].map(x=>`<option ${u.cs===x?'selected':''}>${x}</option>`).join('')}</select>
+ <select style="width:140px" onchange="A.setUI('cc',this.value)" aria-label="Filter class"><option value="">Semua class</option>${['A','B','C'].map(x=>`<option ${u.cc===x?'selected':''}>${x}</option>`).join('')}</select>
+ <select style="width:230px" onchange="A.setUI('cf',this.value==='1')" aria-label="Filter follow up"><option value="">Semua follow up</option><option value="1" ${u.cf?'selected':''}>Belum follow up bulan ini</option></select>${pager(rows.length)}</div>
+ <div class="wrapx"><table class="tbl"><thead><tr><th>Name</th><th>Status</th><th>Class</th><th class="num">Total Mesin</th><th>Pembelian Terakhir</th><th>Follow Up Bulan Ini</th><th>Actions</th></tr></thead><tbody>
+ ${rows.map(({c,l,fu})=>`<tr class="row" onclick="A.setUI('cx','${u.cx===c.id?'':c.id}')"><td><a>${esc(c.name)}</a><br><small style="color:var(--muted)">${esc(c.pic)}</small></td><td>${badge(l.active?'Active':'Non Active')}</td><td>${l.cls==='—'?'—':`<span class="b ${{A:'ok',B:'info',C:'gray'}[l.cls]}">Class ${l.cls}</span>`}</td><td class="num">${l.mesin}</td><td>${fd(l.last)}</td><td>${fu?`<span class="b ok">Sudah</span>`:`<span class="b bad">Belum follow up bulan ini</span>`}</td><td>${(!fu&&S.role==='Sales')?`<button class="btn sec sm" onclick="event.stopPropagation();A.followUp('${c.id}')">Catat follow up</button>`:'—'}</td></tr>
+ ${u.cx===c.id?`<tr><td colspan="7" style="background:var(--th)"><div class="cols2"><div><b>Riwayat pembelian (dasar Status dan Class)</b><ul style="margin:6px 0 0 18px;padding:0">${[...c.purchases].sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<li>${fd(p.date)} · ${p.type==='mesin'?'Mesin':'Sparepart'} · ${esc(p.what)} × ${p.qty}</li>`).join('')}</ul></div><div><b>Activities (dasar follow up)</b><ul style="margin:6px 0 0 18px;padding:0">${[...c.acts].sort((a,b)=>b.date.localeCompare(a.date)).map(a=>`<li>${fd(a.date)} · ${esc(a.what)}</li>`).join('')||'<li>Belum ada activity</li>'}</ul></div></div></td></tr>`:''}`).join('')||'<tr><td colspan="7" class="empty">Tidak ada customer yang cocok.</td></tr>'}
+ </tbody></table></div>
+ <div class="hint">${ic('info')}Aturan label: Active bila ada pembelian apa pun dalam 6 bulan terakhir (sejak ${fd(labelOf(S.customers[0]).cut)}). Class dari total kumulatif mesin: 1 sampai 2 = C, 3 sampai 5 = B, lebih dari 5 = A, tidak turun saat Non Active. Label tidak bisa diedit. Klik baris untuk melihat dasarnya. ${tbc('Class hanya menghitung mesin, TBC di PRD.')}</div></div>`;
+}
+
+/* ===== suppliers ===== */
+function pgSuppliers(){
+ const u=S.ui,q=(u.sq||'').toLowerCase(),isP=S.role==='Purchasing';
+ const rows=S.suppliers.filter(s=>(!q||(s.name+s.contact+s.cats.join(' ')).toLowerCase().includes(q))&&(!u.ss||(u.ss==='Aktif')===s.active));
+ return head([['Data Supplier']],'Data Supplier',`<button class="btn" ${isP?'':'disabled title="Hanya Purchasing yang mengelola supplier"'} onclick="A.supEdit('')">${ic('plus')}Tambah Supplier</button>`)+
+ `<div class="card"><p class="sub">Master supplier untuk Purchasing. Dipilih per barang di Form Breakdown dan terlihat semua role di form. ${tbc('Field final supplier masih usulan di PRD.')}</p>
+ ${isP?'':`<div class="hint" style="margin:0 0 12px">${ic('lock')}Akses penuh hanya untuk Purchasing. Role ${S.role} hanya melihat.</div>`}
+ <div class="tools"><div class="spill">${ic('search')}<input data-keep="sq" placeholder="Search" aria-label="Search" value="${esc(u.sq||'')}" oninput="A.setUI('sq',this.value)"></div>
+ <select style="width:150px" onchange="A.setUI('ss',this.value)" aria-label="Filter status"><option value="">Semua status</option><option ${u.ss==='Aktif'?'selected':''}>Aktif</option><option ${u.ss==='Nonaktif'?'selected':''}>Nonaktif</option></select>${pager(rows.length)}</div>
+ <div class="wrapx"><table class="tbl"><thead><tr><th>Nama Supplier</th><th>Kontak</th><th>Kategori Barang</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+ ${rows.map(s=>`<tr><td><b>${esc(s.name)}</b></td><td>${esc(s.contact)}</td><td>${s.cats.map(c=>`<span class="b gray" style="margin:0 4px 4px 0">${esc(c)}</span>`).join('')}</td><td>${badge(s.active?'Aktif':'Nonaktif')}</td><td style="white-space:nowrap"><button class="btn sec sm" ${isP?'':'disabled'} onclick="A.supEdit('${s.id}')" aria-label="Edit">${ic('pen')}</button> <button class="btn sec sm" ${isP?'':'disabled'} onclick="A.supTog('${s.id}')">${s.active?'Nonaktifkan':'Aktifkan'}</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Tidak ada supplier.</td></tr>'}
+ </tbody></table></div></div>`;
+}
+
+function pgBundling(){
+ return head([['Bundling Product']],'Bundling Product')+
+ `<div class="card"><div class="banner stop" style="margin:0 0 16px">${ic('alert')}<div><b>Belum bisa dispesifikasi ${tbc('PRD bagian E: MoM baru menyebut nama fitur, belum ada detail.')}</b>Halaman ini placeholder untuk bahan diskusi. Belum ada fungsi.</div></div>
+ <h3>Dugaan sementara dari PRD</h3><div class="wrapx" style="margin-top:10px"><table class="tbl"><thead><tr><th>Aspek</th><th>Dugaan</th></tr></thead><tbody><tr><td>Tujuan</td><td>Menjual beberapa produk sebagai satu paket dengan harga paket</td></tr><tr><td>Pengguna</td><td>Sales, mungkin manajemen untuk mengatur paket</td></tr><tr><td>Data</td><td>Nama paket, isi produk dan qty, harga paket</td></tr><tr><td>Keterkaitan</td><td>Paket bisa dipilih di Form Breakdown atau Quotation</td></tr><tr><td>Log perubahan</td><td>Perubahan paket pada form tercatat di log perubahan form</td></tr></tbody></table></div></div>`;
+}
+
+/* ===== shell, modals, router ===== */
+const ASSUME=[
+ ['Channel notifikasi','Trigger notifikasi dari PRD B10 disimulasikan di app (lonceng dan toast). Channel in app, email, atau WhatsApp masih TBC.'],
+ ['Posisi quotation di alur','Quotation dibuat setelah Sales edit harga dan qty, sebelum keputusan Disetujui atau Batal (PRD D, TBC nomor 5).'],
+ ['Aturan Tidak Sesuai','Form kembali ke Sales untuk direvisi. Aturan detail revisi masih TBC. Di prototype, revisi mengembalikan form ke status Harga Terisi.'],
+ ['Class hanya hitung mesin','Status Active memakai semua jenis barang, Class hanya mesin (PRD A, TBC).'],
+ ['Coret barang oleh Sales','Daftar teknisi tetap utuh. Sales mencoret barang yang tidak dibutuhkan customer, barang dicoret tidak ikut dibeli, tidak masuk quotation, dan tidak dihitung di total.'],
+ ['Status pengadaan tanpa Dicari','Setelah Disetujui, tiap barang berstatus Belum Diproses sampai Purchasing memilih In Stock, Dibeli, atau Indent. Nama "Belum Diproses" adalah usulan.'],
+ ['Penerimaan disembunyikan dari Sales','Sales tidak melihat card, kolom, status, dan log Stock In. Sales tetap melihat status pengadaan.'],
+ ['Stock In dari app existing','Tampilan Stock In di app live belum dilihat. Modal di prototype adalah placeholder.'],
+ ['Labeling di Organizations','Status, Class, dan Follow Up jadi kolom di menu Organizations. Tampilan asli menu Organizations belum dilihat.'],
+ ['Notifikasi follow up','Customer tanpa Activity di bulan berjalan memicu notifikasi ke Sales. Berlaku ke semua customer, termasuk Non Active. Perlu dipastikan.'],
+ ['Template quotation','Satu template standar perusahaan (PRD D2, TBC). Preview PDF mengacu pada contoh penawaran Ditajaya.'],
+ ['PPN','PRD D1 menambahkan PPN 11% ke total. Contoh Ditajaya menulis harga excl. PPN. Perlu dipastikan.'],
+ ['Field supplier dan field quotation','Usulan di PRD, belum final.'],
+ ['Barang datang sebagian','Tidak diatur di PRD. Prototype mengizinkan penerimaan per barang dan per qty, status form baru Diterima Baik bila semua barang lengkap.']];
+const NAV=[['gauge','Dashboard',"A.live('Dashboard')"],['leads','Leads',"A.live('Leads')"],['quotes','Quotes',"A.go('#/quotes')",'quotes'],['mail','Mail',"A.live('Mail')"],['clip','Activities',"A.live('Activities')"],['contact','Organizations',"A.go('#/organizations')",'organizations'],['box','Products',"A.live('Products')"],'hr',['flow','Form Breakdown',"A.go('#/breakdown')",'breakdown'],['truck','Data Supplier',"A.go('#/suppliers')",'suppliers'],['pack','Bundling Product',"A.go('#/bundling')",'bundling']];
+function shell(body,active){
+ const un=S.notifs.filter(n=>n.roles.includes(S.role)&&!n.read[S.role]);
+ const mine=S.notifs.filter(n=>n.roles.includes(S.role)).sort((a,b)=>b.t-a.t).slice(0,12);
+ const dark=document.documentElement.getAttribute('data-theme')==='dark'||(!document.documentElement.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches);
+ return `<div class="shell"><nav class="side" aria-label="Menu utama"><div class="logo" style="margin-bottom:10px;width:40px;height:32px;font-size:15px">dp</div>
+ ${NAV.map(n=>n==='hr'?'<hr>':`<a role="button" tabindex="0" data-tip="${n[1]}" aria-label="${n[1]}" class="${n[3]&&n[3]===active?'active':''}" onclick="${n[2]}" onkeydown="if(event.key==='Enter')${n[2]}">${ic(n[0])}</a>`).join('')}</nav>
+ <div class="main"><header class="top"><div class="spill">${ic('search')}<input placeholder="Search" aria-label="Search global"></div><button class="fab" aria-label="Tambah" onclick="toast('Quick create milik app live, di luar prototype.')">${ic('plus')}</button><div class="sp"></div>
+ <div class="demo"><small>Demo · masuk sebagai</small><div class="roles" role="group" aria-label="Ganti role">${ROLES.map(r=>`<button class="rp ${r===S.role?'on':''}" aria-pressed="${r===S.role}" onclick="A.setRole('${r}')">${r}</button>`).join('')}</div>
+ <button class="ib" title="Reset data demo" aria-label="Reset data demo" onclick="A.ask('Reset data demo?','Semua perubahan di prototype dikembalikan ke data awal.','Reset',A.reset)">${ic('reset')}</button><button class="btn sec sm" onclick="A.modal('assume')">Asumsi PRD <span class="b warn">${ASSUME.length}</span></button></div>
+ <div class="bellwrap"><button class="ib" aria-label="Notifikasi" onclick="A.bell()">${ic('bell')}${un.length?`<span class="dot">${un.length}</span>`:''}</button>
+ ${S.ui.bell?`<div class="pop"><h4>Notifikasi ${S.role} <a style="font-weight:500;font-size:13px" onclick="A.readAll()">Tandai dibaca</a></h4>${mine.length?mine.map(n=>`<div class="it ${n.read[S.role]?'':'un'}" onclick="A.openN('${n.id}')">${esc(n.text)}<br><small>${fdt(n.t)}</small></div>`).join(''):'<div class="empty">Belum ada notifikasi.</div>'}<div class="it" style="cursor:default"><small>Channel notifikasi masih TBC (in app, email, atau WhatsApp).</small></div></div>`:''}</div>
+ <button class="ib" aria-label="Ganti tema" onclick="A.dark()">${ic(dark?'sun':'moon')}</button><div class="avatar" title="${PERSON[S.role]} (${S.role})">${PERSON[S.role][0]}</div></header>
+ <main class="page">${body}</main></div></div>`;
+}
+function modalHtml(){
+ const m=S.modal;if(!m)return'';
+ let b='';
+ if(m.type==='confirm')b=`<div class="mod" role="dialog" aria-modal="true"><h3>${esc(m.title)}</h3><p class="sub" style="color:var(--muted)">${esc(m.text)}</p><div class="acts"><button class="btn sec" onclick="A.close()">Kembali</button><button class="btn" onclick="A.okAsk()">${esc(m.okLabel)}</button></div></div>`;
+ if(m.type==='assume')b=`<div class="mod wide" role="dialog" aria-modal="true"><h3>Asumsi dan titik TBC dari PRD</h3><p class="sub" style="color:var(--muted)">Prototype mengikuti PRD Draft 7 apa adanya. Titik berikut ditandai TBC di UI supaya bisa langsung direspons stakeholder.</p><div class="wrapx"><table class="tbl"><tbody>${ASSUME.map(a=>`<tr><td style="width:34%"><b>${a[0]}</b></td><td>${a[1]}</td></tr>`).join('')}</tbody></table></div><div class="acts"><button class="btn" onclick="A.close()">Tutup</button></div></div>`;
+ if(m.type==='receive'){const f=getF(m.fid),it=f.items.find(i=>i.id===m.iid);
+  b=`<div class="mod" role="dialog" aria-modal="true"><h3>Stock In</h3><p class="sub" style="color:var(--muted)">${esc(it.name)} · Supplier ${esc(it.supplier)} · sisa ${remain(it)} dari ${it.qty}</p>
+  <div class="grid2"><div><label class="l">Tanggal terima <span class="req">*</span></label><input id="rv-date" type="date" value="${m.date}"></div><div><label class="l">Qty diterima <span class="req">*</span></label><input id="rv-qty" type="number" min="1" value="${m.qty}"></div>
+  <div class="fld full"><label class="l">Kondisi <span class="req">*</span></label><select id="rv-cond"><option>Baik</option><option>Rusak</option></select></div><div class="fld full"><label class="l">Catatan</label><textarea id="rv-note" style="min-height:60px"></textarea></div></div>
+  <div class="hint">${ic('info')}Pilih Rusak: status pengadaan otomatis jadi Perlu Follow Up dan Purchasing dinotifikasi. Baik: On Hand produk bertambah. Placeholder fitur Stock In app live, tampilan final mengikuti app.</div><div class="err" id="rv-err"></div>
+  <div class="acts"><button class="btn sec" onclick="A.close()">Batal</button><button class="btn" onclick="A.saveRecv()">Simpan Stock In</button></div></div>`}
+ if(m.type==='preview'){const q=getQid(m.qid);
+  b=`<div class="mod wide" role="dialog" aria-modal="true"><h3>Preview dokumen quotation</h3><p class="sub" style="color:var(--muted)">PDF dihasilkan otomatis dari data form. Tampilan di bawah adalah simulasi.</p>${docHtml(q,m.vi)}<div class="acts"><button class="btn sec" onclick="A.close()">Tutup</button>${S.role==='Sales'&&m.vi===q.versions.length-1?`<button class="btn" onclick="A.send('${q.id}')">${ic('send')}${lastV(q).sentAt?'Kirim ulang':'Kirim email'}</button>`:''}</div></div>`}
+ if(m.type==='send'){const q=getQid(m.qid),v=lastV(q),f=q.formId&&getF(q.formId);
+  const sub=`Penawaran ${v.subject} (${q.number})`;
+  const body=`Dengan hormat,\n\nTerlampir penawaran ${v.subject} (${q.number}, v${v.ver}) untuk ${f?f.cust:'Bapak/Ibu'}. Penawaran berlaku sampai ${fd(v.expiry)}.\n\nMohon konfirmasi dari Bapak/Ibu.\n\nHormat kami,\n${v.owner}\nPT Ditajaya Mitra Perkasa`;
+  b=`<div class="mod wide" role="dialog" aria-modal="true"><h3>${v.sentAt?'Kirim ulang':'Kirim'} quotation v${v.ver} via email</h3><p class="sub" style="color:var(--muted)">Subject dan isi email berasal dari template dan bisa diedit sebelum kirim.</p>
+  <div class="grid2"><div><label class="l">Kepada (email PIC) <span class="req">*</span></label><input id="sd-to" type="email" value="${esc(m.to)}" placeholder="pic@customer.com"></div><div><label class="l">CC</label><input id="sd-cc" value="${esc(m.cc)}" placeholder="Opsional"></div>
+  <div class="fld full"><label class="l">Subject</label><input id="sd-sub" value="${esc(sub)}"></div><div class="fld full"><label class="l">Isi email</label><textarea id="sd-body" style="min-height:150px">${esc(body)}</textarea></div>
+  <div class="fld full"><label class="l">Lampiran</label><span class="b info">${ic('file').replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')} Quotation-${esc(q.number.replace(/\//g,'-'))}-v${v.ver}.pdf</span></div></div>
+  <label style="display:flex;gap:8px;align-items:center;margin-top:12px;cursor:pointer"><input id="sd-fail" type="checkbox"> Simulasikan Gagal Kirim <small style="color:var(--muted)">(khusus demo)</small></label><div class="err" id="sd-err"></div>
+  <div class="acts"><button class="btn sec" onclick="A.close()">Batal</button><button class="btn" onclick="A.doSend()">${ic('send')}Kirim email</button></div></div>`}
+ if(m.type==='supplier'){const s=m.id?S.suppliers.find(x=>x.id===m.id):{name:'',contact:'',cats:[],active:true};
+  b=`<div class="mod" role="dialog" aria-modal="true"><h3>${m.id?'Edit':'Tambah'} supplier</h3><p class="sub" style="color:var(--muted)">Field masih usulan.</p><div class="grid2"><div class="fld full"><label class="l">Nama supplier <span class="req">*</span></label><input id="sp-name" value="${esc(s.name)}"></div><div class="fld full"><label class="l">Kontak</label><input id="sp-contact" value="${esc(s.contact)}" placeholder="Nama · nomor telepon"></div><div class="fld full"><label class="l">Kategori barang <small style="color:var(--muted);font-weight:400">pisahkan dengan koma</small></label><input id="sp-cats" value="${esc(s.cats.join(', '))}"></div><div class="fld full"><label class="l">Status</label><select id="sp-active"><option value="1" ${s.active?'selected':''}>Aktif</option><option value="0" ${s.active?'':'selected'}>Nonaktif</option></select></div></div><div class="err" id="sp-err"></div><div class="acts"><button class="btn sec" onclick="A.close()">Batal</button><button class="btn" onclick="A.supSave()">Simpan</button></div></div>`}
+ return `<div class="ov" onclick="if(event.target===this)A.close()">${b}</div>`;
+}
+function render(){
+ const y=window.scrollY,ae=document.activeElement,key=ae&&ae.dataset&&ae.dataset.keep,pos=ae&&ae.selectionStart;
+ const p=(location.hash.replace(/^#\/?/,'')||'breakdown').split('/');
+ let html,act;
+ if(p[0]==='quotes'){html=p[1]?pgQuote(p[1]):pgQuotes();act='quotes'}
+ else if(p[0]==='organizations'||p[0]==='labeling'){html=pgOrgs();act='organizations'}
+ else if(p[0]==='suppliers'){html=pgSuppliers();act='suppliers'}
+ else if(p[0]==='bundling'){html=pgBundling();act='bundling'}
+ else{act='breakdown';html=p[1]==='new'?pgNew():(p[1]?pgDetail(p[1]):pgList())}
+ $('#app').innerHTML=shell(html,act)+modalHtml();
+ window.scrollTo(0,y);
+ if(key){const el=document.querySelector(`[data-keep="${key}"]`);if(el){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
+}
+window.addEventListener('hashchange',()=>{S.ui.attempt=null;S.ui.bell=false;if(location.hash.indexOf('breakdown/new')<0)S.ui.nf=null;render();window.scrollTo(0,0)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.modal)A.close()});
+document.addEventListener('click',e=>{if(S.ui.bell&&!e.target.closest('.bellwrap')){S.ui.bell=false;render()}});
+seed();render();
+</script>
+</body>
+</html>
