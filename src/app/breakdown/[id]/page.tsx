@@ -12,7 +12,9 @@ import { canPrice, canStruct, canSup } from '@/domain/permissions'
 import { iso } from '@/lib/format'
 import { getRole } from '@/lib/role'
 import { ProcurementCard } from '@/roles/purchasing/ProcurementCard'
-import { SendToSalesButton } from '@/roles/purchasing/SendToSalesButton'
+import { headerActionsFor } from '@/roles'
+import { QuotationCard } from '@/roles/sales/QuotationCard'
+import { ConfirmationCard } from '@/roles/teknisi/ConfirmationCard'
 import { ReceivingCard } from '@/roles/gudang/ReceivingCard'
 import { store } from '@/server/store'
 
@@ -28,7 +30,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   return (
     <FormUiProvider>
       <PageHead crumbs={[['Form Breakdown', '/breakdown'], [f.id]]} title={`${f.id} · ${f.cust}`}>
-        {role === 'Purchasing' && f.status === 'Diajukan' && <SendToSalesButton fid={f.id} />}
+        {headerActionsFor(role, f)}
       </PageHead>
       <Banner form={f} role={role} turn={turn} />
       <div className="card">
@@ -49,6 +51,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       />
       <ProcurementCard form={f} role={role} />
       <ReceivingCard form={f} role={role} today={iso(todayOf(db))} />
+      <ConfirmationCard form={f} role={role} />
+      <QuotationCard form={f} quote={q} role={role} today={todayOf(db)} />
       <CommentsCard fid={f.id} comments={f.comments} />
       <LogCard form={f} role={role} />
     </FormUiProvider>
