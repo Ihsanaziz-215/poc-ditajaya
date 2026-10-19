@@ -5,6 +5,7 @@ import { CommentsCard } from '@/components/breakdown/CommentsCard'
 import { FormUiProvider } from '@/components/breakdown/FormUi'
 import { InfoCard } from '@/components/breakdown/InfoCard'
 import { ItemsCard } from '@/components/breakdown/ItemsCard'
+import { MachineCard } from '@/components/breakdown/MachineCard'
 import { LogCard } from '@/components/breakdown/LogCard'
 import { Stepper } from '@/components/breakdown/Stepper'
 import { today as todayOf, procOf, recvOf, stepOf, turnOf } from '@/domain/derived'
@@ -43,6 +44,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <Stepper step={stepOf(f, q)} role={role} />
       </div>
       <InfoCard form={f} />
+      <MachineCard form={f} canEdit={canStruct(f, role)} />
       <ItemsCard
         form={f}
         role={role}

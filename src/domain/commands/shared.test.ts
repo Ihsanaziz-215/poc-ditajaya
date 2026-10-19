@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { as, freshDb } from '../testing'
 import { DomainError } from './core'
-import { addComment, addItem, deleteItem, editItem, markAllNotifsRead, markNotifRead } from './shared'
+import { addComment, addItem, deleteItem, editItem, editMachine, markAllNotifsRead, markNotifRead } from './shared'
 import { createForm } from './teknisi'
 
 describe('editItem', () => {
@@ -95,5 +95,42 @@ describe('comments and notifications', () => {
     markAllNotifsRead(db, as(db, 'Sales'))
     expect(db.notifs.filter((n) => n.roles.includes('Sales')).every((n) => n.read.Sales)).toBe(true)
     expect(db.notifs.filter((n) => n.roles.includes('Purchasing')).every((n) => !n.read.Sales)).toBe(true)
+  })
+})
+
+describe('unit, part no and machine data', () => {
+  const draft = () => {
+    const db = freshDb()
+    createForm(db, as(db, 'Teknisi'), { cust: db.customers[0].name, date: '2026-10-15', analysis: '', note: '', items: [{ name: 'Freon R11', qty: 1 }], submit: false })
+    return { db, f: db.forms[0] }
+  }
+  test('Teknisi edits unit, part no and spec of a draft item, and it is logged', () => {
+    const { db, f } = draft()
+    const id = f.items[0].id
+    editItem(db, as(db, 'Teknisi'), f.id, id, 'unit', ' tabung ')
+    editItem(db, as(db, 'Teknisi'), f.id, id, 'partNo', 'R11-X')
+    expect(f.items[0]).toMatchObject({ unit: 'tabung', partNo: 'R11-X' })
+    expect(f.log.at(-1)).toMatchObject({ act: 'Ubah Part No — Freon R11', o: '—', n: 'R11-X' })
+  })
+  test('Purchasing cannot change unit or part no; overly long text is rejected', () => {
+    const { db, f } = draft()
+    const id = f.items[0].id
+    expect(() => editItem(db, as(db, 'Purchasing'), f.id, id, 'unit', 'set')).toThrow(DomainError)
+    expect(() => editItem(db, as(db, 'Teknisi'), f.id, id, 'spec', 'x'.repeat(201))).toThrow(DomainError)
+  })
+  test('addItem stores the unit', () => {
+    const { db, f } = draft()
+    addItem(db, as(db, 'Teknisi'), f.id, { name: 'Kabel', qty: 20, unit: 'meter' })
+    expect(f.items.at(-1)?.unit).toBe('meter')
+  })
+  test('machine data: Teknisi edits a draft, other roles and locked forms are refused', () => {
+    const { db, f } = draft()
+    editMachine(db, as(db, 'Teknisi'), f.id, 'brand', ' Harland ')
+    expect(f.machine?.brand).toBe('Harland')
+    expect(f.log.at(-1)).toMatchObject({ act: 'Ubah Merk mesin', o: '—', n: 'Harland' })
+    expect(() => editMachine(db, as(db, 'Purchasing'), f.id, 'model', 'x')).toThrow(DomainError)
+    expect(() => editMachine(db, as(db, 'Teknisi'), f.id, 'nope' as never, 'x')).toThrow(DomainError)
+    f.status = 'Diajukan'
+    expect(() => editMachine(db, as(db, 'Teknisi'), f.id, 'model', 'x')).toThrow(DomainError)
   })
 })

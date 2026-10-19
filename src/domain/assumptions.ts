@@ -12,5 +12,6 @@ export const ASSUME: [string, string][] = [
   ['Template quotation', 'Satu template standar perusahaan (PRD D2, TBC). Preview PDF mengacu pada contoh penawaran Ditajaya.'],
   ['PPN', 'PRD D1 menambahkan PPN 11% ke total. Contoh Ditajaya menulis harga excl. PPN. Perlu dipastikan.'],
   ['Field supplier dan field quotation', 'Usulan di PRD, belum final.'],
+  ['Field dari form kertas teknisi', 'Data mesin (merk, model, SN/tahun, varian), Part No, Satuan, dan spesifikasi per barang ditambahkan dari form kertas lapangan. Semuanya opsional dan belum ada di PRD B2. Hasil analisa tidak wajib karena form kertas tidak punya kolom itu.'],
   ['Barang datang sebagian', 'Tidak diatur di PRD. Prototype mengizinkan penerimaan per barang dan per qty, status form baru Diterima Baik bila semua barang lengkap.'],
 ]

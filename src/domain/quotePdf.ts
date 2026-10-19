@@ -101,7 +101,7 @@ export async function buildQuotePdf(o: { quote: Quote; vi: number; cust: string 
   // right edges of the numeric columns
   const R = { qty: W - M - 235, price: W - M - 160, disc: W - M - 90, total: W - M - 4 }
   const nameX = M + 26
-  const nameW = R.qty - 40 - nameX
+  const nameW = R.qty - 60 - nameX
   const head = () => {
     need(30)
     page.drawRectangle({ x: M, y: y - 5, width: W - 2 * M, height: 19, color: rgb(0.93, 0.94, 0.96) })
@@ -115,7 +115,7 @@ export async function buildQuotePdf(o: { quote: Quote; vi: number; cust: string 
   }
   head()
   v.items.forEach((i, k) => {
-    const name = wrap(i.name, nameW)
+    const name = [...wrap(i.name, nameW), ...(i.partNo ? [`Part No: ${i.partNo}`] : [])]
     const h = (name.length - 1) * 12 + 24
     if (y - h < M + 30) {
       newPage()
@@ -123,7 +123,7 @@ export async function buildQuotePdf(o: { quote: Quote; vi: number; cust: string 
     }
     text(String(k + 1), M + 4)
     name.forEach((l, n) => page.drawText(l, { x: nameX, y: y - n * 12, size: 10, font, color: INK }))
-    right(String(i.qty), R.qty)
+    right(`${i.qty}${i.unit ? ' ' + i.unit : ''}`, R.qty)
     right(rn(i.price), R.price)
     right(rn(i.disc || 0), R.disc)
     right(rn(Math.max(i.qty * i.price - (i.disc || 0), 0)), R.total)

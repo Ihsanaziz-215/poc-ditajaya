@@ -28,7 +28,7 @@ export function QuoteDocument({ quote: q, vi, cust, formId, expired }: { quote: 
         <tbody>
           {v.items.map((i, k) => (
             <tr key={i.iid}>
-              <td>{k + 1}</td><td>{i.name}</td><td className="r">{i.qty}</td><td className="r">{rn(i.price)}</td><td className="r">{rn(i.disc || 0)}</td>
+              <td>{k + 1}</td><td>{i.name}{i.partNo && <div style={{ color: '#777', fontSize: 11 }}>Part No: {i.partNo}</div>}</td><td className="r">{i.qty}{i.unit ? ` ${i.unit}` : ''}</td><td className="r">{rn(i.price)}</td><td className="r">{rn(i.disc || 0)}</td>
               <td className="r">{rn(Math.max(i.qty * i.price - (i.disc || 0), 0))}</td>
             </tr>
           ))}

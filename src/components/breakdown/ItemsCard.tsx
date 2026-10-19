@@ -18,10 +18,11 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
   const [rev, setRev] = useState(0)
   const [nn, setNn] = useState('')
   const [nq, setNq] = useState(1)
+  const [nu, setNu] = useState('')
   const nStr = f.items.filter((i) => i.struck).length
   const tot = total(f)
 
-  const edit = async (iid: string, field: 'name' | 'qty' | 'price' | 'supplier', value: string) => {
+  const edit = async (iid: string, field: 'name' | 'qty' | 'price' | 'supplier' | 'unit' | 'partNo' | 'spec', value: string) => {
     await run(editItemAction(f.id, iid, field, value))
     setRev((r) => r + 1)
   }
@@ -45,7 +46,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
         <table className="tbl">
           <thead>
             <tr>
-              <th style={{ width: 44 }}>No</th><th>Nama barang</th><th className="num">Qty</th><th className="num">Harga</th><th>Supplier</th><th className="num">Total</th>
+              <th style={{ width: 44 }}>No</th><th>Nama barang</th><th>Part No</th><th className="num">Qty</th><th>Satuan</th><th className="num">Harga</th><th>Supplier</th><th className="num">Total</th>
               {cs && <th />}
             </tr>
           </thead>
@@ -59,11 +60,24 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
                     {cs && !x ? (
                       <input defaultValue={i.name} aria-label="Nama barang" onBlur={(e) => e.target.value !== i.name && edit(i.id, 'name', e.target.value)} />
                     ) : x ? <><s>{i.name}</s> <span className="b gray">Dicoret</span></> : i.name}
+                    {cs && !x ? (
+                      <input defaultValue={i.spec ?? ''} placeholder="Spesifikasi (opsional)" aria-label="Spesifikasi" style={{ marginTop: 4, fontSize: 12 }} onBlur={(e) => e.target.value.trim() !== (i.spec ?? '') && edit(i.id, 'spec', e.target.value)} />
+                    ) : i.spec ? <div style={{ color: 'var(--muted)', fontSize: 12 }}>{i.spec}</div> : null}
+                  </td>
+                  <td>
+                    {cs && !x ? (
+                      <input defaultValue={i.partNo ?? ''} placeholder="-" aria-label="Part No" style={{ width: 110 }} onBlur={(e) => e.target.value.trim() !== (i.partNo ?? '') && edit(i.id, 'partNo', e.target.value)} />
+                    ) : i.partNo || '—'}
                   </td>
                   <td className="num">
                     {cs && !x ? (
                       <input className="q" type="number" min={1} defaultValue={i.qty} aria-label="Qty" onBlur={(e) => e.target.value !== String(i.qty) && edit(i.id, 'qty', e.target.value)} />
                     ) : x ? <s>{i.qty}</s> : i.qty}
+                  </td>
+                  <td>
+                    {cs && !x ? (
+                      <input list="units" defaultValue={i.unit ?? ''} placeholder="pcs" aria-label="Satuan" style={{ width: 80 }} onBlur={(e) => e.target.value.trim() !== (i.unit ?? '') && edit(i.id, 'unit', e.target.value)} />
+                    ) : i.unit || '—'}
                   </td>
                   <td className="num">
                     {cp && !x ? (
@@ -114,18 +128,20 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
         <div className="addrow">
           <input className="n" placeholder="Tambah barang: nama" aria-label="Nama barang baru" value={nn} onChange={(e) => setNn(e.target.value)} />
           <input className="q" type="number" min={1} aria-label="Qty barang baru" value={nq} onChange={(e) => setNq(Number(e.target.value))} />
+          <input list="units" placeholder="Satuan" aria-label="Satuan barang baru" style={{ width: 90 }} value={nu} onChange={(e) => setNu(e.target.value)} />
           <button
             className="btn info sm"
             disabled={pending}
             onClick={async () => {
-              const r = await run(addItemAction(f.id, { name: nn, qty: nq }))
-              if (r.ok) { setNn(''); setNq(1) }
+              const r = await run(addItemAction(f.id, { name: nn, qty: nq, unit: nu }))
+              if (r.ok) { setNn(''); setNq(1); setNu('') }
             }}
           >
             <Icon name="plus" />Tambah
           </button>
         </div>
       )}
+      <datalist id="units">{['pcs', 'set', 'unit', 'lot', 'meter', 'tabung', 'kg', 'liter', 'roll'].map((u) => <option key={u} value={u} />)}</datalist>
       {lockHint}
       {role === 'Sales' && f.status === 'Harga Terisi' && (
         <div className="hint"><Icon name="info" />Barang yang tidak dibutuhkan customer dicoret, bukan dihapus. Tetap tampil di daftar, tapi tidak ikut dibeli dan tidak masuk quotation.</div>

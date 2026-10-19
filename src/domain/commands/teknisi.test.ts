@@ -10,6 +10,23 @@ describe('createForm', () => {
     const db = freshDb()
     expect(() => createForm(db, as(db, 'Sales'), input)).toThrow(DomainError)
   })
+  test('analysis is optional; machine data and item unit/part no are stored', () => {
+    const db = freshDb()
+    createForm(db, as(db, 'Teknisi'), {
+      ...input, analysis: '', submit: true,
+      machine: { brand: ' Kaeser ', model: 'AS 36', serial: '3610646 / 1995', variant: '' },
+      items: [{ name: 'Kabel NYAF 1,5 mm', qty: 20, unit: ' meter ', partNo: '-', spec: 'tunggal' }],
+    })
+    const f = db.forms[0]
+    expect(f.status).toBe('Diajukan')
+    expect(f.machine).toEqual({ brand: 'Kaeser', model: 'AS 36', serial: '3610646 / 1995', variant: '' })
+    expect(f.items[0]).toMatchObject({ qty: 20, unit: 'meter', partNo: '-', spec: 'tunggal' })
+  })
+  test('empty machine data is not stored', () => {
+    const db = freshDb()
+    createForm(db, as(db, 'Teknisi'), { ...input, machine: { brand: ' ', model: '', serial: '', variant: '' } })
+    expect(db.forms[0].machine).toBeUndefined()
+  })
   test('submit without required fields reports per-field errors', () => {
     const db = freshDb()
     try {
@@ -18,7 +35,6 @@ describe('createForm', () => {
     } catch (e) {
       expect((e as DomainError).fields).toEqual({
         cust: 'Pilih customer.',
-        analysis: 'Hasil analisa wajib diisi.',
         items: 'Isi minimal satu barang dengan nama dan qty.',
       })
     }

@@ -33,6 +33,6 @@ export function syncQuote(db: Db, ctx: Ctx, f: Form): QuoteVersion | undefined {
   let branched: QuoteVersion | undefined
   if (v.status === 'Terkirim') v = branched = newVersion(db, ctx, q, 'revisi harga atau qty setelah terkirim')
   const old = v.items
-  v.items = active(f).map((i) => ({ iid: i.id, name: i.name, qty: i.qty, price: i.price, disc: old.find((o) => o.iid === i.id)?.disc || 0 }))
+  v.items = active(f).map((i) => ({ iid: i.id, name: i.name, qty: i.qty, price: i.price, unit: i.unit, partNo: i.partNo, disc: old.find((o) => o.iid === i.id)?.disc || 0 }))
   return branched
 }

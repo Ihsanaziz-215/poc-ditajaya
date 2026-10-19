@@ -7,6 +7,9 @@ export type ProcStatus = 'In Stock' | 'Dibeli' | 'Indent' | 'Perlu Follow Up'
 export type Confirmation = 'Menunggu' | 'Sesuai' | 'Tidak Sesuai'
 export type SendStatus = 'Belum Dikirim' | 'Terkirim' | 'Gagal Kirim'
 
+export interface Machine { brand: string; model: string; serial: string; variant: string }
+export type MachineField = keyof Machine
+
 export interface Item {
   id: string
   name: string
@@ -20,6 +23,10 @@ export interface Item {
   bad: number
   stock: number
   struck: boolean
+  /** Satuan (pcs, set, meter, lot, ...), Part No dan spesifikasi tambahan dari form teknisi. */
+  unit?: string
+  partNo?: string
+  spec?: string
 }
 
 export interface LogEntry { t: number; user: string; role: Role | '—'; act: string; o: string; n: string }
@@ -32,6 +39,8 @@ export interface Form {
   date: string
   analysis: string
   note: string
+  /** Data mesin dari form kertas teknisi: merk, model, SN/tahun, varian (connection). */
+  machine?: Machine
   items: Item[]
   status: FormStatus
   conf: Confirmation
@@ -64,7 +73,7 @@ export interface Customer {
   acts: { date: string; what: string }[]
 }
 
-export interface QuoteItem { iid: string; name: string; qty: number; price: number; disc: number }
+export interface QuoteItem { iid: string; name: string; qty: number; price: number; disc: number; unit?: string; partNo?: string }
 
 export interface QuoteVersion {
   ver: number

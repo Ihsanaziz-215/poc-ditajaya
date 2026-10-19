@@ -1,5 +1,5 @@
 import { allGood } from '../derived'
-import type { Db } from '../types'
+import type { Db, Machine } from '../types'
 import { PERSON } from '../types'
 import { addLog, DomainError, getForm, nextId, notify, requireRole } from './core'
 import type { CommandResult, Ctx } from './core'
@@ -9,7 +9,8 @@ export interface CreateFormInput {
   date: string
   analysis: string
   note: string
-  items: { name: string; qty: number }[]
+  machine?: Machine
+  items: { name: string; qty: number; unit?: string; partNo?: string; spec?: string }[]
   submit: boolean
 }
 
@@ -19,7 +20,6 @@ export function createForm(db: Db, ctx: Ctx, input: CreateFormInput): CommandRes
   if (input.submit) {
     if (!input.cust) e.cust = 'Pilih customer.'
     if (!input.date) e.date = 'Isi tanggal analisa.'
-    if (!input.analysis.trim()) e.analysis = 'Hasil analisa wajib diisi.'
     if (!input.items.some((i) => i.name.trim() && i.qty > 0)) e.items = 'Isi minimal satu barang dengan nama dan qty.'
     else if (input.items.some((i) => i.name.trim() && !(Number.isInteger(i.qty) && i.qty > 0))) e.items = 'Qty harus lebih dari 0.'
   } else if (!input.cust) {
@@ -31,8 +31,12 @@ export function createForm(db: Db, ctx: Ctx, input: CreateFormInput): CommandRes
   const id = `BD-${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, '0')}-${String(++db.seq.form).padStart(3, '0')}`
   const f = {
     id, cust: input.cust, tech: PERSON.Teknisi, date: input.date || '', analysis: input.analysis.trim(), note: input.note.trim(),
+    machine: input.machine && Object.values(input.machine).some((v) => String(v).trim())
+      ? Object.fromEntries(Object.entries(input.machine).map(([k, v]) => [k, String(v).trim().slice(0, 200)])) as unknown as Machine
+      : undefined,
     items: input.items.filter((i) => i.name.trim() && i.qty > 0).map((i) => ({
       id: nextId(db), name: i.name.trim(), qty: i.qty, price: 0, supplier: '', proc: null, eta: '', pnote: '', good: 0, bad: 0, stock: 0, struck: false,
+      unit: (i.unit ?? '').trim().slice(0, 200), partNo: (i.partNo ?? '').trim().slice(0, 200), spec: (i.spec ?? '').trim().slice(0, 200),
     })),
     status: input.submit ? ('Diajukan' as const) : ('Draft' as const),
     conf: 'Menunggu' as const, confNote: '', done: false, log: [], comments: [],

@@ -65,12 +65,18 @@ export function buildSeed(real: number): Db {
   const f1 = mk('BD-2610-001', 'PT Sarana Sentra', '2026-10-14', 'Kompresor refrigerasi dryer Harland HRND 930 tidak mendingin. Kompresor, filter dryer dan katup ekspansi perlu diganti.', [
     it('Compressor refrigran Daikin single phase JT90GBBV1L', 1), it('Filter dryer DML 163s', 1), it('Thermostatic expansion valve Danfoss TUBE', 1), it('Hotgas by pas valve Danfoss TCHE', 1),
     it('Freon R134a', 1), it('Freon R11', 1), it('Evaporator', 1), it('Contactor LC1D25M7', 1)], 'Diajukan')
+  f1.machine = { brand: 'Harland', model: 'HRND 930', serial: 'P104774453', variant: '' }
+  f1.items.forEach((i) => { i.unit = 'pcs' }); f1.items[0].unit = 'set'; f1.items[0].spec = 'Type JT90GBBV1L, 220 V / 50 Hz / R134a'; f1.items[4].unit = 'tabung'; f1.items[5].unit = 'tabung'
+  f1.items[1].partNo = '023Z506491'
   submit(f1, D(10, 14, 16, 2)); f1.items[4].stock = 3; f1.items[1].stock = 1
   C(f1, D(10, 14, 16, 10), 'Teknisi', 'Unit di lokasi, bisa dicek ulang kalau ada pertanyaan soal spesifikasi.')
   /* F2 harga terisi */
   const f2 = mk('BD-2610-002', 'PT Dunia Mega Raya', '2026-10-12', 'Panel kontrol kompresor Kaeser AS 36 perlu penggantian timer, contactor dan komponen kelistrikan.', [
     it('Timer type DZT 410909/230V', 1), it('Contactor Schneider LC1D50A 220V', 1), it('Skun Y 2,5 mm', 50), it('Skun Y 4,0 mm', 25),
     it('Push bottom type KG5-BE 102c (merah)', 1), it('Push bottom type KG5-BE 101c (hijau)', 1), it('Kabel tunggal NYAF 1,5 mm', 20)], 'Harga Terisi')
+  f2.machine = { brand: 'Kaeser', model: 'AS 36', serial: '3610646 / 1995', variant: '' }
+  f2.items.forEach((i) => { i.unit = 'pcs' }); f2.items[2].unit = 'pcs'; f2.items[6].unit = 'meter'
+  f2.items[0].spec = 'Model No: 410909/230V/50-60 Hz'
   submit(f2, D(10, 12, 10, 0))
   const TLM = 'Toko Listrik Mandiri'
   price(f2, D(10, 13, 9, 0), [[650000, TLM], [1250000, TLM], [3500, TLM], [4500, TLM], [85000, TLM], [85000, TLM], [6500, TLM]])
@@ -132,7 +138,7 @@ export function buildSeed(real: number): Db {
       ver: 1, date: D(10, 8, 10, 30), expiry: '2026-10-29', subject: `Penawaran ${f.cust}`, desc: '', owner: P.Sales, pic: c.pic, email: c.email, addr: c.addr, lead: '',
       termin: 'DP 50% setelah PO, pelunasan setelah pekerjaan selesai', estimasi: '7-14 hari kerja setelah barang diterima', catatan: '',
       status: 'Belum Dikirim', sentTo: '', cc: '', sentAt: null,
-      items: act(f).map((i) => ({ iid: i.id, name: i.name, qty: i.qty, price: i.price, disc: 0 })), ...over,
+      items: act(f).map((i) => ({ iid: i.id, name: i.name, qty: i.qty, price: i.price, unit: i.unit, partNo: i.partNo, disc: 0 })), ...over,
     }
     v.status = 'Terkirim'; v.sentTo = c.email; v.sentAt = v.date + 3600000
     quotes.push({ id: 'Q' + qseq, number: qno(qseq), formId: f.id, versions: [v] })
