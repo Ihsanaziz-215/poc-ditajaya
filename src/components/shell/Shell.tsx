@@ -1,10 +1,10 @@
 import { Icon } from '@/components/ui/Icon'
-import { PERSON } from '@/domain/types'
 import type { Notif, Role } from '@/domain/types'
 import { AssumptionsButton } from './AssumptionsModal'
 import { Bell } from './Bell'
 import type { BellNotif } from './Bell'
 import { ResetButton, UserMenu } from './UserMenu'
+import { ProfileMenu } from './ProfileMenu'
 import { Sidebar } from './Sidebar'
 import { ThemeToggle } from './ThemeToggle'
 
@@ -33,7 +33,7 @@ export function Shell({ role, notifs, children }: { role: Role; notifs: Notif[];
           </div>
           <Bell role={role} notifs={mine} unreadCount={unreadCount} />
           <ThemeToggle />
-          <div className="avatar" title={`${PERSON[role]} (${role})`}>{PERSON[role][0]}</div>
+          <ProfileMenu role={role} />
         </header>
         <main className="page">{children}</main>
       </div>

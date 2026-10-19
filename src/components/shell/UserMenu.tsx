@@ -4,18 +4,10 @@ import { Icon } from '@/components/ui/Icon'
 import { useAction, useUi } from '@/components/ui/Providers'
 import { PERSON } from '@/domain/types'
 import type { Role } from '@/domain/types'
-import { logoutAction, resetDemoAction } from '@/server/actions/app'
+import { resetDemoAction } from '@/server/actions/app'
 
 export function UserMenu({ role }: { role: Role }) {
-  const { run, pending } = useAction()
-  return (
-    <>
-      <span className="rp on" title={PERSON[role]}>{PERSON[role]} · {role}</span>
-      <button className="ib" title="Keluar" aria-label="Keluar" disabled={pending} onClick={() => run(logoutAction())}>
-        <Icon name="lock" />
-      </button>
-    </>
-  )
+  return <span className="rp on" title={PERSON[role]}>{PERSON[role]} · {role}</span>
 }
 
 export function ResetButton() {
