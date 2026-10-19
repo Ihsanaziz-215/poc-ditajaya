@@ -1,4 +1,4 @@
-export type IconName = 'gauge' | 'leads' | 'quotes' | 'mail' | 'clip' | 'contact' | 'box' | 'flow' | 'tag' | 'truck' | 'pack' | 'bell' | 'moon' | 'sun' | 'search' | 'plus' | 'eye' | 'lock' | 'trash' | 'pen' | 'file' | 'send' | 'reset' | 'info' | 'user' | 'alert' | 'logout'
+export type IconName = 'gauge' | 'leads' | 'quotes' | 'mail' | 'clip' | 'contact' | 'box' | 'flow' | 'tag' | 'truck' | 'pack' | 'bell' | 'moon' | 'sun' | 'search' | 'plus' | 'eye' | 'lock' | 'trash' | 'pen' | 'file' | 'send' | 'reset' | 'info' | 'user' | 'alert' | 'logout' | 'check'
 
 const PATHS: Record<IconName, string> = {
   gauge: '<path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l3-5"/><circle cx="12" cy="17" r="1.4"/>',
@@ -26,6 +26,7 @@ const PATHS: Record<IconName, string> = {
   reset: '<path d="M4 12a8 8 0 1 0 3-6"/><path d="M4 4v5h5"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 15-5 16 0"/>',
+  check: '<path d="M5 12l5 5L20 7"/>',
   logout: '<path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M16 8l4 4-4 4"/><path d="M20 12H9"/>',
   alert: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',
 }

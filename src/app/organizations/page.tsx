@@ -79,8 +79,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                   <td>{fu ? <span className="b ok">Sudah</span> : <span className="b bad">Belum follow up bulan ini</span>}</td>
                   <td style={{ whiteSpace: 'nowrap' }}>
                     <Link className="btn sec sm" href={`/organizations/${c.id}/edit`} aria-label={`Edit ${c.name}`}><Icon name="pen" /></Link>{' '}
-                    {role === 'Sales' && <><DeleteOrgButton cid={c.id} name={c.name} />{' '}</>}
-                    {!fu && role === 'Sales' && <FollowUpButton cid={c.id} />}
+                    <DeleteOrgButton cid={c.id} name={c.name} canEdit={role === 'Sales'} />{' '}
+                    {!fu && <FollowUpButton cid={c.id} canEdit={role === 'Sales'} />}
                   </td>
                   </tr>
                   {sp.cx === c.id && (
