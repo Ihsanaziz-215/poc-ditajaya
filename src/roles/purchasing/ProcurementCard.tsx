@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { useAction } from '@/components/ui/Providers'
-import { active, canSetProc, need } from '@/domain/derived'
+import { active, canSetProc, need, stockOf } from '@/domain/derived'
 import type { Form, Role } from '@/domain/types'
 import { fd } from '@/lib/format'
 import { markAllBoughtAction, resolveFollowUpAction, setFromStockAction, setProcAction, setProcInfoAction } from './actions'
@@ -36,7 +36,7 @@ export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
                 <td>{i.name}</td>
                 <td>{i.supplier || '—'}</td>
                 <td className="num">{i.qty}</td>
-                <td className="num">{i.stock || 0}</td>
+                <td className="num">{stockOf(i)}</td>
                 <td className="num">
                   {canAct && i.proc !== 'Perlu Follow Up' ? (
                     <input className="q" type="number" min={0} max={i.qty} defaultValue={i.fromStock || 0} disabled={pending || i.good > 0 || i.bad > 0} aria-label="Qty dari stok" onBlur={(e) => e.target.value !== String(i.fromStock || 0) && after(run(setFromStockAction(f.id, i.id, Number(e.target.value))))} />
@@ -73,7 +73,7 @@ export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
           </tbody>
         </table>
       </div>
-      <div className="hint"><Icon name="info" />Stok mengacu ke data Products (In Stock dan On Hand) di app live. Angka di prototype adalah mock.</div>
+      <div className="hint"><Icon name="info" />Stok mengacu ke data Products (In Stock dan On Hand) di app live. Angka stok di prototype ini acak (mock).</div>
     </div>
   )
 }

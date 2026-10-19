@@ -132,3 +132,17 @@ export const hasFollowUp = (c: Customer, t: Date): boolean => {
   const m = iso(t).slice(0, 7)
   return c.acts.some((a) => a.date.slice(0, 7) === m)
 }
+
+/**
+ * Stok gudang (mock). Data Products belum tersambung, jadi tiap barang diberi angka acak yang stabil
+ * (dari id barang) supaya kolom tidak kosong: sebagian cukup, sebagian kurang (tidak pernah 0).
+ * Angka yang sudah diisi eksplisit (stock > 0) dipakai apa adanya.
+ */
+export const stockOf = (i: Item): number => {
+  if (i.stock > 0) return i.stock
+  let h = 0
+  for (const c of i.id) h = (h * 31 + c.charCodeAt(0)) >>> 0
+  const r = h % 5 // 0-2 = sebagian, 3-4 = cukup
+  if (r <= 2) return Math.max(1, Math.floor(i.qty / 2))
+  return i.qty + (h % 4)
+}
