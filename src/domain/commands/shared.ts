@@ -16,6 +16,7 @@ export const fieldLabel = (k: string): string => FL[k]
 
 const ITEM_FIELDS: ItemField[] = ['name', 'qty', 'price', 'supplier', 'unit', 'partNo', 'spec']
 const TEXT_MAX = 200
+const SPEC_MAX = 500
 
 export function editItem(db: Db, ctx: Ctx, fid: string, iid: string, field: ItemField, value: string | number): CommandResult {
   if (!ITEM_FIELDS.includes(field)) throw new DomainError('Field tidak dapat diubah.')
@@ -30,7 +31,7 @@ export function editItem(db: Db, ctx: Ctx, fid: string, iid: string, field: Item
   if (field === 'qty' && !(Number.isInteger(nv) && (nv as number) >= 1)) throw new DomainError('Qty minimal 1.')
   if (field === 'price' && !((nv as number) >= 0)) throw new DomainError('Harga tidak valid.')
   if (field === 'name' && !nv) throw new DomainError('Nama barang tidak boleh kosong.')
-  if ((field === 'unit' || field === 'partNo' || field === 'spec') && String(nv).length > TEXT_MAX) throw new DomainError(`${FL[field]} maksimal ${TEXT_MAX} karakter.`)
+  if (field === 'spec' ? String(nv).length > SPEC_MAX : (field === 'unit' || field === 'partNo') && String(nv).length > TEXT_MAX) throw new DomainError(`${FL[field]} maksimal ${field === 'spec' ? SPEC_MAX : TEXT_MAX} karakter.`)
   const ov = it[field] ?? ''
   if (ov === nv) return
   ;(it as unknown as Record<string, unknown>)[field] = nv

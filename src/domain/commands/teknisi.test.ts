@@ -22,6 +22,14 @@ describe('createForm', () => {
     expect(f.machine).toEqual({ brand: 'Kaeser', model: 'AS 36', serial: '3610646 / 1995', variant: '' })
     expect(f.items[0]).toMatchObject({ qty: 20, unit: 'meter', partNo: '-', spec: 'tunggal' })
   })
+  test('section headings are kept as the group of the items below them', () => {
+    const db = freshDb()
+    createForm(db, as(db, 'Teknisi'), {
+      ...input,
+      items: [{ name: 'Evaporator', qty: 1 }, { name: 'Kawat las perak', qty: 15, group: ' COMPATIBLE ' }, { name: 'Pentil', qty: 5, group: 'COMPATIBLE' }],
+    })
+    expect(db.forms[0].items.map((i) => i.group)).toEqual([undefined, 'COMPATIBLE', 'COMPATIBLE'])
+  })
   test('empty machine data is not stored', () => {
     const db = freshDb()
     createForm(db, as(db, 'Teknisi'), { ...input, machine: { brand: ' ', model: '', serial: '', variant: '' } })

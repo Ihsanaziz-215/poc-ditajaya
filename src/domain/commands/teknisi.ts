@@ -10,7 +10,7 @@ export interface CreateFormInput {
   analysis: string
   note: string
   machine?: Machine
-  items: { name: string; qty: number; unit?: string; partNo?: string; spec?: string }[]
+  items: { name: string; qty: number; unit?: string; partNo?: string; spec?: string; group?: string }[]
   submit: boolean
 }
 
@@ -36,7 +36,7 @@ export function createForm(db: Db, ctx: Ctx, input: CreateFormInput): CommandRes
       : undefined,
     items: input.items.filter((i) => i.name.trim() && i.qty > 0).map((i) => ({
       id: nextId(db), name: i.name.trim(), qty: i.qty, price: 0, supplier: '', proc: null, eta: '', pnote: '', good: 0, bad: 0, stock: 0, struck: false,
-      unit: (i.unit ?? '').trim().slice(0, 200), partNo: (i.partNo ?? '').trim().slice(0, 200), spec: (i.spec ?? '').trim().slice(0, 200),
+      unit: (i.unit ?? '').trim().slice(0, 200), partNo: (i.partNo ?? '').trim().slice(0, 200), spec: (i.spec ?? '').trim().slice(0, 500), group: (i.group ?? '').trim().slice(0, 200) || undefined,
     })),
     status: input.submit ? ('Diajukan' as const) : ('Draft' as const),
     conf: 'Menunggu' as const, confNote: '', done: false, log: [], comments: [],

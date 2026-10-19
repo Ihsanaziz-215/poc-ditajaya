@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { useAction, useUi } from '@/components/ui/Providers'
 import { active, total } from '@/domain/derived'
@@ -53,16 +53,21 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
           <tbody>
             {f.items.map((i, k) => {
               const x = i.struck
+              const head = i.group && i.group !== (f.items[k - 1]?.group ?? '') ? i.group : ''
               return (
-                <tr key={`${i.id}-${rev}`} style={x ? { opacity: 0.65 } : undefined}>
+                <Fragment key={`${i.id}-${rev}`}>
+                {head && (
+                  <tr style={{ background: 'var(--warn-soft)' }}><td colSpan={cs ? 9 : 8} style={{ textAlign: 'center', fontWeight: 600 }}>{head}</td></tr>
+                )}
+                <tr style={x ? { opacity: 0.65 } : undefined}>
                   <td>{k + 1}</td>
                   <td>
                     {cs && !x ? (
                       <input defaultValue={i.name} aria-label="Nama barang" onBlur={(e) => e.target.value !== i.name && edit(i.id, 'name', e.target.value)} />
                     ) : x ? <><s>{i.name}</s> <span className="b gray">Dicoret</span></> : i.name}
                     {cs && !x ? (
-                      <input defaultValue={i.spec ?? ''} placeholder="Spesifikasi (opsional)" aria-label="Spesifikasi" style={{ marginTop: 4, fontSize: 12 }} onBlur={(e) => e.target.value.trim() !== (i.spec ?? '') && edit(i.id, 'spec', e.target.value)} />
-                    ) : i.spec ? <div style={{ color: 'var(--muted)', fontSize: 12 }}>{i.spec}</div> : null}
+                      <textarea defaultValue={i.spec ?? ''} rows={1} placeholder="Baris tambahan (opsional)" aria-label="Spesifikasi" style={{ marginTop: 4, fontSize: 12, minHeight: 34 }} onBlur={(e) => e.target.value.trim() !== (i.spec ?? '') && edit(i.id, 'spec', e.target.value)} />
+                    ) : i.spec ? <div style={{ color: 'var(--muted)', fontSize: 12, whiteSpace: 'pre-line' }}>{i.spec}</div> : null}
                   </td>
                   <td>
                     {cs && !x ? (
@@ -119,6 +124,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
                     </td>
                   )}
                 </tr>
+                </Fragment>
               )
             })}
           </tbody>

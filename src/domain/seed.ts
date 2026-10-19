@@ -68,6 +68,7 @@ export function buildSeed(real: number): Db {
   f1.machine = { brand: 'Harland', model: 'HRND 930', serial: 'P104774453', variant: '' }
   f1.items.forEach((i) => { i.unit = 'pcs' }); f1.items[0].unit = 'set'; f1.items[0].spec = 'Type JT90GBBV1L, 220 V / 50 Hz / R134a'; f1.items[4].unit = 'tabung'; f1.items[5].unit = 'tabung'
   f1.items[1].partNo = '023Z506491'
+  f1.items[3].spec = 'type: Dunfos TCHE 068U4583 / 01238\nR134a'; f1.items[7].group = 'COMPATIBLE'
   submit(f1, D(10, 14, 16, 2)); f1.items[4].stock = 3; f1.items[1].stock = 1
   C(f1, D(10, 14, 16, 10), 'Teknisi', 'Unit di lokasi, bisa dicek ulang kalau ada pertanyaan soal spesifikasi.')
   /* F2 harga terisi */

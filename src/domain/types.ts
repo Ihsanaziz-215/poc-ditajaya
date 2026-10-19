@@ -27,6 +27,8 @@ export interface Item {
   unit?: string
   partNo?: string
   spec?: string
+  /** Judul seksi di form kertas (mis. COMPATIBLE); tampil sebagai baris judul sebelum barang pertama seksi itu. */
+  group?: string
 }
 
 export interface LogEntry { t: number; user: string; role: Role | '—'; act: string; o: string; n: string }

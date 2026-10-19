@@ -116,7 +116,7 @@ describe('unit, part no and machine data', () => {
     const { db, f } = draft()
     const id = f.items[0].id
     expect(() => editItem(db, as(db, 'Purchasing'), f.id, id, 'unit', 'set')).toThrow(DomainError)
-    expect(() => editItem(db, as(db, 'Teknisi'), f.id, id, 'spec', 'x'.repeat(201))).toThrow(DomainError)
+    expect(() => editItem(db, as(db, 'Teknisi'), f.id, id, 'spec', 'x'.repeat(501))).toThrow(DomainError)
   })
   test('addItem stores the unit', () => {
     const { db, f } = draft()
