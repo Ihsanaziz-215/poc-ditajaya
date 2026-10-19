@@ -24,8 +24,8 @@ export function OrgFilters({ total }: { total: number }) {
       <select style={{ width: 140 }} aria-label="Filter class" value={sp.get('cc') ?? ''} onChange={(e) => set('cc', e.target.value)}>
         <option value="">Semua class</option><option>A</option><option>B</option><option>C</option>
       </select>
-      <select style={{ width: 230 }} aria-label="Filter follow up" value={sp.get('cf') ?? ''} onChange={(e) => set('cf', e.target.value)}>
-        <option value="">Semua follow up</option><option value="1">Belum follow up bulan ini</option>
+      <select style={{ width: 170 }} aria-label="Filter follow up" value={sp.get('cf') ?? ''} onChange={(e) => set('cf', e.target.value)}>
+        <option value="">Semua follow up</option><option value="1">Belum follow up</option>
       </select>
       <div className="pager">Per Page <select aria-label="Per page" defaultValue="10"><option>10</option></select> 1 - {total} of {total}</div>
     </div>

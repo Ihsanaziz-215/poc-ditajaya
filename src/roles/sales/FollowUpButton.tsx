@@ -10,10 +10,10 @@ export function FollowUpButton({ cid, canEdit }: { cid: string; canEdit: boolean
     <button
       className="btn sm"
       disabled={pending || !canEdit}
-      title={canEdit ? 'Catat bahwa customer ini sudah di-follow up bulan ini' : 'Hanya Sales yang bisa mencatat follow up'}
+      title={canEdit ? 'Tandai customer ini sudah di-follow up bulan ini' : 'Hanya Sales yang bisa mencatat follow up'}
       onClick={() => run(recordFollowUpAction(cid))}
     >
-      <Icon name="check" />Sudah follow up
+      <Icon name="check" />Sudah
     </button>
   )
 }

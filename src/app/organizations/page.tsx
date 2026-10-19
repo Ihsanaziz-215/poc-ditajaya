@@ -66,7 +66,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
         <Suspense><OrgFilters total={rows.length} /></Suspense>
         <div className="wrapx">
           <table className="tbl">
-            <thead><tr><th>ID</th><th>Name</th><th className="num">Person Count</th><th>Created At</th><th>Status</th><th>Class</th><th className="num">Total Mesin</th><th>Pembelian Terakhir</th><th>Follow Up Bulan Ini</th><th>Actions</th></tr></thead>
+            <thead><tr><th>ID</th><th>Name</th><th className="num">Person Count</th><th>Created At</th><th>Status</th><th>Class</th><th className="num">Total Mesin</th><th>Pembelian Terakhir</th><th>Follow Up</th><th>Actions</th></tr></thead>
             <tbody>
               {rows.map(({ c, l, fu }) => (
                 <Fragment key={c.id}>
@@ -79,7 +79,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                   <td>{l.cls === '—' ? '—' : <span className={`b ${{ A: 'ok', B: 'info', C: 'gray' }[l.cls]}`}>Class {l.cls}</span>}</td>
                   <td className="num">{l.mesin}</td>
                   <td>{fd(l.last)}</td>
-                  <td>{fu ? <span className="b ok">Sudah</span> : <span className="b bad">Belum follow up bulan ini</span>}</td>
+                  <td>{fu ? <span className="b ok">Sudah</span> : <span className="b bad">Belum</span>}</td>
                   <td style={{ whiteSpace: 'nowrap' }}>
                     <Link className="btn sec sm" href={`/organizations/${c.id}/edit`} aria-label={`Edit ${c.name}`}><Icon name="pen" /></Link>{' '}
                     <DeleteOrgButton cid={c.id} name={c.name} canEdit={role === 'Sales'} />{' '}
