@@ -7,7 +7,7 @@ import { Icon } from '@/components/ui/Icon'
 import { PageHead } from '@/components/ui/PageHead'
 import { isExpired, today } from '@/domain/derived'
 import { PERSON } from '@/domain/types'
-import { fd, fdt } from '@/lib/format'
+import { fdt } from '@/lib/format'
 import { getRole } from '@/lib/role'
 import { store } from '@/server/store'
 
