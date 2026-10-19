@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import { buildSeed } from '@/domain/seed'
 import type { Db } from '@/domain/types'
@@ -51,4 +52,4 @@ export function createStore(file: string): Store {
 }
 
 const g = globalThis as unknown as { __dbStore?: Store }
-export const store: Store = (g.__dbStore ??= createStore(process.env.DB_PATH ?? path.join(process.cwd(), 'data', 'db.json')))
+export const store: Store = (g.__dbStore ??= createStore(process.env.DB_PATH ?? path.join(process.env.VERCEL ? os.tmpdir() : path.join(process.cwd(), 'data'), 'db.json')))
