@@ -14,4 +14,5 @@ export const ASSUME: [string, string][] = [
   ['Field quotation', 'Usulan di PRD, belum final. Field supplier sudah ditetapkan: nama supplier, kontak, nama PIC, kategori, status.'],
   ['Field dari form kertas teknisi', 'Data mesin (merk, model, SN/tahun, varian), Part No, Satuan, dan spesifikasi per barang ditambahkan dari form kertas lapangan. Semuanya opsional dan belum ada di PRD B2. Hasil analisa tidak wajib karena form kertas tidak punya kolom itu.'],
   ['Barang datang sebagian', 'Tidak diatur di PRD. Prototype mengizinkan penerimaan per barang dan per qty, status form baru Diterima Baik bila semua barang lengkap.'],
+  ['Purchasing mengisi atau mengganti supplier setelah Disetujui', 'PRD B3 mengunci isi form untuk Purchasing setelah dikirim ke Sales. Di prototype Purchasing boleh mengisi atau mengganti supplier saat pengadaan (termasuk barang tambahan Sales) sampai Gudang menerima barang.'],
 ]
