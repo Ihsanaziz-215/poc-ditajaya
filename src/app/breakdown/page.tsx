@@ -5,7 +5,7 @@ import { Icon } from '@/components/ui/Icon'
 import { PageHead } from '@/components/ui/PageHead'
 import { ListFilters } from '@/components/breakdown/ListFilters'
 import { filterForms } from '@/domain/listing'
-import { isExpired, statusOf, today, total } from '@/domain/derived'
+import { isExpired, statusOf, today, total, turnOf } from '@/domain/derived'
 import { fd, rp } from '@/lib/format'
 import { getRole } from '@/lib/role'
 import { store } from '@/server/store'
@@ -32,13 +32,15 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
             <thead>
               <tr>
                 <th>No. Form</th><th>Customer</th><th>Teknisi</th><th>Tanggal Analisa</th><th>Status</th>
-                <th className="num">Total Harga</th><th>Quotation</th>
+                <th className="num">Total Harga</th><th>Quotation</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((f) => {
                 const q = db.quotes.find((x) => x.formId === f.id)
                 const v = q?.versions[q.versions.length - 1]
+                const turn = turnOf(f)
+                const mine = turn?.role === role
                 return (
                   <tr key={f.id} className="row">
                     <td><Link href={`/breakdown/${f.id}`}>{f.id}</Link></td>
@@ -52,11 +54,18 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                         <>v{v.ver} <Badge v={v.status} />{isExpired(v, t) && <> <Badge v="Kedaluwarsa" /></>}</>
                       ) : '—'}
                     </td>
+                    <td>
+                      {mine ? (
+                        <Link className="btn sm" href={`/breakdown/${f.id}`} title={turn.text}><Icon name="pen" />Edit</Link>
+                      ) : (
+                        <span style={{ color: 'var(--muted)' }} title={turn ? `Giliran ${turn.role}` : undefined}>—</span>
+                      )}
+                    </td>
                   </tr>
                 )
               })}
               {!rows.length && (
-                <tr><td colSpan={7} className="empty">Tidak ada form yang cocok dengan filter.</td></tr>
+                <tr><td colSpan={8} className="empty">Tidak ada form yang cocok dengan filter.</td></tr>
               )}
             </tbody>
           </table>
