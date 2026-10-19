@@ -4,7 +4,7 @@ import type { Notif, Role } from '@/domain/types'
 import { AssumptionsButton } from './AssumptionsModal'
 import { Bell } from './Bell'
 import type { BellNotif } from './Bell'
-import { ResetButton, RoleSwitcher } from './RoleSwitcher'
+import { ResetButton, UserMenu } from './UserMenu'
 import { Sidebar } from './Sidebar'
 import { ThemeToggle } from './ThemeToggle'
 
@@ -27,7 +27,7 @@ export function Shell({ role, notifs, children }: { role: Role; notifs: Notif[];
           <div className="sp" />
           <div className="demo">
             <small>Demo · masuk sebagai</small>
-            <RoleSwitcher role={role} />
+            <UserMenu role={role} />
             <ResetButton />
             <AssumptionsButton />
           </div>

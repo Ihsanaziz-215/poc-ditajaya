@@ -5,7 +5,6 @@ import { PERSON } from '@/domain/types'
 import { iso } from '@/lib/format'
 import { getRole } from '@/lib/role'
 import { NewForm } from '@/roles/teknisi/NewForm'
-import { SwitchToTeknisi } from '@/roles/teknisi/SwitchToTeknisi'
 import { store } from '@/server/store'
 
 export default async function Page() {
@@ -17,9 +16,8 @@ export default async function Page() {
         <div className="card">
           <div className="banner stop" style={{ margin: 0 }}>
             <Icon name="lock" />
-            <div><b>Form baru hanya bisa dibuat oleh Teknisi</b>Anda login sebagai {role}. Ganti role untuk mencoba mengisi form analisa.</div>
+            <div><b>Form baru hanya bisa dibuat oleh Teknisi</b>Anda login sebagai {role}. Keluar lalu login sebagai Teknisi untuk mengisi form analisa.</div>
           </div>
-          <div className="acts" style={{ marginTop: 14 }}><SwitchToTeknisi /></div>
         </div>
       </>
     )

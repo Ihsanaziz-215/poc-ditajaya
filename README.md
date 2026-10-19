@@ -1,6 +1,6 @@
 # POC Ditajaya: Modul Form Breakdown
 
-Port prototype HTML Form Breakdown ke Next.js (App Router, TypeScript, Tailwind). Satu app, satu dashboard, dengan tombol switch role di header (Teknisi, Purchasing, Sales, Gudang). Tidak ada auth.
+Port prototype HTML Form Breakdown ke Next.js (App Router, TypeScript, Tailwind). Satu app, satu dashboard, dengan satu login per role (Teknisi, Purchasing, Sales, Gudang).
 
 ## Menjalankan
 
@@ -17,7 +17,7 @@ Semua data disimpan di `data/db.json` (di-gitignore) dan di-seed dari data mock 
 
 ## Cara kerja role
 
-Role aktif disimpan di cookie `role` (default Sales). Ini hanya pemilih role, bukan auth. Aturan hak akses PRD B11 tetap ditegakkan di server: tiap aksi dicek terhadap role di cookie, dan aksi yang tidak diizinkan ditolak tanpa mengubah data.
+Tiap role punya akun sendiri: username `teknisi`, `purchasing`, `sales`, `gudang`, password bersama `ditajaya123` (ganti lewat env `DEMO_PASSWORD`). Login memasang cookie sesi `session` yang ditandatangani HMAC (`httpOnly`, 7 hari; secret dari env `SESSION_SECRET`, wajib di-set di production). `src/proxy.ts` mengarahkan semua halaman ke `/login` kalau belum login, dan role selalu diambil dari sesi di server, bukan dari klien. Aturan hak akses PRD B11 ditegakkan di server: tiap aksi dicek terhadap role sesi, dan aksi yang tidak diizinkan ditolak tanpa mengubah data. Akun dan password ini sengaja sederhana untuk POC (hardcode, tanpa database user, tanpa rate limit).
 
 ## Peta kode
 
@@ -30,7 +30,7 @@ Role aktif disimpan di cookie `role` (default Sales). Ini hanya pemilih role, bu
 
 ## Sengaja tidak ada
 
-Auth/login/RBAC, Bundling Product (TBC di PRD), email dan WhatsApp nyata (pengiriman quotation dan notifikasi disimulasikan dan dicatat di log), database sungguhan.
+Manajemen user sungguhan (akun hardcode untuk POC), Bundling Product (TBC di PRD), email dan WhatsApp nyata (pengiriman quotation dan notifikasi disimulasikan dan dicatat di log), database sungguhan.
 
 ## Perbedaan prototype dan PRD
 

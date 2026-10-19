@@ -1,10 +1,16 @@
 import { cookies } from 'next/headers'
-import { ROLES } from '@/domain/types'
+import { redirect } from 'next/navigation'
 import type { Role } from '@/domain/types'
+import { SESSION_COOKIE, verifySession } from './auth'
 
-export const ROLE_COOKIE = 'role'
+/** Role of the logged-in user, or null when there is no valid session. */
+export async function getSession(): Promise<Role | null> {
+  return verifySession((await cookies()).get(SESSION_COOKIE)?.value)
+}
 
+/** For pages behind the login: sends visitors without a session to /login. */
 export async function getRole(): Promise<Role> {
-  const v = (await cookies()).get(ROLE_COOKIE)?.value
-  return ROLES.includes(v as Role) ? (v as Role) : 'Sales'
+  const role = await getSession()
+  if (!role) redirect('/login')
+  return role
 }
