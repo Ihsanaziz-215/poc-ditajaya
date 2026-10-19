@@ -8,9 +8,9 @@ export default async function Page() {
   if (await getSession()) redirect('/breakdown')
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f6', color: '#1f2937', display: 'grid', placeItems: 'center', padding: 16 }}>
-      <div style={{ width: 600, maxWidth: '100%' }}>
-        <div style={{ display: 'grid', placeItems: 'center', marginBottom: 28 }}>
-          <Image src="/logo.png" alt="Ditajaya Mitra Perkasa" width={200} height={150} priority style={{ width: 200, height: 'auto', mixBlendMode: 'multiply' }} />
+      <div style={{ width: 380, maxWidth: '100%' }}>
+        <div style={{ display: 'grid', placeItems: 'center', marginBottom: 18 }}>
+          <Image src="/logo.png" alt="Ditajaya Mitra Perkasa" width={200} height={150} priority style={{ width: 110, height: 'auto', mixBlendMode: 'multiply' }} />
         </div>
         <LoginForm />
       </div>
