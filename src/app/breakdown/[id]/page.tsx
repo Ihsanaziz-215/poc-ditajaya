@@ -9,7 +9,7 @@ import { MachineCard } from '@/components/breakdown/MachineCard'
 import { LogCard } from '@/components/breakdown/LogCard'
 import { Stepper } from '@/components/breakdown/Stepper'
 import { today as todayOf, procOf, recvOf, stepOf, turnOf } from '@/domain/derived'
-import { canPrice, canStruct, canSup } from '@/domain/permissions'
+import { canPrice, canStruct, canSup, canSupItem } from '@/domain/permissions'
 import { iso } from '@/lib/format'
 import { getRole } from '@/lib/role'
 import { ProcurementCard } from '@/roles/purchasing/ProcurementCard'
@@ -48,7 +48,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <ItemsCard
         form={f}
         role={role}
-        perm={{ struct: canStruct(f, role), price: canPrice(f, role), sup: canSup(f, role) }}
+        perm={{ struct: canStruct(f, role), price: canPrice(f, role), sup: canSup(f, role), supItems: f.items.filter((i) => canSupItem(f, role, i)).map((i) => i.id) }}
         suppliers={db.suppliers.map((s) => ({ name: s.name, active: s.active }))}
       />
       <ProcurementCard form={f} role={role} />

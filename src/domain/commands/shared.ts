@@ -1,5 +1,5 @@
 import { rn } from '@/lib/format'
-import { canPrice, canStruct, canSup } from '../permissions'
+import { canPrice, canStruct, canSupItem } from '../permissions'
 import { PERSON, ROLES } from '../types'
 import type { Db, MachineField } from '../types'
 import { addLog, DomainError, getForm, nextId, notify, requireRole } from './core'
@@ -24,7 +24,7 @@ export function editItem(db: Db, ctx: Ctx, fid: string, iid: string, field: Item
   const it = f.items.find((i) => i.id === iid)
   if (!it) throw new DomainError('Barang tidak ditemukan.')
   const allowed =
-    field === 'price' ? canPrice(f, ctx.role) : field === 'supplier' ? canSup(f, ctx.role) : canStruct(f, ctx.role)
+    field === 'price' ? canPrice(f, ctx.role) : field === 'supplier' ? canSupItem(f, ctx.role, it) : canStruct(f, ctx.role)
   if (!allowed) throw new DomainError('Isi form terkunci untuk role ini di tahap ini.')
   const isNum = field === 'qty' || field === 'price'
   const nv = isNum ? Number(value) : String(value).trim()

@@ -9,7 +9,7 @@ import { rp } from '@/lib/format'
 import { addItemAction, deleteItemAction, editItemAction, setStrikeAction } from '@/server/actions/shared'
 import { useFormUi } from './FormUi'
 
-export interface ItemsPerm { struct: boolean; price: boolean; sup: boolean }
+export interface ItemsPerm { struct: boolean; price: boolean; sup: boolean; supItems?: string[] }
 
 export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role: Role; perm: ItemsPerm; suppliers: { name: string; active: boolean }[] }) {
   const { run, pending } = useAction()
@@ -96,7 +96,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
                     ) : i.price ? (x ? <s>{rp(i.price)}</s> : rp(i.price)) : '—'}
                   </td>
                   <td>
-                    {csu && !x ? (
+                    {(csu || perm.supItems?.includes(i.id)) && !x ? (
                       <select
                         className={missing.has(`item:${i.id}`) && !i.supplier ? 'miss' : ''}
                         defaultValue={i.supplier} aria-label="Supplier"
