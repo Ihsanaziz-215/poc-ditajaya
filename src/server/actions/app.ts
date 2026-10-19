@@ -10,9 +10,9 @@ import { run } from '../run'
 import type { ActionResult } from '../run'
 import { store } from '../store'
 
-export async function loginAction(username: string, password: string): Promise<ActionResult> {
-  const role = checkLogin(username, password)
-  if (!role) return { ok: false, error: 'Username atau password salah.' }
+export async function loginAction(email: string, password: string): Promise<ActionResult> {
+  const role = checkLogin(email, password)
+  if (!role) return { ok: false, error: 'Email atau password salah.' }
   ;(await cookies()).set(SESSION_COOKIE, signSession(role), {
     path: '/',
     maxAge: SESSION_TTL_MS / 1000,

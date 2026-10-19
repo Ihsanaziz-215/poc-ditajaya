@@ -17,7 +17,7 @@ Semua data disimpan di `data/db.json` (di-gitignore) dan di-seed dari data mock 
 
 ## Cara kerja role
 
-Tiap role punya akun sendiri: username `teknisi`, `purchasing`, `sales`, `gudang`, password bersama `ditajaya123` (ganti lewat env `DEMO_PASSWORD`). Login memasang cookie sesi `session` yang ditandatangani HMAC (`httpOnly`, 7 hari; secret dari env `SESSION_SECRET`, wajib di-set di production). `src/proxy.ts` mengarahkan semua halaman ke `/login` kalau belum login, dan role selalu diambil dari sesi di server, bukan dari klien. Aturan hak akses PRD B11 ditegakkan di server: tiap aksi dicek terhadap role sesi, dan aksi yang tidak diizinkan ditolak tanpa mengubah data. Akun dan password ini sengaja sederhana untuk POC (hardcode, tanpa database user, tanpa rate limit).
+Tiap role punya akun sendiri dengan email `<role>@ditajaya.test` (teknisi, purchasing, sales, gudang). Password bersama diatur lewat env `DEMO_PASSWORD` (nilai default untuk lokal ada di `src/lib/auth.ts`, di production wajib diganti). Login memasang cookie sesi `session` yang ditandatangani HMAC (`httpOnly`, 7 hari; secret dari env `SESSION_SECRET`, wajib di-set di production). `src/proxy.ts` mengarahkan semua halaman ke `/login` kalau belum login, dan role selalu diambil dari sesi di server, bukan dari klien. Aturan hak akses PRD B11 ditegakkan di server: tiap aksi dicek terhadap role sesi, dan aksi yang tidak diizinkan ditolak tanpa mengubah data. Akun dan password ini sengaja sederhana untuk POC (hardcode, tanpa database user, tanpa rate limit).
 
 ## Peta kode
 

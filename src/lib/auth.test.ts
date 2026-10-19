@@ -2,13 +2,14 @@ import { describe, expect, test } from 'vitest'
 import { checkLogin, DEMO_PASSWORD, SESSION_TTL_MS, signSession, verifySession } from './auth'
 
 describe('login', () => {
-  test.each([['teknisi', 'Teknisi'], ['Purchasing', 'Purchasing'], [' sales ', 'Sales'], ['gudang', 'Gudang']])('%s logs in as its own role', (u, role) => {
+  test.each([['teknisi@ditajaya.test', 'Teknisi'], ['Purchasing@Ditajaya.test', 'Purchasing'], [' sales@ditajaya.test ', 'Sales'], ['gudang@ditajaya.test', 'Gudang']])('%s logs in as its own role', (u, role) => {
     expect(checkLogin(u, DEMO_PASSWORD)).toBe(role)
   })
   test('wrong password or unknown user is rejected', () => {
-    expect(checkLogin('sales', 'salah')).toBeNull()
-    expect(checkLogin('admin', DEMO_PASSWORD)).toBeNull()
-    expect(checkLogin('sales', '')).toBeNull()
+    expect(checkLogin('sales@ditajaya.test', 'salah')).toBeNull()
+    expect(checkLogin('admin@ditajaya.test', DEMO_PASSWORD)).toBeNull()
+    expect(checkLogin('sales@ditajaya.test', '')).toBeNull()
+    expect(checkLogin('sales', DEMO_PASSWORD)).toBeNull()
   })
 })
 

@@ -5,9 +5,9 @@ import type { Role } from '@/domain/types'
 export const SESSION_COOKIE = 'session'
 export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
-/** POC accounts: one login per role. Override the shared password with DEMO_PASSWORD. */
+/** POC accounts: one login (email) per role. Override the shared password with DEMO_PASSWORD. */
 export const DEMO_PASSWORD = process.env.DEMO_PASSWORD ?? 'ditajaya123'
-export const ACCOUNTS: { username: string; role: Role }[] = ROLES.map((r) => ({ username: r.toLowerCase(), role: r }))
+export const ACCOUNTS: { email: string; role: Role }[] = ROLES.map((r) => ({ email: `${r.toLowerCase()}@ditajaya.test`, role: r }))
 
 const secret = () => process.env.SESSION_SECRET ?? 'poc-ditajaya-dev-secret'
 const sign = (payload: string) => createHmac('sha256', secret()).update(payload).digest('base64url')
@@ -18,8 +18,8 @@ const same = (a: string, b: string) => {
   return x.length === y.length && timingSafeEqual(x, y)
 }
 
-export function checkLogin(username: string, password: string): Role | null {
-  const acc = ACCOUNTS.find((a) => a.username === username.trim().toLowerCase())
+export function checkLogin(email: string, password: string): Role | null {
+  const acc = ACCOUNTS.find((a) => a.email === email.trim().toLowerCase())
   return acc && same(password, DEMO_PASSWORD) ? acc.role : null
 }
 
