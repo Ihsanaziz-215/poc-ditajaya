@@ -1,7 +1,6 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { Badge, Tbc } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { PageHead } from '@/components/ui/PageHead'
 import { useAction } from '@/components/ui/Providers'
