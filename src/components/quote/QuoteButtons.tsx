@@ -7,6 +7,8 @@ import type { Quote } from '@/domain/types'
 import { QuoteDocument } from './QuoteDocument'
 import { SendQuoteModal } from './SendQuoteModal'
 
+const pdfHref = (q: Quote, vi: number) => `/quotes/${q.id}/pdf?v=${vi}`
+
 interface Common { quote: Quote; cust: string | null; formId: string | null }
 
 export function PreviewButton({ quote, cust, formId, vi, expired, canSend, className = 'btn sec', small }: Common & { vi: number; expired: boolean; canSend: boolean; className?: string; small?: boolean }) {
@@ -15,14 +17,16 @@ export function PreviewButton({ quote, cust, formId, vi, expired, canSend, class
   const last = quote.versions[quote.versions.length - 1]
   return (
     <>
-      <button className={`${className}${small ? ' sm' : ''}`} onClick={() => setOpen(true)}><Icon name="file" />{small ? 'Preview PDF' : 'Preview PDF'}</button>
+      <button className={`${className}${small ? ' sm' : ''}`} onClick={() => setOpen(true)}><Icon name="file" />Preview PDF</button>
+      <a className={`${className}${small ? ' sm' : ''}`} href={pdfHref(quote, vi)} download><Icon name="file" />Unduh PDF</a>
       {open && !send && (
         <Modal wide onClose={() => setOpen(false)}>
           <h3>Preview dokumen quotation</h3>
-          <p className="sub" style={{ color: 'var(--muted)' }}>PDF dihasilkan otomatis dari data form. Tampilan di bawah adalah simulasi.</p>
+          <p className="sub" style={{ color: 'var(--muted)' }}>PDF dihasilkan otomatis dari data form. Tampilan di bawah adalah pratinjau, unduh untuk mendapatkan file PDF-nya.</p>
           <QuoteDocument quote={quote} vi={vi} cust={cust} formId={formId} expired={expired} />
           <div className="acts">
             <button className="btn sec" onClick={() => setOpen(false)}>Tutup</button>
+            <a className="btn sec" href={pdfHref(quote, vi)} download><Icon name="file" />Unduh PDF</a>
             {canSend && vi === quote.versions.length - 1 && (
               <button className="btn" onClick={() => setSend(true)}><Icon name="send" />{last.sentAt ? 'Kirim ulang' : 'Kirim email'}</button>
             )}

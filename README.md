@@ -30,7 +30,7 @@ Tiap role punya akun sendiri: username `teknisi`, `purchasing`, `sales`, `gudang
 
 ## Sengaja tidak ada
 
-Manajemen user sungguhan (akun hardcode untuk POC), Bundling Product (TBC di PRD), email dan WhatsApp nyata (pengiriman quotation dan notifikasi disimulasikan dan dicatat di log), database sungguhan.
+Manajemen user sungguhan (akun hardcode untuk POC), Bundling Product (TBC di PRD), email dan WhatsApp nyata (pengiriman quotation dan notifikasi disimulasikan dan dicatat di log; PDF quotation dibuat sungguhan di `/quotes/<id>/pdf`), database sungguhan.
 
 ## Perbedaan prototype dan PRD
 
