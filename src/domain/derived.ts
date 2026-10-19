@@ -45,6 +45,25 @@ export function recvOf(f: Form): RecvView {
   return 'Belum Diterima'
 }
 
+/** Every value statusOf can return, in lifecycle order (used by the list filter). */
+export const LIST_STATUSES = ['Draft', 'Diajukan', 'Harga Terisi', 'Disetujui', 'Dibeli', 'Indent', 'In Stock', 'Perlu Follow Up', 'Diterima Baik', 'Tidak Sesuai', 'Sesuai', 'Selesai', 'Batal'] as const
+
+/**
+ * One status for list views, picked from the four PRD B1 groups by lifecycle position:
+ * pengajuan until approved, then pengadaan until the goods are in, then konfirmasi.
+ * The detail page still shows all four groups.
+ */
+export function statusOf(f: Form): string {
+  if (f.done) return 'Selesai'
+  if (f.status !== 'Disetujui') return f.status
+  const p = procOf(f)
+  if (p === 'Perlu Follow Up') return p
+  if (p === 'Belum Diproses') return 'Disetujui'
+  if (!allGood(f)) return p
+  if (f.conf === 'Menunggu') return 'Diterima Baik'
+  return f.conf
+}
+
 export interface Turn { role: Role; text: string }
 
 function turnRaw(f: Form): Turn | null {

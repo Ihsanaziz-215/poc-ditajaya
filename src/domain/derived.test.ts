@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { buildSeed } from './seed'
-import { calc, hasFollowUp, isExpired, labelOf, procOf, recvOf, stepOf, turnOf, today } from './derived'
+import { calc, hasFollowUp, isExpired, labelOf, procOf, recvOf, statusOf, stepOf, turnOf, today } from './derived'
 import type { Form, Item } from './types'
 
 const db = buildSeed(Date.now())
@@ -33,6 +33,14 @@ describe('form state per seed form', () => {
     const item = (o: Partial<Item>): Item => ({ id: 'x', name: 'n', qty: 2, price: 1, supplier: 's', proc: 'Dibeli', eta: '', pnote: '', good: 0, bad: 0, stock: 0, struck: false, ...o })
     const f: Form = { ...F(4), items: [item({}), item({ id: 'y' })], conf: 'Menunggu' }
     expect(turnOf(f)?.role).toBe('Gudang')
+  })
+  test('statusOf gives one list status per lifecycle position', () => {
+    expect([1, 2, 3, 4, 5, 6].map((n) => statusOf(F(n)))).toEqual(['Diajukan', 'Harga Terisi', 'Perlu Follow Up', 'Diterima Baik', 'Selesai', 'Batal'])
+    const approved: Form = { ...F(3), items: F(3).items.map((i) => ({ ...i, proc: null, good: 0, bad: 0, stock: 0 })) }
+    expect(statusOf(approved)).toBe('Disetujui')
+    expect(statusOf({ ...approved, items: approved.items.map((i) => ({ ...i, proc: 'Indent' as const })) })).toBe('Indent')
+    expect(statusOf({ ...F(4), conf: 'Tidak Sesuai' })).toBe('Tidak Sesuai')
+    expect(statusOf({ ...F(4), conf: 'Sesuai' })).toBe('Sesuai')
   })
   test('F2 with a sent quote is at step 3', () => {
     const q = structuredClone(Q('Q3001'))
