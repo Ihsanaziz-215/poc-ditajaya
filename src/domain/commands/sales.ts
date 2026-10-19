@@ -4,19 +4,21 @@ import { PERSON } from '../types'
 import type { Db, Quote, QuoteVersion } from '../types'
 import { addLog, DomainError, getForm, notify, requireRole } from './core'
 import type { CommandResult, Ctx } from './core'
-import { lastVersion, newVersion, syncQuote } from './quoteSync'
+import { branchedMessage, lastVersion, newVersion, syncQuote } from './quoteSync'
 
-export function toggleStrike(db: Db, ctx: Ctx, fid: string, iid: string): CommandResult {
+export function setStrike(db: Db, ctx: Ctx, fid: string, iid: string, struck: boolean): CommandResult {
   requireRole(ctx, 'Sales')
   const f = getForm(db, fid)
   if (f.status !== 'Harga Terisi') throw new DomainError('Barang hanya bisa dicoret saat form berstatus Harga Terisi.')
   const it = f.items.find((i) => i.id === iid)
   if (!it) throw new DomainError('Barang tidak ditemukan.')
-  if (!it.struck && active(f).length < 2) throw new DomainError('Minimal satu barang harus tetap aktif.')
-  it.struck = !it.struck
-  addLog(ctx, f, `${it.struck ? 'Coret' : 'Batal coret'} barang — ${it.name}`, it.struck ? 'Aktif' : 'Dicoret', it.struck ? 'Dicoret' : 'Aktif')
-  syncQuote(db, ctx, f)
-  return it.struck
+  if (it.struck === struck) return
+  if (struck && active(f).length < 2) throw new DomainError('Minimal satu barang harus tetap aktif.')
+  it.struck = struck
+  addLog(ctx, f, `${struck ? 'Coret' : 'Batal coret'} barang — ${it.name}`, struck ? 'Aktif' : 'Dicoret', struck ? 'Dicoret' : 'Aktif')
+  const b = syncQuote(db, ctx, f)
+  if (b) return { message: branchedMessage(b), kind: 'info' }
+  return struck
     ? { message: 'Barang dicoret. Tidak ikut dibeli dan tidak masuk quotation.', kind: 'info' }
     : { message: 'Coret dibatalkan.' }
 }
@@ -76,16 +78,21 @@ export function makeQuote(db: Db, ctx: Ctx, fid: string): CommandResult {
 
 export type QuoteField = 'subject' | 'desc' | 'owner' | 'expiry' | 'pic' | 'email' | 'addr' | 'termin' | 'estimasi' | 'catatan'
 
-export function setQuoteField(db: Db, ctx: Ctx, qid: string, key: QuoteField, value: string): void {
+const QUOTE_FIELDS: QuoteField[] = ['subject', 'desc', 'owner', 'expiry', 'pic', 'email', 'addr', 'termin', 'estimasi', 'catatan']
+
+export function setQuoteField(db: Db, ctx: Ctx, qid: string, key: QuoteField, value: string): CommandResult {
   requireRole(ctx, 'Sales')
+  if (!QUOTE_FIELDS.includes(key)) throw new DomainError('Field quotation tidak dapat diubah.')
   const q = getQuote(db, qid)
   let v = lastVersion(q)
   if (v[key] === value) return
-  if (v.status === 'Terkirim') v = newVersion(db, ctx, q, 'revisi isi quotation')
+  const branch = v.status === 'Terkirim'
+  if (branch) v = newVersion(db, ctx, q, 'revisi isi quotation')
   v[key] = value
+  if (branch) return { message: branchedMessage(v), kind: 'info', redirect: `/quotes/${q.id}` }
 }
 
-export function setQuoteDiscount(db: Db, ctx: Ctx, qid: string, iid: string, value: number | string): void {
+export function setQuoteDiscount(db: Db, ctx: Ctx, qid: string, iid: string, value: number | string): CommandResult {
   requireRole(ctx, 'Sales')
   const q = getQuote(db, qid)
   const n = Math.max(Number(value) || 0, 0)
@@ -93,8 +100,10 @@ export function setQuoteDiscount(db: Db, ctx: Ctx, qid: string, iid: string, val
   const cur = v.items.find((i) => i.iid === iid)
   if (!cur) throw new DomainError('Item quotation tidak ditemukan.')
   if (cur.disc === n) return
-  if (v.status === 'Terkirim') v = newVersion(db, ctx, q, 'revisi diskon')
+  const branch = v.status === 'Terkirim'
+  if (branch) v = newVersion(db, ctx, q, 'revisi diskon')
   v.items.find((i) => i.iid === iid)!.disc = n
+  if (branch) return { message: branchedMessage(v), kind: 'info', redirect: `/quotes/${q.id}?tab=items` }
 }
 
 export function sendQuote(db: Db, ctx: Ctx, qid: string, input: { to: string; cc: string; fail: boolean }): CommandResult {

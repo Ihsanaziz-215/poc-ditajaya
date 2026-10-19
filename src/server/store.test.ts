@@ -44,6 +44,12 @@ describe('store', () => {
     fs.writeFileSync(file, JSON.stringify({ version: 99, forms: [] }))
     expect((await createStore(file).read()).forms).toHaveLength(6)
   })
+  test('a file missing seq or quotes reseeds', async () => {
+    fs.writeFileSync(file, JSON.stringify({ version: 1, forms: [] }))
+    const db = await createStore(file).read()
+    expect(db.forms).toHaveLength(6)
+    expect(db.seq.quote).toBe(3003)
+  })
   test('concurrent mutations are serialized', async () => {
     const s = createStore(file)
     const start = (await s.read()).seq.id

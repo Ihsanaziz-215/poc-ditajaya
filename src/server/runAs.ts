@@ -13,7 +13,11 @@ export async function runAs(
   role: Role,
   fn: (db: Db, ctx: Ctx) => CommandResult,
   s: Store = defaultStore,
+  expectedRole?: Role,
 ): Promise<ActionResult> {
+  if (expectedRole && expectedRole !== role) {
+    return { ok: false, error: `Role berubah di tab lain (sekarang ${role}). Muat ulang halaman.` }
+  }
   try {
     const r = await s.mutate((db) => fn(db, { role, now: now(db) }))
     return { ok: true, ...(r || {}) }

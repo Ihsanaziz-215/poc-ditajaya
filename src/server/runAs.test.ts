@@ -46,3 +46,13 @@ test('unexpected errors are rethrown', async () => {
   const s = mk()
   await expect(runAs('Sales', () => { throw new TypeError('bug') }, s)).rejects.toThrow('bug')
 })
+
+test('I-1: an action bound to a different role than the cookie is rejected without touching the store', async () => {
+  const s = mk()
+  const before = (await s.read()).forms[0].comments.length
+  const r = await runAs('Sales', (db) => { db.forms[0].comments.push({ t: 1, role: 'Sales', user: 'x', text: 'x' }) }, s, 'Teknisi')
+  expect(r).toMatchObject({ ok: false })
+  expect((await s.read()).forms[0].comments).toHaveLength(before)
+  const ok = await runAs('Sales', () => undefined, s, 'Sales')
+  expect(ok.ok).toBe(true)
+})

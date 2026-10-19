@@ -4,7 +4,8 @@ import { PERSON, ROLES } from '../types'
 import type { Db } from '../types'
 import { addLog, DomainError, getForm, nextId, notify, requireRole } from './core'
 import type { Ctx } from './core'
-import { syncQuote } from './quoteSync'
+import { branchedMessage, syncQuote } from './quoteSync'
+import type { CommandResult } from './core'
 
 export type ItemField = 'name' | 'qty' | 'price' | 'supplier'
 const FL: Record<string, string> = { name: 'Nama Barang', qty: 'Qty', price: 'Harga', supplier: 'Supplier', eta: 'Estimasi Tiba', pnote: 'Catatan Purchasing' }
@@ -12,7 +13,10 @@ export const fieldValue = (k: string, v: unknown): string =>
   k === 'price' ? (v ? rn(Number(v)) : '—') : v === '' || v == null ? '—' : String(v)
 export const fieldLabel = (k: string): string => FL[k]
 
-export function editItem(db: Db, ctx: Ctx, fid: string, iid: string, field: ItemField, value: string | number): void {
+const ITEM_FIELDS: ItemField[] = ['name', 'qty', 'price', 'supplier']
+
+export function editItem(db: Db, ctx: Ctx, fid: string, iid: string, field: ItemField, value: string | number): CommandResult {
+  if (!ITEM_FIELDS.includes(field)) throw new DomainError('Field tidak dapat diubah.')
   const f = getForm(db, fid)
   const it = f.items.find((i) => i.id === iid)
   if (!it) throw new DomainError('Barang tidak ditemukan.')
@@ -28,17 +32,19 @@ export function editItem(db: Db, ctx: Ctx, fid: string, iid: string, field: Item
   if (ov === nv) return
   ;(it as unknown as Record<string, unknown>)[field] = nv
   addLog(ctx, f, `Ubah ${FL[field]} — ${field === 'name' ? ov : it.name}`, fieldValue(field, ov), fieldValue(field, nv))
-  if (ctx.role === 'Sales') syncQuote(db, ctx, f)
+  const b = ctx.role === 'Sales' ? syncQuote(db, ctx, f) : undefined
+  if (b) return { message: branchedMessage(b), kind: 'info' }
 }
 
-export function addItem(db: Db, ctx: Ctx, fid: string, input: { name: string; qty: number }): void {
+export function addItem(db: Db, ctx: Ctx, fid: string, input: { name: string; qty: number }): CommandResult {
   const f = getForm(db, fid)
   if (!canStruct(f, ctx.role)) throw new DomainError('Isi form terkunci untuk role ini di tahap ini.')
   const name = input.name.trim()
   if (!name || !(Number.isInteger(input.qty) && input.qty >= 1)) throw new DomainError('Isi nama barang dan qty minimal 1.')
   f.items.push({ id: nextId(db), name, qty: input.qty, price: 0, supplier: '', proc: null, eta: '', pnote: '', good: 0, bad: 0, stock: 0, struck: false })
   addLog(ctx, f, 'Tambah barang', '—', `${name} × ${input.qty}`)
-  if (ctx.role === 'Sales') syncQuote(db, ctx, f)
+  const b = ctx.role === 'Sales' ? syncQuote(db, ctx, f) : undefined
+  if (b) return { message: branchedMessage(b), kind: 'info' }
 }
 
 export function deleteItem(db: Db, ctx: Ctx, fid: string, iid: string): void {

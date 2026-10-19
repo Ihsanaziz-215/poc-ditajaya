@@ -2,7 +2,8 @@
 
 import { addComment, addItem, deleteItem, editItem } from '@/domain/commands/shared'
 import type { ItemField } from '@/domain/commands/shared'
-import { toggleStrike } from '@/domain/commands/sales'
+import { setStrike } from '@/domain/commands/sales'
+import type { Role } from '@/domain/types'
 import { run } from '../run'
 import type { ActionResult } from '../run'
 
@@ -15,9 +16,9 @@ export async function addItemAction(fid: string, input: { name: string; qty: num
 export async function deleteItemAction(fid: string, iid: string): Promise<ActionResult> {
   return run((db, ctx) => deleteItem(db, ctx, fid, iid))
 }
-export async function toggleStrikeAction(fid: string, iid: string): Promise<ActionResult> {
-  return run((db, ctx) => toggleStrike(db, ctx, fid, iid))
+export async function setStrikeAction(fid: string, iid: string, struck: boolean): Promise<ActionResult> {
+  return run((db, ctx) => setStrike(db, ctx, fid, iid, struck))
 }
-export async function addCommentAction(fid: string, text: string): Promise<ActionResult> {
-  return run((db, ctx) => addComment(db, ctx, fid, text))
+export async function addCommentAction(fid: string, text: string, role: Role): Promise<ActionResult> {
+  return run((db, ctx) => addComment(db, ctx, fid, text), role)
 }

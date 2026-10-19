@@ -37,6 +37,7 @@ export function setProc(db: Db, ctx: Ctx, fid: string, iid: string, v: 'In Stock
 }
 
 export function setProcInfo(db: Db, ctx: Ctx, fid: string, iid: string, key: 'eta' | 'pnote', value: string): void {
+  if (key !== 'eta' && key !== 'pnote') throw new DomainError('Field tidak dapat diubah.')
   const { f, it } = procContext(db, ctx, fid, iid)
   const v = value.trim()
   if (it[key] === v) return

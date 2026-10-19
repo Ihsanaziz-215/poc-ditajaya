@@ -6,13 +6,13 @@ import { useAction, useUi } from '@/components/ui/Providers'
 import { active, total } from '@/domain/derived'
 import type { Form, Role } from '@/domain/types'
 import { rp } from '@/lib/format'
-import { addItemAction, deleteItemAction, editItemAction, toggleStrikeAction } from '@/server/actions/shared'
+import { addItemAction, deleteItemAction, editItemAction, setStrikeAction } from '@/server/actions/shared'
 import { useFormUi } from './FormUi'
 
 export interface ItemsPerm { struct: boolean; price: boolean; sup: boolean }
 
 export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role: Role; perm: ItemsPerm; suppliers: { name: string; active: boolean }[] }) {
-  const { run } = useAction()
+  const { run, pending } = useAction()
   const { confirm } = useUi()
   const { missing } = useFormUi()
   const [rev, setRev] = useState(0)
@@ -90,7 +90,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
                   {cs && (
                     <td>
                       {role === 'Sales' ? (
-                        <button className="btn sec sm" onClick={() => run(toggleStrikeAction(f.id, i.id))}>{x ? 'Batal coret' : 'Coret'}</button>
+                        <button className="btn sec sm" disabled={pending} onClick={() => run(setStrikeAction(f.id, i.id, !x))}>{x ? 'Batal coret' : 'Coret'}</button>
                       ) : (
                         <button
                           className="btn sec sm"
@@ -116,6 +116,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
           <input className="q" type="number" min={1} aria-label="Qty barang baru" value={nq} onChange={(e) => setNq(Number(e.target.value))} />
           <button
             className="btn info sm"
+            disabled={pending}
             onClick={async () => {
               const r = await run(addItemAction(f.id, { name: nn, qty: nq }))
               if (r.ok) { setNn(''); setNq(1) }

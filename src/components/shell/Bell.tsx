@@ -32,7 +32,7 @@ export function Bell({ role, notifs, unreadCount }: { role: Role; notifs: BellNo
         <div className="pop">
           <h4>
             Notifikasi {role}{' '}
-            <a style={{ fontWeight: 500, fontSize: 13 }} onClick={() => run(markAllNotifsReadAction())}>Tandai dibaca</a>
+            <a style={{ fontWeight: 500, fontSize: 13 }} onClick={() => run(markAllNotifsReadAction(role))}>Tandai dibaca</a>
           </h4>
           {notifs.length ? (
             notifs.map((n) => (
@@ -40,7 +40,7 @@ export function Bell({ role, notifs, unreadCount }: { role: Role; notifs: BellNo
                 key={n.id}
                 className={`it ${n.unread ? 'un' : ''}`}
                 onClick={async () => {
-                  await run(markNotifReadAction(n.id))
+                  await run(markNotifReadAction(n.id, role))
                   setOpen(false)
                   router.push(n.href)
                 }}

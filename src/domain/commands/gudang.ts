@@ -16,6 +16,7 @@ export function receive(
   input: { date: string; qty: number; cond: 'Baik' | 'Rusak'; note: string },
 ): CommandResult {
   requireRole(ctx, 'Gudang')
+  if (input.cond !== 'Baik' && input.cond !== 'Rusak') throw new DomainError('Kondisi harus Baik atau Rusak.')
   const f = getForm(db, fid)
   if (f.status !== 'Disetujui' || f.done) throw new DomainError('Penerimaan hanya untuk form Disetujui yang belum selesai.')
   const it = f.items.find((i) => i.id === iid)

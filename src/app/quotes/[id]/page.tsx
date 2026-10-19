@@ -44,7 +44,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <div className="vers">
           <b style={{ marginRight: 6 }}>Versi</b>
           {q.versions.map((x, k) => (
-            <Link key={k} className={`vb ${k === idx ? 'on' : ''}`} href={`${base}?v=${k}${tab === 'items' ? '&tab=items' : ''}`}>v{x.ver}</Link>
+            <Link key={k} className={`vb ${k === idx ? 'on' : ''}`} href={`${base}${k === lastIdx ? '' : `?v=${k}`}${tab === 'items' ? `${k === lastIdx ? '?' : '&'}tab=items` : ''}`}>v{x.ver}</Link>
           ))}
           <span style={{ marginLeft: 8 }}><Badge v={v.status} />{expired && <> <Badge v="Kedaluwarsa" /></>}</span>
           {f && <span style={{ marginLeft: 'auto' }}>Dibuat dari <Link href={`/breakdown/${f.id}`}>{f.id}</Link></span>}
@@ -59,8 +59,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       ) : null}
       <div className="card">
         <div className="tabs">
-          <Link className={`tab ${tab === 'info' ? 'on' : ''}`} href={`${base}?v=${idx}`}>Quote Information</Link>
-          <Link className={`tab ${tab === 'items' ? 'on' : ''}`} href={`${base}?v=${idx}&tab=items`}>Quote Items</Link>
+          <Link className={`tab ${tab === 'info' ? 'on' : ''}`} href={`${base}${isLast ? '' : `?v=${idx}`}`}>Quote Information</Link>
+          <Link className={`tab ${tab === 'items' ? 'on' : ''}`} href={`${base}${isLast ? '?' : `?v=${idx}&`}tab=items`}>Quote Items</Link>
         </div>
         <QuoteEditor quote={q} vi={idx} tab={tab} editable={editable} owners={owners} formId={q.formId} />
       </div>
@@ -79,7 +79,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
                   <td>{x.sentTo || '—'}{x.cc && <><br /><small style={{ color: 'var(--muted)' }}>CC {x.cc}</small></>}</td>
                   <td>{x.sentAt ? fdt(x.sentAt) : '—'}</td>
                   <td>
-                    <Link className="btn sec sm" href={`${base}?v=${k}`}>Lihat</Link>{' '}
+                    <Link className="btn sec sm" href={k === lastIdx ? base : `${base}?v=${k}`}>Lihat</Link>{' '}
                     <PreviewButton {...common} vi={k} expired={isExpired(x, t)} canSend={role === 'Sales'} small />
                   </td>
                 </tr>

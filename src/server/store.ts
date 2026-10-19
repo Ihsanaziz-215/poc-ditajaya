@@ -22,7 +22,7 @@ export function createStore(file: string): Store {
   const load = (): Db => {
     try {
       const db = JSON.parse(fs.readFileSync(file, 'utf8')) as Db
-      if (db && db.version === 1 && Array.isArray(db.forms)) return db
+      if (db && db.version === 1 && db.seq && db.clock && [db.forms, db.quotes, db.suppliers, db.customers, db.notifs].every(Array.isArray)) return db
     } catch {
       /* missing or corrupt: fall through to seed */
     }

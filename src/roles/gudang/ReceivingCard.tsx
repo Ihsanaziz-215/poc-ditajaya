@@ -10,7 +10,7 @@ import { receiveAllAction } from './actions'
 import { ReceiveModal } from './ReceiveModal'
 
 export function ReceivingCard({ form: f, role, today }: { form: Form; role: Role; today: string }) {
-  const { run } = useAction()
+  const { run, pending } = useAction()
   const [open, setOpen] = useState<string | null>(null)
   if (f.status !== 'Disetujui' || role === 'Sales') return null
   const items = active(f)
@@ -24,7 +24,7 @@ export function ReceivingCard({ form: f, role, today }: { form: Form; role: Role
           <h3>Penerimaan barang (Stock In)</h3>
           <p className="sub">Gudang mencatat barang masuk lewat fitur Stock In yang sudah ada di app. Barang In Stock tidak perlu diterima lagi. Barang rusak otomatis mengubah status pengadaan ke Perlu Follow Up.</p>
         </div>
-        {isG && <button className="btn info sm" title="Pintasan demo" onClick={() => run(receiveAllAction(f.id))}>Stock In semua (Baik)</button>}
+        {isG && <button className="btn info sm" disabled={pending} title="Pintasan demo" onClick={() => run(receiveAllAction(f.id))}>Stock In semua (Baik)</button>}
       </div>
       {bad.length > 0 && (
         <div className="banner stop">

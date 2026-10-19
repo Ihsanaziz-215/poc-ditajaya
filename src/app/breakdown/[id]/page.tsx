@@ -53,7 +53,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <ReceivingCard form={f} role={role} today={iso(todayOf(db))} />
       <ConfirmationCard form={f} role={role} />
       <QuotationCard form={f} quote={q} role={role} today={todayOf(db)} />
-      <CommentsCard fid={f.id} comments={f.comments} />
+      <CommentsCard fid={f.id} comments={f.comments} role={role} />
       <LogCard form={f} role={role} />
     </FormUiProvider>
   )

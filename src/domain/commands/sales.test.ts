@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { as, freshDb } from '../testing'
 import { DomainError } from './core'
-import { decide, reviseForm, toggleStrike } from './sales'
+import { decide, reviseForm, setStrike } from './sales'
 
 describe('decide', () => {
   test('only Sales', () => {
@@ -29,15 +29,15 @@ describe('decide', () => {
   })
 })
 
-describe('toggleStrike', () => {
+describe('setStrike', () => {
   test('strikes and unstrikes with logs', () => {
     const db = freshDb()
     const f = db.forms[1]
     const ctx = as(db, 'Sales')
-    toggleStrike(db, ctx, f.id, f.items[0].id)
+    setStrike(db, ctx, f.id, f.items[0].id, true)
     expect(f.items[0].struck).toBe(true)
     expect(f.log.at(-1)).toMatchObject({ act: `Coret barang — ${f.items[0].name}`, o: 'Aktif', n: 'Dicoret' })
-    toggleStrike(db, ctx, f.id, f.items[0].id)
+    setStrike(db, ctx, f.id, f.items[0].id, false)
     expect(f.items[0].struck).toBe(false)
     expect(f.log.at(-1)).toMatchObject({ act: `Batal coret barang — ${f.items[0].name}`, o: 'Dicoret', n: 'Aktif' })
   })
@@ -45,19 +45,19 @@ describe('toggleStrike', () => {
     const db = freshDb()
     const f = db.forms[1]
     const ctx = as(db, 'Sales')
-    f.items.slice(1).forEach((i) => toggleStrike(db, ctx, f.id, i.id))
-    expect(() => toggleStrike(db, ctx, f.id, f.items[0].id)).toThrow('Minimal satu barang harus tetap aktif.')
+    f.items.slice(1).forEach((i) => setStrike(db, ctx, f.id, i.id, true))
+    expect(() => setStrike(db, ctx, f.id, f.items[0].id, true)).toThrow('Minimal satu barang harus tetap aktif.')
   })
   test('non-Sales or wrong status is rejected', () => {
     const db = freshDb()
-    expect(() => toggleStrike(db, as(db, 'Purchasing'), db.forms[1].id, db.forms[1].items[0].id)).toThrow(DomainError)
-    expect(() => toggleStrike(db, as(db, 'Sales'), db.forms[3].id, db.forms[3].items[0].id)).toThrow(DomainError)
+    expect(() => setStrike(db, as(db, 'Purchasing'), db.forms[1].id, db.forms[1].items[0].id, true)).toThrow(DomainError)
+    expect(() => setStrike(db, as(db, 'Sales'), db.forms[3].id, db.forms[3].items[0].id, true)).toThrow(DomainError)
   })
   test('struck items drop out of the quote', () => {
     const db = freshDb()
     const f = db.forms[2]
     f.status = 'Harga Terisi'
-    toggleStrike(db, as(db, 'Sales'), f.id, f.items[1].id)
+    setStrike(db, as(db, 'Sales'), f.id, f.items[1].id, true)
     const q = db.quotes[0]
     expect(q.versions.at(-1)!.items.some((i) => i.iid === f.items[1].id)).toBe(false)
     expect(q.versions[0].items.some((i) => i.iid === f.items[1].id)).toBe(true)

@@ -23,10 +23,10 @@ export async function resetDemoAction(): Promise<ActionResult> {
   return { ok: true, message: 'Data demo dikembalikan ke awal', kind: 'ok', redirect: '/breakdown' }
 }
 
-export async function markNotifReadAction(id: string): Promise<ActionResult> {
-  return run((db, ctx) => markNotifRead(db, ctx, id))
+export async function markNotifReadAction(id: string, role: Role): Promise<ActionResult> {
+  return run((db, ctx) => markNotifRead(db, ctx, id), role)
 }
 
-export async function markAllNotifsReadAction(): Promise<ActionResult> {
-  return run((db, ctx) => markAllNotifsRead(db, ctx))
+export async function markAllNotifsReadAction(role: Role): Promise<ActionResult> {
+  return run((db, ctx) => markAllNotifsRead(db, ctx), role)
 }

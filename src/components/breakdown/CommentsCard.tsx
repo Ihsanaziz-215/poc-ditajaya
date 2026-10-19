@@ -3,11 +3,11 @@
 import { useState } from 'react'
 import { RoleBadge } from '@/components/ui/Badge'
 import { useAction } from '@/components/ui/Providers'
-import type { Comment } from '@/domain/types'
+import type { Comment, Role } from '@/domain/types'
 import { fdt } from '@/lib/format'
 import { addCommentAction } from '@/server/actions/shared'
 
-export function CommentsCard({ fid, comments }: { fid: string; comments: Comment[] }) {
+export function CommentsCard({ fid, comments, role }: { fid: string; comments: Comment[]; role: Role }) {
   const { run, pending } = useAction()
   const [text, setText] = useState('')
   return (
@@ -33,7 +33,7 @@ export function CommentsCard({ fid, comments }: { fid: string; comments: Comment
           disabled={pending}
           onClick={async () => {
             if (!text.trim()) return
-            const r = await run(addCommentAction(fid, text))
+            const r = await run(addCommentAction(fid, text, role))
             if (r.ok) setText('')
           }}
         >

@@ -72,6 +72,9 @@ export function useAction() {
       }
       router.refresh()
       return r
+    } catch {
+      toast('Terjadi kesalahan. Coba lagi.', 'bad')
+      return { ok: false, error: 'Terjadi kesalahan. Coba lagi.' }
     } finally {
       setPending(false)
     }

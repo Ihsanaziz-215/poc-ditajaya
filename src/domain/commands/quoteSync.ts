@@ -22,12 +22,17 @@ export function newVersion(db: Db, ctx: Ctx, q: Quote, why: string): QuoteVersio
 }
 
 /** Re-derives the latest quote version's items from the form; a sent version spawns a new one first. */
-export function syncQuote(db: Db, ctx: Ctx, f: Form): void {
+export const branchedMessage = (v: QuoteVersion) => `Versi baru dibuat: Quotation v${v.ver}. Versi lama tetap tersimpan.`
+
+/** Returns the newly created version when the sent one had to branch, otherwise undefined. */
+export function syncQuote(db: Db, ctx: Ctx, f: Form): QuoteVersion | undefined {
   getForm(db, f.id)
   const q = db.quotes.find((x) => x.formId === f.id)
-  if (!q) return
+  if (!q) return undefined
   let v = lastVersion(q)
-  if (v.status === 'Terkirim') v = newVersion(db, ctx, q, 'revisi harga atau qty setelah terkirim')
+  let branched: QuoteVersion | undefined
+  if (v.status === 'Terkirim') v = branched = newVersion(db, ctx, q, 'revisi harga atau qty setelah terkirim')
   const old = v.items
   v.items = active(f).map((i) => ({ iid: i.id, name: i.name, qty: i.qty, price: i.price, disc: old.find((o) => o.iid === i.id)?.disc || 0 }))
+  return branched
 }

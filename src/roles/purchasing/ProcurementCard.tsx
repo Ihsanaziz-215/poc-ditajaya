@@ -10,7 +10,7 @@ import { fd } from '@/lib/format'
 import { markAllBoughtAction, resolveFollowUpAction, setProcAction, setProcInfoAction } from './actions'
 
 export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
-  const { run } = useAction()
+  const { run, pending } = useAction()
   const [rev, setRev] = useState(0)
   if (f.status !== 'Disetujui') return null
   const items = active(f)
@@ -24,7 +24,7 @@ export function ProcurementCard({ form: f, role }: { form: Form; role: Role }) {
           <p className="sub">Purchasing mengecek barang yang disetujui customer: In Stock bila sudah ada di gudang, Dibeli, atau Indent. Barang yang dicoret Sales tidak ikut.</p>
         </div>
         {canAct && items.some((i) => !i.proc) && (
-          <button className="btn info sm" onClick={() => run(markAllBoughtAction(f.id))}>Tandai semua Dibeli</button>
+          <button className="btn info sm" disabled={pending} onClick={() => run(markAllBoughtAction(f.id))}>Tandai semua Dibeli</button>
         )}
       </div>
       <div className="wrapx">
