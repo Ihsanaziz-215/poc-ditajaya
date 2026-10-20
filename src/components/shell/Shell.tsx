@@ -5,7 +5,7 @@ import { Bell } from './Bell'
 import type { BellNotif } from './Bell'
 import { ResetButton, UserMenu } from './UserMenu'
 import { ProfileMenu } from './ProfileMenu'
-import { Sidebar } from './Sidebar'
+import { MenuToggle, Sidebar } from './Sidebar'
 import { ThemeToggle } from './ThemeToggle'
 
 export function Shell({ role, notifs, children }: { role: Role; notifs: Notif[]; children: React.ReactNode }) {
@@ -20,6 +20,7 @@ export function Shell({ role, notifs, children }: { role: Role; notifs: Notif[];
       <Sidebar />
       <div className="main">
         <header className="top">
+          <MenuToggle />
           <div className="spill">
             <Icon name="search" />
             <input placeholder="Search" aria-label="Search global" />

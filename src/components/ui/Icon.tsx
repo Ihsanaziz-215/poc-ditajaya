@@ -1,6 +1,8 @@
-export type IconName = 'gauge' | 'leads' | 'quotes' | 'mail' | 'clip' | 'contact' | 'box' | 'flow' | 'tag' | 'truck' | 'pack' | 'bell' | 'moon' | 'sun' | 'search' | 'plus' | 'eye' | 'lock' | 'trash' | 'pen' | 'file' | 'send' | 'reset' | 'info' | 'user' | 'alert' | 'logout' | 'check'
+export type IconName = 'menu' | 'close' | 'gauge' | 'leads' | 'quotes' | 'mail' | 'clip' | 'contact' | 'box' | 'flow' | 'tag' | 'truck' | 'pack' | 'bell' | 'moon' | 'sun' | 'search' | 'plus' | 'eye' | 'lock' | 'trash' | 'pen' | 'file' | 'send' | 'reset' | 'info' | 'user' | 'alert' | 'logout' | 'check'
 
 const PATHS: Record<IconName, string> = {
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
   gauge: '<path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l3-5"/><circle cx="12" cy="17" r="1.4"/>',
   leads: '<circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M10 12h4"/>',
   quotes: '<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6M9 12h4"/>',
