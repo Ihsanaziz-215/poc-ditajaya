@@ -172,5 +172,34 @@ label.l{display:block;font-weight:500;margin:0 0 6px}
  .top{padding:8px 12px}
  .pop{position:fixed;left:12px;right:12px;width:auto;top:70px}
  #toasts{bottom:78px}
+ .sp{display:none}
+ .demo{order:10;width:100%;flex-wrap:wrap;gap:6px;border-radius:10px}
+ .demo small{width:100%}
+ .roles{flex-wrap:wrap}
+ .top{gap:8px}
+ .bellwrap,.ib,.avatar{margin-left:0}
+ .phead h1{font-size:21px}
+ .acts{width:100%}
+ .card{padding:14px}
+ .tabs{margin:-4px -14px 14px;padding:0 14px;overflow-x:auto}
+ .tab{white-space:nowrap}
+ .tools .spill{display:flex;width:100%}
+ .pager{margin-left:0;width:100%;justify-content:space-between}
+ .filt>div{min-width:0;flex:1 1 100%}
+ .tot{gap:14px;flex-wrap:wrap}
+ .addrow input.n{min-width:0;flex:1 1 100%}
+ .mod{padding:16px;border-radius:14px}
+ .mod .acts{justify-content:stretch}
+ .mod .acts .btn{flex:1;justify-content:center}
+ .paper{padding:16px 14px;overflow-x:auto}
+ .paper .meta{grid-template-columns:1fr}
+ .paper .stamp{right:10px;top:70px;font-size:16px}
+ .sg{flex:1 1 140px}
+ .cols2{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+ .btn{padding:9px 13px}
+ .st{min-width:92px}
+ .ch .btn{width:100%;justify-content:center}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
