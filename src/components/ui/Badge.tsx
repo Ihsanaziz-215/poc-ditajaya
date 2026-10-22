@@ -5,7 +5,7 @@ const BCOL: Record<string, string> = {
   Batal: 'bad', 'Diterima Rusak': 'bad', 'Tidak Sesuai': 'bad', 'Perlu Follow Up': 'bad', 'Gagal Kirim': 'bad', Kedaluwarsa: 'bad',
   Indent: 'warn', 'Non Active': 'gray', Nonaktif: 'gray', 'Belum Dikirim': 'gray', Draft: 'gray', Menunggu: 'gray',
   'Belum Diterima': 'gray', '—': 'gray', Diajukan: 'info', 'Harga Terisi': 'info', 'In Stock': 'info',
-  'Belum Diproses': 'gray', Dicoret: 'gray', 'Tidak Perlu': 'gray',
+  'Belum Diproses': 'gray', Dibatalkan: 'gray', 'Tidak Perlu': 'gray',
 }
 
 export function Badge({ v }: { v: string }) {

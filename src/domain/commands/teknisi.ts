@@ -46,7 +46,7 @@ export function createForm(db: Db, ctx: Ctx, input: CreateFormInput): CommandRes
   let message = 'Draft tersimpan'
   if (input.submit) {
     addLog(ctx, f, 'Ubah status pengajuan', 'Draft', 'Diajukan')
-    message = notify(db, ctx, ['Purchasing'], id, `Form Diajukan: ${id} ${f.cust}`)
+    message = notify(db, ctx, ['Purchasing', 'Sales'], id, `Form Diajukan: ${id} ${f.cust}`)
   }
   return { message, kind: input.submit ? 'info' : 'ok', redirect: `/breakdown/${id}` }
 }
@@ -58,7 +58,7 @@ export function submitDraft(db: Db, ctx: Ctx, fid: string): CommandResult {
   if (!f.items.length || f.items.some((i) => !i.name.trim() || !(i.qty > 0))) throw new DomainError('Lengkapi nama dan qty semua barang dulu.')
   f.status = 'Diajukan'
   addLog(ctx, f, 'Ubah status pengajuan', 'Draft', 'Diajukan')
-  return { message: notify(db, ctx, ['Purchasing'], f.id, `Form Diajukan: ${f.id} ${f.cust}`), kind: 'info' }
+  return { message: notify(db, ctx, ['Purchasing', 'Sales'], f.id, `Form Diajukan: ${f.id} ${f.cust}`), kind: 'info' }
 }
 
 export function confirmItems(db: Db, ctx: Ctx, fid: string, res: 'Sesuai' | 'Tidak Sesuai', note: string): CommandResult {

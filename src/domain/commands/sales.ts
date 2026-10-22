@@ -9,18 +9,18 @@ import { branchedMessage, lastVersion, newVersion, syncQuote } from './quoteSync
 export function setStrike(db: Db, ctx: Ctx, fid: string, iid: string, struck: boolean): CommandResult {
   requireRole(ctx, 'Sales')
   const f = getForm(db, fid)
-  if (f.status !== 'Harga Terisi') throw new DomainError('Barang hanya bisa dicoret saat form berstatus Harga Terisi.')
+  if (f.status !== 'Harga Terisi') throw new DomainError('Barang hanya bisa dibatalkan saat form berstatus Harga Terisi.')
   const it = f.items.find((i) => i.id === iid)
   if (!it) throw new DomainError('Barang tidak ditemukan.')
   if (it.struck === struck) return
   if (struck && active(f).length < 2) throw new DomainError('Minimal satu barang harus tetap aktif.')
   it.struck = struck
-  addLog(ctx, f, `${struck ? 'Coret' : 'Batal coret'} barang — ${it.name}`, struck ? 'Aktif' : 'Dicoret', struck ? 'Dicoret' : 'Aktif')
+  addLog(ctx, f, `${struck ? 'Batalkan' : 'Aktifkan kembali'} barang — ${it.name}`, struck ? 'Aktif' : 'Dibatalkan', struck ? 'Dibatalkan' : 'Aktif')
   const b = syncQuote(db, ctx, f)
   if (b) return { message: branchedMessage(b), kind: 'info' }
   return struck
-    ? { message: 'Barang dicoret. Tidak ikut dibeli dan tidak masuk quotation.', kind: 'info' }
-    : { message: 'Coret dibatalkan.' }
+    ? { message: 'Barang dibatalkan. Tidak ikut dibeli dan tidak masuk quotation.', kind: 'info' }
+    : { message: 'Barang diaktifkan kembali.' }
 }
 
 export function decide(db: Db, ctx: Ctx, fid: string, res: 'Disetujui' | 'Batal'): CommandResult {

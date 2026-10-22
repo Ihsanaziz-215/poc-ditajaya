@@ -82,7 +82,7 @@ function turnRaw(f: Form): Turn | null {
   if (f.status === 'Draft') return { role: 'Teknisi', action: 'Ajukan', text: 'Lengkapi daftar barang lalu ajukan form.' }
   if (f.status === 'Diajukan') return { role: 'Purchasing', action: 'Isi Harga', text: 'Isi harga dan supplier tiap barang, lalu kirim ke Sales.' }
   if (f.status === 'Harga Terisi')
-    return { role: 'Sales', action: 'Putuskan', text: 'Sesuaikan harga dan qty, coret barang yang tidak dibutuhkan customer, kirim quotation, lalu putuskan Disetujui atau Batal.' }
+    return { role: 'Sales', action: 'Putuskan', text: 'Sesuaikan harga dan qty, batalkan barang yang tidak dibutuhkan customer, kirim quotation, lalu putuskan Disetujui atau Batal.' }
   const p = procOf(f)
   if (p === 'Belum Diproses' || p === 'Perlu Follow Up')
     return {

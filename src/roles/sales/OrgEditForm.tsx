@@ -12,7 +12,7 @@ const COUNTRIES = ['Indonesia', 'Malaysia', 'Singapore', 'Thailand', 'Vietnam', 
 export function OrgEditForm({ customer: c, owners, canEdit }: { customer?: Customer; owners: string[]; canEdit: boolean }) {
   const { run, pending } = useAction()
   const [v, setV] = useState({
-    name: c?.name ?? '', addr: c?.addr ?? '', country: c?.country ?? 'Indonesia', city: c?.city ?? '', province: c?.province ?? '', postal: c?.postal ?? '', owner: c?.owner ?? '',
+    name: c?.name ?? '', addr: c?.addr ?? '', country: c?.country ?? 'Indonesia', city: c?.city ?? '', province: c?.province ?? '', postal: c?.postal ?? '', owner: c?.owner ?? '', pic: c?.pic ?? '', email: c?.email ?? '', phone: c?.phone ?? '',
   })
   const [err, setErr] = useState<Record<string, string>>({})
   const set = (k: keyof typeof v, val: string) => setV((x) => ({ ...x, [k]: val }))
@@ -51,6 +51,22 @@ export function OrgEditForm({ customer: c, owners, canEdit }: { customer?: Custo
             <input aria-label="Postal Code" placeholder="Postal Code" disabled={ro} value={v.postal} onChange={(e) => set('postal', e.target.value)} />
           </div>
         </div>
+        <div className="grid2" style={{ marginTop: 16 }}>
+          <div className="fld">
+            <label className="l" htmlFor="o-pic">PIC (perusahaan)</label>
+            <input id="o-pic" disabled={ro} value={v.pic} onChange={(e) => set('pic', e.target.value)} />
+          </div>
+          <div className="fld">
+            <label className="l" htmlFor="o-phone">No. Telp</label>
+            <input id="o-phone" type="tel" disabled={ro} value={v.phone} onChange={(e) => set('phone', e.target.value)} />
+          </div>
+          <div className="fld">
+            <label className="l" htmlFor="o-email">Email</label>
+            <input id="o-email" type="email" className={err.email ? 'miss' : ''} disabled={ro} value={v.email} onChange={(e) => set('email', e.target.value)} />
+            {err.email && <div className="err">{err.email}</div>}
+          </div>
+        </div>
+        <div className="hint">PIC dan email otomatis terisi di quotation (Up. dan tujuan kirim). Semua form breakdown customer ini menampilkan kontak ini.</div>
         <div className="fld" style={{ marginTop: 16 }}>
           <label className="l" htmlFor="o-owner">Sales Owner</label>
           <select id="o-owner" disabled={ro} value={v.owner} onChange={(e) => set('owner', e.target.value)}>

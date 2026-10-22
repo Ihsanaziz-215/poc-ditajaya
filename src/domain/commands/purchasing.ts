@@ -9,7 +9,7 @@ function procContext(db: Db, ctx: Ctx, fid: string, iid?: string): { f: Form; it
   const f = getForm(db, fid)
   if (f.status !== 'Disetujui' || f.done) throw new DomainError('Pengadaan hanya bisa diproses pada form Disetujui.')
   const it = iid ? f.items.find((i) => i.id === iid) : undefined
-  if (iid && (!it || it.struck)) throw new DomainError('Barang tidak ditemukan atau dicoret.')
+  if (iid && (!it || it.struck)) throw new DomainError('Barang tidak ditemukan atau dibatalkan.')
   return { f, it: it as Item }
 }
 

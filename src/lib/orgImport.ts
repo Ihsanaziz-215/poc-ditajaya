@@ -1,8 +1,8 @@
 import type { OrgInput } from '@/domain/commands/organizations'
 
-export const ORG_COLUMNS = ['Name', 'Address', 'Country', 'City', 'Province', 'Postal Code', 'Sales Owner'] as const
+export const ORG_COLUMNS = ['Name', 'Address', 'Country', 'City', 'Province', 'Postal Code', 'Sales Owner', 'PIC', 'Email', 'Phone'] as const
 const KEYS: Record<string, keyof OrgInput> = {
-  name: 'name', address: 'addr', country: 'country', city: 'city', province: 'province', 'postal code': 'postal', postal: 'postal', 'sales owner': 'owner',
+  name: 'name', address: 'addr', country: 'country', city: 'city', province: 'province', 'postal code': 'postal', postal: 'postal', 'sales owner': 'owner', pic: 'pic', email: 'email', phone: 'phone', telp: 'phone', 'no telp': 'phone',
 }
 
 /** Minimal CSV parser (quoted fields, escaped quotes, CRLF). Delimiter is detected from the header line. */
@@ -39,11 +39,11 @@ export function rowsToOrgs(rows: unknown[][]): OrgInput[] {
   if (!idx.includes('name')) throw new Error('Kolom "Name" tidak ditemukan di baris pertama.')
   return body
     .map((r) => {
-      const o: OrgInput = { name: '', addr: '', country: 'Indonesia', city: '', province: '', postal: '', owner: '' }
+      const o: OrgInput = { name: '', addr: '', country: 'Indonesia', city: '', province: '', postal: '', owner: '', pic: '', email: '', phone: '' }
       idx.forEach((k, c) => { if (k) o[k] = String(r[c] ?? '').trim() })
       return o
     })
     .filter((o) => o.name || o.addr || o.city)
 }
 
-export const templateCsv = (): string => ORG_COLUMNS.join(',') + '\nPT Contoh Jaya,Jl. Contoh No. 1,Indonesia,Jakarta,DKI Jakarta,12345,Sales\n'
+export const templateCsv = (): string => ORG_COLUMNS.join(',') + '\nPT Contoh Jaya,Jl. Contoh No. 1,Indonesia,Jakarta,DKI Jakarta,12345,Sales,Budi,budi@contoh.co.id,021-5551234\n'

@@ -96,7 +96,7 @@ export function buildSeed(real: number): Db {
   f3.items.forEach((i, k) => L(f3, D(10, 7, 9, k), P.Purchasing, 'Purchasing', `Isi harga — ${i.name}`, '—', rn(i.price)))
   priced(f3, D(10, 7, 9, 20))
   L(f3, D(10, 8, 10, 0), P.Sales, 'Sales', 'Ubah Harga — Oil filter element', rn(450000), rn(420000))
-  L(f3, D(10, 8, 10, 10), P.Sales, 'Sales', 'Coret barang — Pressure gauge', 'Aktif', 'Dicoret')
+  L(f3, D(10, 8, 10, 10), P.Sales, 'Sales', 'Batalkan barang — Pressure gauge', 'Aktif', 'Dibatalkan')
   L(f3, D(10, 8, 10, 30), P.Sales, 'Sales', 'Buat Quotation v1', '—', 'Belum Dikirim')
   L(f3, D(10, 8, 11, 0), P.Sales, 'Sales', 'Kirim Quotation v1 ke rahmat@jatikarya.example', 'Belum Dikirim', 'Terkirim')
   L(f3, D(10, 9, 9, 0), P.Sales, 'Sales', 'Ubah status pengajuan', 'Harga Terisi', 'Disetujui')

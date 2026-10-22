@@ -11,9 +11,10 @@ describe('format', () => {
   test('iso zero-pads month and day', () => {
     expect(iso(new Date(2026, 9, 5))).toBe('2026-10-05')
   })
-  test('rp uses IDR with two decimals', () => {
-    expect(rp(2145000)).toBe('IDR 2,145,000.00')
-    expect(rp(0)).toBe('IDR 0.00')
+  test('rp uses Rp with id-ID grouping', () => {
+    expect(rp(2145000)).toBe('Rp2.145.000')
+    expect(rp(12000000)).toBe('Rp12.000.000')
+    expect(rp(0)).toBe('Rp0')
   })
   test('rn uses id-ID grouping and treats missing as 0', () => {
     expect(rn(2145000)).toBe('2.145.000')

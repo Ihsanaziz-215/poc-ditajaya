@@ -28,7 +28,7 @@ export function receive(
   const f = getForm(db, fid)
   if (f.status !== 'Disetujui' || f.done) throw new DomainError('Penerimaan hanya untuk form Disetujui yang belum selesai.')
   const it = f.items.find((i) => i.id === iid)
-  if (!it || it.struck) throw new DomainError('Barang tidak ditemukan atau dicoret.')
+  if (!it || it.struck) throw new DomainError('Barang tidak ditemukan atau dibatalkan.')
   const why = whyNotReceivable(f, it)
   if (why) throw new DomainError(why)
   const q = input.qty

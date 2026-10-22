@@ -15,8 +15,8 @@ describe('rowsToOrgs', () => {
   test('maps headers case-insensitively, ignores unknown columns and empty rows', () => {
     const rows = [['name', 'ADDRESS', 'Postal Code', 'Foo', 'sales owner'], ['PT A', 'Jl. A', 12345, 'x', 'Sales'], ['', '', '', '', ''], ['PT B']]
     expect(rowsToOrgs(rows)).toEqual([
-      { name: 'PT A', addr: 'Jl. A', country: 'Indonesia', city: '', province: '', postal: '12345', owner: 'Sales' },
-      { name: 'PT B', addr: '', country: 'Indonesia', city: '', province: '', postal: '', owner: '' },
+      { name: 'PT A', addr: 'Jl. A', country: 'Indonesia', city: '', province: '', postal: '12345', owner: 'Sales', pic: '', email: '', phone: '' },
+      { name: 'PT B', addr: '', country: 'Indonesia', city: '', province: '', postal: '', owner: '', pic: '', email: '', phone: '' },
     ])
   })
   test('requires a Name column', () => {

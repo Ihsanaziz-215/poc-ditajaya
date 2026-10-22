@@ -76,6 +76,7 @@ export interface Customer {
   name: string
   pic: string
   email: string
+  phone?: string
   addr: string
   country?: string
   city?: string

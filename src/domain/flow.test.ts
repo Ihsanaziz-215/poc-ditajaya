@@ -52,7 +52,7 @@ test('a form travels from Teknisi to Selesai through all four roles', () => {
   expect(f.log.some((l) => /comment/i.test(l.act))).toBe(false)
 
   const texts = db.notifs.map((n) => `${n.roles.join('+')}|${n.text}`)
-  expect(texts).toContain(`Purchasing|Form Diajukan: ${f.id} PT ABC`)
+  expect(texts).toContain(`Purchasing+Sales|Form Diajukan: ${f.id} PT ABC`)
   expect(texts).toContain(`Sales|Harga Terisi: ${f.id} PT ABC`)
   expect(texts).toContain(`Purchasing+Teknisi|Disetujui: ${f.id} PT ABC`)
   expect(texts).toContain('Purchasing|Barang Diterima Rusak: Seal ×1 (Supplier CV Bearing Prima)')

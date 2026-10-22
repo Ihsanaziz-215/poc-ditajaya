@@ -36,10 +36,10 @@ describe('setStrike', () => {
     const ctx = as(db, 'Sales')
     setStrike(db, ctx, f.id, f.items[0].id, true)
     expect(f.items[0].struck).toBe(true)
-    expect(f.log.at(-1)).toMatchObject({ act: `Coret barang — ${f.items[0].name}`, o: 'Aktif', n: 'Dicoret' })
+    expect(f.log.at(-1)).toMatchObject({ act: `Batalkan barang — ${f.items[0].name}`, o: 'Aktif', n: 'Dibatalkan' })
     setStrike(db, ctx, f.id, f.items[0].id, false)
     expect(f.items[0].struck).toBe(false)
-    expect(f.log.at(-1)).toMatchObject({ act: `Batal coret barang — ${f.items[0].name}`, o: 'Dicoret', n: 'Aktif' })
+    expect(f.log.at(-1)).toMatchObject({ act: `Aktifkan kembali barang — ${f.items[0].name}`, o: 'Dibatalkan', n: 'Aktif' })
   })
   test('the last active item cannot be struck', () => {
     const db = freshDb()

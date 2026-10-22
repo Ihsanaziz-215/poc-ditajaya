@@ -3,7 +3,7 @@ import { as, freshDb } from '../testing'
 import { DomainError } from './core'
 import { createOrganization, deleteOrganization, editOrganization, importOrganizations } from './organizations'
 
-const input = { name: 'PT Jati Karya', addr: 'Jalan Baru', country: 'Indonesia', city: 'jakarta', province: 'jakarta', postal: '12260', owner: 'Sales' }
+const input = { name: 'PT Jati Karya', addr: 'Jalan Baru', country: 'Indonesia', city: 'jakarta', province: 'jakarta', postal: '12260', owner: 'Sales', pic: 'Budi', email: 'budi@jati.co.id', phone: '021-555' }
 
 describe('editOrganization', () => {
   test('only Sales can edit', () => {
@@ -89,5 +89,14 @@ describe('importOrganizations', () => {
     expect(() => importOrganizations(db, as(db, 'Sales'), [])).toThrow('File tidak berisi baris data.')
     expect(() => importOrganizations(db, as(db, 'Gudang'), [input])).toThrow(DomainError)
     expect(() => importOrganizations(db, as(db, 'Sales'), Array.from({ length: 501 }, (_, i) => ({ ...input, name: `PT ${i}` })))).toThrow('Maksimal 500')
+  })
+})
+
+describe('organization contact', () => {
+  test('stores PIC, email and phone and rejects a bad email', () => {
+    const db = freshDb()
+    createOrganization(db, as(db, 'Sales'), { ...input, name: 'PT Kontak' })
+    expect(db.customers[0]).toMatchObject({ pic: 'Budi', email: 'budi@jati.co.id', phone: '021-555' })
+    expect(() => createOrganization(db, as(db, 'Sales'), { ...input, name: 'PT X', email: 'bukan-email' })).toThrow('Format email')
   })
 })

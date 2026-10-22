@@ -13,7 +13,7 @@ export interface FlowStep {
 export const FLOW: FlowStep[] = [
   { status: 'Draft', owner: 'Teknisi', doing: 'Isi data mesin, hasil analisa, dan daftar barang.', next: [{ to: 'Diajukan', when: 'Teknisi klik Ajukan' }] },
   { status: 'Diajukan', owner: 'Purchasing', doing: 'Isi harga dan supplier tiap barang.', next: [{ to: 'Harga Terisi', when: 'Semua harga dan supplier terisi, kirim ke Sales' }] },
-  { status: 'Harga Terisi', owner: 'Sales', doing: 'Edit harga dan qty, coret barang, buat dan kirim quotation.', next: [{ to: 'Disetujui', when: 'Customer setuju' }, { to: 'Batal', when: 'Customer tidak jadi' }] },
+  { status: 'Harga Terisi', owner: 'Sales', doing: 'Edit harga dan qty, batalkan barang, buat dan kirim quotation.', next: [{ to: 'Disetujui', when: 'Customer setuju' }, { to: 'Batal', when: 'Customer tidak jadi' }] },
   { status: 'Disetujui', owner: 'Purchasing', doing: 'Tanya Gudang soal stok, isi qty Dari stok, lalu tandai sisanya Dibeli atau Indent (semua dari stok = In Stock).', next: [{ to: 'In Stock / Dibeli / Indent', when: 'Semua barang sudah punya status pengadaan' }] },
   { status: 'In Stock / Dibeli / Indent', owner: 'Gudang', doing: 'Catat barang yang datang beserta kondisinya. Indent otomatis jadi Dibeli saat mulai datang.', next: [{ to: 'Diterima Baik', when: 'Semua barang diterima baik' }, { to: 'Perlu Follow Up', when: 'Ada barang diterima rusak' }] },
   { status: 'Perlu Follow Up', owner: 'Purchasing', doing: 'Retur ke supplier, lalu beli ulang.', exception: true, next: [{ to: 'In Stock / Dibeli / Indent', when: 'Selesai follow up, barang kembali ke Dibeli' }] },

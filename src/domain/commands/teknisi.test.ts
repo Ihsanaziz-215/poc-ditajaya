@@ -65,7 +65,7 @@ describe('createForm', () => {
       ['Buat form', '—', 'Draft'],
       ['Ubah status pengajuan', 'Draft', 'Diajukan'],
     ])
-    expect(db.notifs[0]).toMatchObject({ roles: ['Purchasing'], fid: 'BD-2610-007', text: 'Form Diajukan: BD-2610-007 PT ABC' })
+    expect(db.notifs[0]).toMatchObject({ roles: ['Purchasing', 'Sales'], fid: 'BD-2610-007', text: 'Form Diajukan: BD-2610-007 PT ABC' })
   })
 })
 

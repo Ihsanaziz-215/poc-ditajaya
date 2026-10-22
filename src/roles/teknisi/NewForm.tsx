@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { PageHead } from '@/components/ui/PageHead'
 import { useAction } from '@/components/ui/Providers'
+import { byName, byPartNo, PRODUCTS } from '@/domain/catalog'
 import { createFormAction } from './actions'
 
 type Row =
@@ -37,6 +38,9 @@ export function NewForm({ customers, today, tech }: { customers: string[]; today
     setErr(r.ok ? {} : r.fields ?? {})
   }
   const setRow = (i: number, p: Partial<Row>) => setRows((a) => a.map((x, k) => (k === i ? ({ ...x, ...p } as Row) : x)))
+  /** Pilih dari rekomendasi gudang: isi Part No dan satuan otomatis. Kalau tidak cocok, tetap manual. */
+  const fromCatalog = (i: number, p: Partial<Row & { kind: 'item' }>, found: ReturnType<typeof byName>) =>
+    setRow(i, found ? { ...p, name: found.name, partNo: found.partNo, unit: (rows[i] as { unit: string }).unit || found.unit } : p)
   const itemCount = rows.filter((r) => r.kind === 'item').length
   let n = 0
 
@@ -97,7 +101,12 @@ export function NewForm({ customers, today, tech }: { customers: string[]; today
                   <tr key={k}>
                     <td>{++n}</td>
                     <td>
-                      <input value={r.name} placeholder="Contoh: Filter dryer DML 163s" aria-label={`Nama barang ${n}`} onChange={(e) => setRow(k, { name: e.target.value })} />
+                      <input value={r.name} placeholder="Contoh: Filter dryer DML 163s" aria-label={`Nama barang ${n}`} list="products" onChange={(e) => fromCatalog(k, { name: e.target.value }, byName(e.target.value))} />
+                      {r.name.trim() && (
+                        <div className="hint" style={{ margin: '4px 0 0', fontSize: 12 }}>
+                          {(byName(r.name) ?? byPartNo(r.partNo)) ? `Ada di gudang, stok ${(byName(r.name) ?? byPartNo(r.partNo))!.stock}` : 'Tidak ada di gudang, isi manual'}
+                        </div>
+                      )}
                       <textarea
                         value={r.spec}
                         rows={1}
@@ -107,7 +116,7 @@ export function NewForm({ customers, today, tech }: { customers: string[]; today
                         onChange={(e) => setRow(k, { spec: e.target.value })}
                       />
                     </td>
-                    <td><input value={r.partNo} placeholder="-" aria-label={`Part No ${n}`} onChange={(e) => setRow(k, { partNo: e.target.value })} /></td>
+                    <td><input value={r.partNo} placeholder="-" aria-label={`Part No ${n}`} list="partnos" onChange={(e) => { const f = byPartNo(e.target.value); setRow(k, f ? { partNo: f.partNo, name: r.name || f.name, unit: r.unit || f.unit } : { partNo: e.target.value }) }} /></td>
                     <td className="num"><input className="q" type="number" min={1} value={r.qty} aria-label={`Qty ${n}`} onChange={(e) => setRow(k, { qty: Number(e.target.value) })} /></td>
                     <td><input list="units" value={r.unit} placeholder="pcs" aria-label={`Satuan ${n}`} onChange={(e) => setRow(k, { unit: e.target.value })} /></td>
                     <td>
@@ -121,6 +130,8 @@ export function NewForm({ customers, today, tech }: { customers: string[]; today
             </tbody>
           </table>
         </div>
+        <datalist id="products">{PRODUCTS.map((x) => <option key={x.partNo} value={x.name}>{x.partNo} · stok {x.stock}</option>)}</datalist>
+        <datalist id="partnos">{PRODUCTS.map((x) => <option key={x.partNo} value={x.partNo}>{x.name} · stok {x.stock}</option>)}</datalist>
         <datalist id="units">{UNITS.map((u) => <option key={u} value={u} />)}</datalist>
         {err.items && <div className="err">{err.items}</div>}
         <div className="acts" style={{ marginTop: 12 }}>

@@ -41,7 +41,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
       <div className="ch">
         <div>
           <h3>Daftar barang</h3>
-          <p className="sub">{active(f).length} barang aktif{nStr ? ` · ${nStr} dicoret Sales` : ''}{tot ? ` · total ${rp(tot)}` : ''}</p>
+          <p className="sub">{active(f).length} barang aktif{nStr ? ` · ${nStr} dibatalkan Sales` : ''}{tot ? ` · total ${rp(tot)}` : ''}</p>
         </div>
       </div>
       <div className="wrapx">
@@ -66,7 +66,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
                   <td>
                     {cs && !x ? (
                       <input defaultValue={i.name} aria-label="Nama barang" onBlur={(e) => e.target.value !== i.name && edit(i.id, 'name', e.target.value)} />
-                    ) : x ? <><s>{i.name}</s> <span className="b gray">Dicoret</span></> : i.name}
+                    ) : x ? <><s>{i.name}</s> <span className="b gray">Dibatalkan</span></> : i.name}
                     {cs && !x ? (
                       <textarea defaultValue={i.spec ?? ''} rows={1} placeholder="Baris tambahan (opsional)" aria-label="Spesifikasi" style={{ marginTop: 4, fontSize: 12, minHeight: 34 }} onBlur={(e) => e.target.value.trim() !== (i.spec ?? '') && edit(i.id, 'spec', e.target.value)} />
                     ) : i.spec ? <div style={{ color: 'var(--muted)', fontSize: 12, whiteSpace: 'pre-line' }}>{i.spec}</div> : null}
@@ -90,8 +90,13 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
                     {cp && !x ? (
                       <input
                         className={`p ${missing.has(`item:${i.id}`) && !(i.price > 0) ? 'miss' : ''}`}
-                        type="number" min={0} defaultValue={i.price || ''} placeholder="0" aria-label="Harga"
-                        onBlur={(e) => e.target.value !== String(i.price || '') && edit(i.id, 'price', e.target.value)}
+                        type="text" inputMode="numeric" defaultValue={i.price ? rp(i.price) : ''} placeholder="Rp0" aria-label="Harga"
+                        onFocus={(e) => { e.target.value = e.target.value.replace(/\D/g, '') }}
+                        onBlur={(e) => {
+                          const raw = e.target.value.replace(/\D/g, '')
+                          e.target.value = raw ? rp(Number(raw)) : ''
+                          if (raw !== String(i.price || '')) edit(i.id, 'price', raw)
+                        }}
                       />
                     ) : i.price ? (x ? <s>{rp(i.price)}</s> : rp(i.price)) : '—'}
                   </td>
@@ -111,7 +116,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
                   {open && (
                     <td>
                       {f.status === 'Harga Terisi' ? (
-                        <button className="btn sec sm" disabled={pending || !cs} title={cs ? undefined : 'Hanya Sales yang bisa mencoret barang'} onClick={() => run(setStrikeAction(f.id, i.id, !x))}>{x ? 'Batal coret' : 'Coret'}</button>
+                        <button className="btn sec sm" disabled={pending || !cs} title={cs ? undefined : 'Hanya Sales yang bisa membatalkan barang'} onClick={() => run(setStrikeAction(f.id, i.id, !x))}>{x ? 'Aktifkan kembali' : 'Dibatalkan'}</button>
                       ) : (
                         <button
                           className="btn sec sm"
@@ -155,7 +160,7 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
       <datalist id="units">{['pcs', 'set', 'unit', 'lot', 'meter', 'tabung', 'kg', 'liter', 'roll'].map((u) => <option key={u} value={u} />)}</datalist>
       {lockHint}
       {role === 'Sales' && f.status === 'Harga Terisi' && (
-        <div className="hint"><Icon name="info" />Barang yang tidak dibutuhkan customer dicoret, bukan dihapus. Tetap tampil di daftar, tapi tidak ikut dibeli dan tidak masuk quotation.</div>
+        <div className="hint"><Icon name="info" />Barang yang tidak dibutuhkan customer dibatalkan, bukan dihapus. Tetap tampil di daftar, tapi tidak ikut dibeli dan tidak masuk quotation.</div>
       )}
     </div>
   )

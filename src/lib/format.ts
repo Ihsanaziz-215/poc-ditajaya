@@ -23,7 +23,10 @@ export const iso = (d: number | string | Date): string => {
   return `${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())}`
 }
 
-export const rp = (n: number): string =>
-  'IDR ' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+/** "Rp12.000.000", id-ID grouping. Decimals only show when the amount has them. */
+export const rp = (n: number): string => {
+  const v = Number(n || 0)
+  return (v < 0 ? '-Rp' : 'Rp') + Math.abs(v).toLocaleString('id-ID', { maximumFractionDigits: 2 })
+}
 
 export const rn = (n: number): string => Number(n || 0).toLocaleString('id-ID')

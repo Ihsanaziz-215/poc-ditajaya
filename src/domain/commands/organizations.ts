@@ -10,6 +10,10 @@ export interface OrgInput {
   province: string
   postal: string
   owner: string
+  /** Kontak perusahaan. PIC dan email dipakai quotation (Up. dan tujuan kirim), telp tampil di Form Breakdown. */
+  pic: string
+  email: string
+  phone: string
 }
 
 const MAX = 200
@@ -17,6 +21,7 @@ const MAX = 200
 function clean(input: OrgInput): OrgInput {
   const v = Object.fromEntries(Object.entries(input).map(([k, val]) => [k, String(val ?? '').trim()])) as unknown as OrgInput
   if (!v.name) throw new DomainError('Name wajib diisi.', { name: 'Name wajib diisi.' })
+  if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) throw new DomainError('Format email tidak valid.', { email: 'Format email tidak valid.' })
   if (Object.values(v).some((s) => s.length > MAX)) throw new DomainError(`Isian maksimal ${MAX} karakter.`)
   return v
 }
@@ -29,7 +34,7 @@ export function createOrganization(db: Db, ctx: Ctx, input: OrgInput): CommandRe
   if (taken(db, v.name)) throw new DomainError('Nama organization sudah dipakai.', { name: 'Nama organization sudah dipakai.' })
   db.customers.unshift({
     id: 'c' + (db.seq.id = db.seq.id + 1), no: Math.max(0, ...db.customers.map((c) => c.no ?? 0)) + 1, persons: 0, createdAt: ctx.now,
-    pic: '', email: '', purchases: [], acts: [], ...v,
+    purchases: [], acts: [], ...v,
   })
   return { message: `${v.name} dibuat.`, kind: 'ok', redirect: '/organizations' }
 }

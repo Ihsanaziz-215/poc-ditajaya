@@ -43,7 +43,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </div>
         <Stepper step={stepOf(f, q)} role={role} />
       </div>
-      <InfoCard form={f} />
+      <InfoCard form={f} customer={db.customers.find((x) => x.name === f.cust)} />
       <MachineCard form={f} canEdit={canStruct(f, role)} />
       <ItemsCard
         form={f}

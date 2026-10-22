@@ -44,7 +44,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
           <button className="btn" disabled title="Hanya Sales yang bisa membuat organization">Create Organization</button>
         )}
       </PageHead>
-      {noFu ? (
+      {role === 'Sales' && (noFu ? (
         <div className="banner turn">
           <Icon name="alert" />
           <div>
@@ -54,7 +54,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
         </div>
       ) : (
         <div className="banner"><Icon name="info" /><div><b>Semua customer sudah di-follow up bulan ini</b></div></div>
-      )}
+      ))}
+      {role === 'Sales' && (
       <div className="banner warn">
         <Icon name="info" />
         <div>
@@ -62,6 +63,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
           Active: ada pembelian dalam 6 bulan terakhir (sejak {fd(cut)}). Class dari total mesin: 1 sampai 2 = C, 3 sampai 5 = B, lebih dari 5 = A, tidak turun saat Non Active.
         </div>
       </div>
+      )}
       <div className="card">
         <Suspense><OrgFilters total={rows.length} /></Suspense>
         <div className="wrapx">
