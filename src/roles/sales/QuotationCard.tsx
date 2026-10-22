@@ -2,12 +2,12 @@ import Link from 'next/link'
 import { PreviewButton, SendButton } from '@/components/quote/QuoteButtons'
 import { Badge, Tbc } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
-import { calc, isExpired } from '@/domain/derived'
+import { calc } from '@/domain/derived'
 import type { Form, Quote, Role } from '@/domain/types'
-import { fd, rp } from '@/lib/format'
+import { rp } from '@/lib/format'
 import { MakeQuoteButton } from './HeaderButtons'
 
-export function QuotationCard({ form: f, quote: q, role, today }: { form: Form; quote?: Quote; role: Role; today: Date }) {
+export function QuotationCard({ form: f, quote: q, role }: { form: Form; quote?: Quote; role: Role }) {
   if (!((f.status !== 'Draft' && f.status !== 'Batal') || q)) return null
   const canMake = f.status === 'Harga Terisi' && !q
   const isSales = role === 'Sales'
@@ -27,13 +27,12 @@ export function QuotationCard({ form: f, quote: q, role, today }: { form: Form; 
           <div className="chips" style={{ marginBottom: 12 }}>
             <div className="sg"><small>Nomor</small><b>{q.number}</b></div>
             <div className="sg"><small>Versi terbaru</small><b>v{v.ver}</b></div>
-            <div className="sg"><small>Status kirim</small><Badge v={v.status} />{isExpired(v, today) && <> <Badge v="Kedaluwarsa" /></>}</div>
-            <div className="sg"><small>Berlaku sampai</small>{fd(v.expiry)}</div>
+            <div className="sg"><small>Status kirim</small><Badge v={v.status} /></div>
             <div className="sg"><small>Grand total (incl. PPN 11%)</small><b>{rp(calc(v).grand)}</b></div>
           </div>
           <div className="acts" style={{ justifyContent: 'flex-start' }}>
             <Link className="btn sec sm" href={`/quotes/${q.id}`}><Icon name="eye" />Buka quote</Link>
-            <PreviewButton {...common} vi={q.versions.length - 1} expired={isExpired(v, today)} canSend={isSales} small />
+            <PreviewButton {...common} vi={q.versions.length - 1} canSend={isSales} small />
             <SendButton {...common} small className="btn" can={isSales} />
           </div>
           {q.versions.length > 1 && (

@@ -96,7 +96,6 @@ export function QuoteEditor({ quote: q, vi, tab, editable, owners, formId }: { q
           <label className="l">Sales Owner <span className="req">*</span></label>
           <select disabled={dis} defaultValue={v.owner} onChange={(e) => set('owner', e.target.value)}>{owners.map((o) => <option key={o}>{o}</option>)}</select>
         </div>
-        {txt('expiry', <>Expired At <span className="req">*</span></>, { type: 'date' })}
         {txt('pic', <>Person <span className="req">*</span></>, { ph: 'Nama PIC' })}
         <div className="fld"><label className="l">Link to lead</label><select disabled><option>Click to add</option></select></div>
       </div>

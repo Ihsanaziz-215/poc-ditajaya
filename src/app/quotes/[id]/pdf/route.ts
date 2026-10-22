@@ -1,4 +1,3 @@
-import { isExpired, today } from '@/domain/derived'
 import { buildQuotePdf, quotePdfName } from '@/domain/quotePdf'
 import { getSession } from '@/lib/role'
 import { store } from '@/server/store'
@@ -14,7 +13,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const asked = raw === null ? last : Number(raw)
   const vi = Number.isInteger(asked) && asked >= 0 && asked <= last ? asked : last
   const form = quote.formId ? db.forms.find((f) => f.id === quote.formId) : undefined
-  const bytes = await buildQuotePdf({ quote, vi, cust: form?.cust ?? null, formId: quote.formId, expired: isExpired(quote.versions[vi], today(db)) })
+  const bytes = await buildQuotePdf({ quote, vi, cust: form?.cust ?? null, formId: quote.formId })
   return new Response(Buffer.from(bytes), {
     headers: {
       'Content-Type': 'application/pdf',

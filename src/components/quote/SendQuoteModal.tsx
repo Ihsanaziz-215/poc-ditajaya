@@ -5,7 +5,6 @@ import { Icon } from '@/components/ui/Icon'
 import { Modal } from '@/components/ui/Modal'
 import { useAction } from '@/components/ui/Providers'
 import type { Quote } from '@/domain/types'
-import { fd } from '@/lib/format'
 import { sendQuoteAction } from '@/roles/sales/actions'
 
 export function SendQuoteModal({ quote: q, cust, onClose }: { quote: Quote; cust: string | null; onClose: () => void }) {
@@ -18,7 +17,7 @@ export function SendQuoteModal({ quote: q, cust, onClose }: { quote: Quote; cust
   const resend = !!v.sentAt
   const [subject, setSubject] = useState(`Penawaran ${v.subject} (${q.number})`)
   const [body, setBody] = useState(
-    `Dengan hormat,\n\nTerlampir penawaran ${v.subject} (${q.number}, v${v.ver}) untuk ${cust || 'Bapak/Ibu'}. Penawaran berlaku sampai ${fd(v.expiry)}.\n\nMohon konfirmasi dari Bapak/Ibu.\n\nHormat kami,\n${v.owner}\nPT Ditajaya Mitra Perkasa`,
+    `Dengan hormat,\n\nTerlampir penawaran ${v.subject} (${q.number}, v${v.ver}) untuk ${cust || 'Bapak/Ibu'}.\n\nMohon konfirmasi dari Bapak/Ibu.\n\nHormat kami,\n${v.owner}\nPT Ditajaya Mitra Perkasa`,
   )
   return (
     <Modal wide onClose={onClose}>

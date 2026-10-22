@@ -13,7 +13,6 @@ describe('makeQuote', () => {
     expect(q).toMatchObject({ id: 'Q3004', number: 'DMP/U/2026/X/QT3004', formId: f.id })
     expect(r).toMatchObject({ redirect: '/quotes/Q3004' })
     const v = q.versions[0]
-    expect(v.expiry).toBe('2026-10-29')
     expect(v.items).toHaveLength(7)
     expect(v).toMatchObject({ ver: 1, status: 'Belum Dikirim', pic: 'Ibu Wulan', email: 'wulan@duniamegaraya.example', owner: 'Rully' })
     expect(f.log.at(-1)).toMatchObject({ act: 'Buat Quotation v1', o: '—', n: 'Belum Dikirim' })

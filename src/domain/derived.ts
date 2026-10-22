@@ -1,5 +1,5 @@
 import { iso } from '@/lib/format'
-import type { Customer, Db, Form, Item, ProcStatus, Quote, QuoteItem, QuoteVersion, Role } from './types'
+import type { Customer, Db, Form, Item, ProcStatus, Quote, QuoteItem, Role } from './types'
 
 export const now = (db: Db): number => db.clock.sim + (Date.now() - db.clock.real)
 export const today = (db: Db): Date => {
@@ -17,8 +17,6 @@ export function calc(v: { items: QuoteItem[] }) {
   const tax = Math.round(base * 0.11)
   return { sub, disc, tax, grand: base + tax }
 }
-
-export const isExpired = (v: QuoteVersion, t: Date): boolean => !!v.expiry && new Date(v.expiry + 'T00:00:00') < t
 
 /** Qty yang harus dibeli: kebutuhan dikurangi yang diambil dari stok gudang. */
 export const need = (i: Item): number => (i.proc === 'In Stock' ? 0 : Math.max(i.qty - (i.fromStock || 0), 0))

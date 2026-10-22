@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, degrees, rgb } from 'pdf-lib'
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import type { PDFFont, PDFPage } from 'pdf-lib'
 import { fd, rn } from '@/lib/format'
 import { calc } from './derived'
@@ -20,8 +20,8 @@ const clean = (s: string) => s.replace(/[\r\t]/g, ' ').replace(/[^\n\x20-\x7e\xa
  * Builds the quotation PDF (PRD D2) from one quote version: customer data, item list
  * (name, qty, unit price, line total), discount, PPN, terms and validity.
  */
-export async function buildQuotePdf(o: { quote: Quote; vi: number; cust: string | null; formId: string | null; expired: boolean }): Promise<Uint8Array> {
-  const { quote: q, vi, cust, formId, expired } = o
+export async function buildQuotePdf(o: { quote: Quote; vi: number; cust: string | null; formId: string | null }): Promise<Uint8Array> {
+  const { quote: q, vi, cust, formId } = o
   const v = q.versions[vi]
   const c = calc(v)
   const doc = await PDFDocument.create()
@@ -35,9 +35,6 @@ export async function buildQuotePdf(o: { quote: Quote; vi: number; cust: string 
   const newPage = () => {
     page = doc.addPage([W, H])
     y = H - M
-    if (expired) {
-      page.drawText('KEDALUWARSA', { x: 105, y: 320, size: 58, font: bold, color: rgb(0.85, 0.1, 0.1), opacity: 0.18, rotate: degrees(30) })
-    }
   }
   const text = (s: string, x: number, size = 10, f: PDFFont = font, color = INK) => page.drawText(clean(s), { x, y, size, font: f, color })
   const right = (s: string, xr: number, size = 10, f: PDFFont = font) => text(s, xr - f.widthOfTextAtSize(clean(s), size), size, f)
@@ -145,7 +142,7 @@ export async function buildQuotePdf(o: { quote: Quote; vi: number; cust: string 
   need(120)
   text('Syarat dan kondisi', M, 10, bold)
   y -= 15
-  const terms = [`Masa berlaku penawaran sampai ${fd(v.expiry)}`, `Termin pembayaran: ${v.termin || '-'}`, `Estimasi pengiriman: ${v.estimasi || '-'}`]
+  const terms = [`Termin pembayaran: ${v.termin || '-'}`, `Estimasi pengiriman: ${v.estimasi || '-'}`]
   if (v.catatan) terms.push(v.catatan)
   terms.forEach((t, i) => {
     const lines = wrap(t, W - 2 * M - 20)

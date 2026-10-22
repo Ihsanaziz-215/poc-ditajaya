@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { buildSeed } from './seed'
-import { calc, hasFollowUp, isExpired, labelOf, procOf, recvOf, statusOf, stepOf, turnOf, today } from './derived'
+import { calc, hasFollowUp, labelOf, procOf, recvOf, statusOf, stepOf, turnOf, today } from './derived'
 import type { Form, Item } from './types'
 
 const db = buildSeed(Date.now())
@@ -49,7 +49,7 @@ describe('form state per seed form', () => {
   })
 })
 
-describe('calc and expiry', () => {
+describe('calc', () => {
   test.each([
     ['Q3001', 2145000, 235950, 2380950],
     ['Q3002', 3500000, 385000, 3885000],
@@ -66,11 +66,6 @@ describe('calc and expiry', () => {
     const c = calc(v)
     expect(c.disc).toBe(100000)
     expect(c.tax).toBe(Math.round(3400000 * 0.11))
-  })
-  test('isExpired relative to 15 Oct 2026', () => {
-    expect(isExpired(Q('Q3003').versions[0], T)).toBe(true)
-    expect(isExpired(Q('Q3001').versions[0], T)).toBe(false)
-    expect(isExpired(Q('Q3002').versions[0], T)).toBe(false)
   })
   test('today(db) is midnight of the simulated day', () => {
     const d = buildSeed(5_000)

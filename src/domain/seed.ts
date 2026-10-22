@@ -136,7 +136,7 @@ export function buildSeed(real: number): Db {
     qseq++
     const c = custBy(f.cust)!
     const v: QuoteVersion = {
-      ver: 1, date: D(10, 8, 10, 30), expiry: '2026-10-29', subject: `Penawaran ${f.cust}`, desc: '', owner: P.Sales, pic: c.pic, email: c.email, addr: c.addr, lead: '',
+      ver: 1, date: D(10, 8, 10, 30), subject: `Penawaran ${f.cust}`, desc: '', owner: P.Sales, pic: c.pic, email: c.email, addr: c.addr, lead: '',
       termin: 'DP 50% setelah PO, pelunasan setelah pekerjaan selesai', estimasi: '7-14 hari kerja setelah barang diterima', catatan: '',
       status: 'Belum Dikirim', sentTo: '', cc: '', sentAt: null,
       items: act(f).map((i) => ({ iid: i.id, name: i.name, qty: i.qty, price: i.price, unit: i.unit, partNo: i.partNo, disc: 0 })), ...over,
@@ -145,10 +145,10 @@ export function buildSeed(real: number): Db {
     quotes.push({ id: 'Q' + qseq, number: qno(qseq), formId: f.id, versions: [v] })
   }
   mkq(f3, {})
-  mkq(f4, { date: D(10, 3, 9, 30), expiry: '2026-10-20' })
-  mkq(f5, { date: D(9, 12, 9, 0), expiry: '2026-09-30' })
+  mkq(f4, { date: D(10, 3, 9, 30) })
+  mkq(f5, { date: D(9, 12, 9, 0) })
   const leg = (id: string, number: string, subject: string, pic: string, email: string, p: number) =>
-    quotes.push({ id, number, formId: null, versions: [{ ver: 1, date: D(9, 23, 9, 0), expiry: '2026-09-30', subject, desc: '', owner: 'Sales', pic, email, addr: '', lead: '', termin: '', estimasi: '', catatan: '', status: 'Belum Dikirim', sentTo: '', cc: '', sentAt: null, items: [{ iid: uid(), name: 'Jasa testing', qty: 1, price: p, disc: 0 }] }] })
+    quotes.push({ id, number, formId: null, versions: [{ ver: 1, date: D(9, 23, 9, 0), subject, desc: '', owner: 'Sales', pic, email, addr: '', lead: '', termin: '', estimasi: '', catatan: '', status: 'Belum Dikirim', sentTo: '', cc: '', sentAt: null, items: [{ iid: uid(), name: 'Jasa testing', qty: 1, price: p, disc: 0 }] }] })
   leg('QL1', 'Q-LIVE-001', 'Testing penawaran PT jati karya', 'Andi (HO) - Jakarta', '', 3000000)
   leg('QL2', 'Q-LIVE-002', 'testing penawaran PT ABC', 'John', '', 100000)
 

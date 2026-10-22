@@ -2,7 +2,7 @@ import type { Role } from '@/domain/types'
 
 const BCOL: Record<string, string> = {
   Disetujui: 'ok', 'Diterima Baik': 'ok', Sesuai: 'ok', Selesai: 'ok', Dibeli: 'ok', Terkirim: 'ok', Active: 'ok', Aktif: 'ok',
-  Batal: 'bad', 'Diterima Rusak': 'bad', 'Tidak Sesuai': 'bad', 'Perlu Follow Up': 'bad', 'Gagal Kirim': 'bad', Kedaluwarsa: 'bad',
+  Batal: 'bad', 'Diterima Rusak': 'bad', 'Tidak Sesuai': 'bad', 'Perlu Follow Up': 'bad', 'Gagal Kirim': 'bad',
   Indent: 'warn', 'Non Active': 'gray', Nonaktif: 'gray', 'Belum Dikirim': 'gray', Draft: 'gray', Menunggu: 'gray',
   'Belum Diterima': 'gray', '—': 'gray', Diajukan: 'info', 'Harga Terisi': 'info', 'In Stock': 'info',
   'Belum Diproses': 'gray', Dibatalkan: 'gray', 'Tidak Perlu': 'gray',

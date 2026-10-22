@@ -93,7 +93,6 @@ export interface QuoteItem { iid: string; name: string; qty: number; price: numb
 export interface QuoteVersion {
   ver: number
   date: number
-  expiry: string
   subject: string
   desc: string
   owner: string

@@ -5,7 +5,7 @@ import { Icon } from '@/components/ui/Icon'
 import { PageHead } from '@/components/ui/PageHead'
 import { ListFilters } from '@/components/breakdown/ListFilters'
 import { filterForms } from '@/domain/listing'
-import { isExpired, statusOf, today, total, turnOf } from '@/domain/derived'
+import { statusOf, total, turnOf } from '@/domain/derived'
 import { fd, rp } from '@/lib/format'
 import { getRole } from '@/lib/role'
 import { store } from '@/server/store'
@@ -14,7 +14,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   const sp = await searchParams
   const role = await getRole()
   const db = await store.read()
-  const t = today(db)
   const rows = filterForms(db.forms, { q: sp.q, status: sp.lst })
   return (
     <>
@@ -54,7 +53,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
                     <td className="num">{total(f) ? rp(total(f)) : '—'}</td>
                     <td>
                       {v ? (
-                        <>v{v.ver} <Badge v={v.status} />{isExpired(v, t) && <> <Badge v="Kedaluwarsa" /></>}</>
+                        <>v{v.ver} <Badge v={v.status} /></>
                       ) : '—'}
                     </td>
                     <td>

@@ -3,12 +3,11 @@ import type { Quote } from '@/domain/types'
 import { fd, rn } from '@/lib/format'
 
 /** Simulated PDF of the quotation (proto:820-832). */
-export function QuoteDocument({ quote: q, vi, cust, formId, expired }: { quote: Quote; vi: number; cust: string | null; formId: string | null; expired: boolean }) {
+export function QuoteDocument({ quote: q, vi, cust, formId }: { quote: Quote; vi: number; cust: string | null; formId: string | null }) {
   const v = q.versions[vi]
   const c = calc(v)
   return (
     <div className="paper">
-      {expired && <div className="stamp">KEDALUWARSA</div>}
       <div className="hd">
         <div className="lg">dp</div>
         <div>
@@ -40,7 +39,6 @@ export function QuoteDocument({ quote: q, vi, cust, formId, expired }: { quote: 
       <div style={{ marginTop: 12 }}>
         <b>Syarat dan kondisi</b>
         <ol>
-          <li>Masa berlaku penawaran sampai {fd(v.expiry)}</li>
           <li>Termin pembayaran: {v.termin || '—'}</li>
           <li>Estimasi pengiriman: {v.estimasi || '—'}</li>
           {v.catatan && <li>{v.catatan}</li>}

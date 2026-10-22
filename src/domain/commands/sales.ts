@@ -61,11 +61,8 @@ export function makeQuote(db: Db, ctx: Ctx, fid: string): CommandResult {
   const c = db.customers.find((x) => x.name === f.cust)
   const seq = ++db.seq.quote
   const id = 'Q' + seq
-  const exp = new Date(ctx.now)
-  exp.setHours(0, 0, 0, 0)
-  exp.setDate(exp.getDate() + 14)
   const v: QuoteVersion = {
-    ver: 1, date: ctx.now, expiry: iso(exp), subject: `Penawaran ${f.cust}`, desc: '', owner: PERSON.Sales,
+    ver: 1, date: ctx.now, subject: `Penawaran ${f.cust}`, desc: '', owner: PERSON.Sales,
     pic: c?.pic || '', email: c?.email || '', addr: c?.addr || '', lead: '',
     termin: 'DP 50% setelah PO, pelunasan setelah pekerjaan selesai', estimasi: '7-14 hari kerja setelah barang diterima', catatan: '',
     status: 'Belum Dikirim', sentTo: '', cc: '', sentAt: null,
@@ -76,9 +73,9 @@ export function makeQuote(db: Db, ctx: Ctx, fid: string): CommandResult {
   return { message: 'Quotation dibuat dari Form Breakdown. Item dan harga terisi otomatis.', kind: 'ok', redirect: `/quotes/${id}` }
 }
 
-export type QuoteField = 'subject' | 'desc' | 'owner' | 'expiry' | 'pic' | 'email' | 'addr' | 'termin' | 'estimasi' | 'catatan'
+export type QuoteField = 'subject' | 'desc' | 'owner' | 'pic' | 'email' | 'addr' | 'termin' | 'estimasi' | 'catatan'
 
-const QUOTE_FIELDS: QuoteField[] = ['subject', 'desc', 'owner', 'expiry', 'pic', 'email', 'addr', 'termin', 'estimasi', 'catatan']
+const QUOTE_FIELDS: QuoteField[] = ['subject', 'desc', 'owner', 'pic', 'email', 'addr', 'termin', 'estimasi', 'catatan']
 
 export function setQuoteField(db: Db, ctx: Ctx, qid: string, key: QuoteField, value: string): CommandResult {
   requireRole(ctx, 'Sales')

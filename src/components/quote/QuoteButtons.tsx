@@ -11,7 +11,7 @@ const pdfHref = (q: Quote, vi: number) => `/quotes/${q.id}/pdf?v=${vi}`
 
 interface Common { quote: Quote; cust: string | null; formId: string | null }
 
-export function PreviewButton({ quote, cust, formId, vi, expired, canSend, className = 'btn sec', small }: Common & { vi: number; expired: boolean; canSend: boolean; className?: string; small?: boolean }) {
+export function PreviewButton({ quote, cust, formId, vi, canSend, className = 'btn sec', small }: Common & { vi: number; canSend: boolean; className?: string; small?: boolean }) {
   const [open, setOpen] = useState(false)
   const [send, setSend] = useState(false)
   const last = quote.versions[quote.versions.length - 1]
@@ -23,7 +23,7 @@ export function PreviewButton({ quote, cust, formId, vi, expired, canSend, class
         <Modal wide onClose={() => setOpen(false)}>
           <h3>Preview dokumen quotation</h3>
           <p className="sub" style={{ color: 'var(--muted)' }}>PDF dihasilkan otomatis dari data form. Tampilan di bawah adalah pratinjau, unduh untuk mendapatkan file PDF-nya.</p>
-          <QuoteDocument quote={quote} vi={vi} cust={cust} formId={formId} expired={expired} />
+          <QuoteDocument quote={quote} vi={vi} cust={cust} formId={formId} />
           <div className="acts">
             <button className="btn sec" onClick={() => setOpen(false)}>Tutup</button>
             <a className="btn sec" href={pdfHref(quote, vi)} download><Icon name="file" />Unduh PDF</a>
