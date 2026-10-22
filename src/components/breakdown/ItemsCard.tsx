@@ -9,6 +9,8 @@ import { rp } from '@/lib/format'
 import { addItemAction, deleteItemAction, editItemAction, setStrikeAction } from '@/server/actions/shared'
 import { useFormUi } from './FormUi'
 
+type Field = 'name' | 'qty' | 'price' | 'supplier' | 'unit' | 'partNo' | 'spec'
+
 export interface ItemsPerm { struct: boolean; price: boolean; sup: boolean; supItems?: string[] }
 
 export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role: Role; perm: ItemsPerm; suppliers: { name: string; active: boolean }[] }) {
@@ -22,11 +24,41 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
   const nStr = f.items.filter((i) => i.struck).length
   const tot = total(f)
 
-  const edit = async (iid: string, field: 'name' | 'qty' | 'price' | 'supplier' | 'unit' | 'partNo' | 'spec', value: string) => {
-    await run(editItemAction(f.id, iid, field, value))
-    setRev((r) => r + 1)
-  }
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState<Record<string, Partial<Record<Field, string>>>>({})
   const { struct: cs, price: cp, sup: csu } = perm
+  const canEdit = cs || cp || csu || !!perm.supItems?.length
+  const changes = Object.entries(draft).flatMap(([iid, fields]) => Object.entries(fields).map(([field, value]) => ({ iid, field: field as Field, value: value as string })))
+  const E = editing
+
+  /** Perubahan hanya ditampung di sini, baru dikirim saat Simpan. Nilai yang sama dengan aslinya dibuang. */
+  const stage = (iid: string, field: Field, value: string) => {
+    const it = f.items.find((x) => x.id === iid)
+    const orig = String(field === 'price' ? it?.price || '' : it?.[field] ?? '')
+    const same = (field === 'qty' || field === 'price' ? value === orig : value.trim() === orig)
+    setDraft((d) => {
+      const cur = { ...(d[iid] ?? {}) }
+      if (same) delete cur[field]
+      else cur[field] = value
+      const n = { ...d, [iid]: cur }
+      if (!Object.keys(cur).length) delete n[iid]
+      return n
+    })
+  }
+  const startEdit = async () => {
+    if (await confirm({ title: 'Ubah data barang?', text: 'Perubahan baru tersimpan setelah klik Simpan, dan tercatat di log.', okLabel: 'Ya, edit' })) setEditing(true)
+  }
+  const cancelEdit = () => { setDraft({}); setEditing(false); setRev((r) => r + 1) }
+  const save = async () => {
+    if (!changes.length) return cancelEdit()
+    const extra = role === 'Sales' ? ' Quotation ikut diperbarui, dan bila sudah terkirim dibuat versi baru.' : ''
+    if (!(await confirm({ title: 'Simpan perubahan?', text: `${changes.length} perubahan akan disimpan dan tercatat di log.${extra}`, okLabel: 'Simpan' }))) return
+    for (const c of changes) {
+      const r = await run(editItemAction(f.id, c.iid, c.field, c.value))
+      if (!r.ok) { setRev((n) => n + 1); return }
+    }
+    cancelEdit()
+  }
   // the stages where someone can restructure the list (Teknisi on Draft, Sales on Harga Terisi); everyone else sees the actions disabled
   const open = f.status === 'Draft' || f.status === 'Harga Terisi'
 
@@ -43,6 +75,14 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
           <h3>Daftar barang</h3>
           <p className="sub">{active(f).length} barang aktif{nStr ? ` · ${nStr} dibatalkan Sales` : ''}{tot ? ` · total ${rp(tot)}` : ''}</p>
         </div>
+        {canEdit && (E ? (
+          <div className="acts">
+            <button className="btn sec sm" disabled={pending} onClick={cancelEdit}>Batal</button>
+            <button className="btn sm" disabled={pending} onClick={save}>Simpan{changes.length ? ` (${changes.length})` : ''}</button>
+          </div>
+        ) : (
+          <button className="btn sec sm" disabled={pending} onClick={startEdit}>Edit</button>
+        ))}
       </div>
       <div className="wrapx">
         <table className="tbl">
@@ -64,48 +104,48 @@ export function ItemsCard({ form: f, role, perm, suppliers }: { form: Form; role
                 <tr style={x ? { opacity: 0.65 } : undefined}>
                   <td>{k + 1}</td>
                   <td>
-                    {cs && !x ? (
-                      <input defaultValue={i.name} aria-label="Nama barang" onBlur={(e) => e.target.value !== i.name && edit(i.id, 'name', e.target.value)} />
+                    {E && cs && !x ? (
+                      <input defaultValue={i.name} aria-label="Nama barang" onChange={(e) => stage(i.id, 'name', e.target.value)} />
                     ) : x ? <><s>{i.name}</s> <span className="b gray">Dibatalkan</span></> : i.name}
-                    {cs && !x ? (
-                      <textarea defaultValue={i.spec ?? ''} rows={1} placeholder="Baris tambahan (opsional)" aria-label="Spesifikasi" style={{ marginTop: 4, fontSize: 12, minHeight: 34 }} onBlur={(e) => e.target.value.trim() !== (i.spec ?? '') && edit(i.id, 'spec', e.target.value)} />
+                    {E && cs && !x ? (
+                      <textarea defaultValue={i.spec ?? ''} rows={1} placeholder="Baris tambahan (opsional)" aria-label="Spesifikasi" style={{ marginTop: 4, fontSize: 12, minHeight: 34 }} onChange={(e) => stage(i.id, 'spec', e.target.value)} />
                     ) : i.spec ? <div style={{ color: 'var(--muted)', fontSize: 12, whiteSpace: 'pre-line' }}>{i.spec}</div> : null}
                   </td>
                   <td>
-                    {cs && !x ? (
-                      <input defaultValue={i.partNo ?? ''} placeholder="-" aria-label="Part No" style={{ width: 110 }} onBlur={(e) => e.target.value.trim() !== (i.partNo ?? '') && edit(i.id, 'partNo', e.target.value)} />
+                    {E && cs && !x ? (
+                      <input defaultValue={i.partNo ?? ''} placeholder="-" aria-label="Part No" style={{ width: 110 }} onChange={(e) => stage(i.id, 'partNo', e.target.value)} />
                     ) : i.partNo || '—'}
                   </td>
                   <td className="num">
-                    {cs && !x ? (
-                      <input className="q" type="number" min={1} defaultValue={i.qty} aria-label="Qty" onBlur={(e) => e.target.value !== String(i.qty) && edit(i.id, 'qty', e.target.value)} />
+                    {E && cs && !x ? (
+                      <input className="q" type="number" min={1} defaultValue={i.qty} aria-label="Qty" onChange={(e) => stage(i.id, 'qty', e.target.value)} />
                     ) : x ? <s>{i.qty}</s> : i.qty}
                   </td>
                   <td>
-                    {cs && !x ? (
-                      <input list="units" defaultValue={i.unit ?? ''} placeholder="pcs" aria-label="Satuan" style={{ width: 80 }} onBlur={(e) => e.target.value.trim() !== (i.unit ?? '') && edit(i.id, 'unit', e.target.value)} />
+                    {E && cs && !x ? (
+                      <input list="units" defaultValue={i.unit ?? ''} placeholder="pcs" aria-label="Satuan" style={{ width: 80 }} onChange={(e) => stage(i.id, 'unit', e.target.value)} />
                     ) : i.unit || '—'}
                   </td>
                   <td className="num">
-                    {cp && !x ? (
+                    {E && cp && !x ? (
                       <input
                         className={`p ${missing.has(`item:${i.id}`) && !(i.price > 0) ? 'miss' : ''}`}
                         type="text" inputMode="numeric" defaultValue={i.price ? rp(i.price) : ''} placeholder="Rp0" aria-label="Harga"
                         onFocus={(e) => { e.target.value = e.target.value.replace(/\D/g, '') }}
+                        onChange={(e) => stage(i.id, 'price', e.target.value.replace(/\D/g, ''))}
                         onBlur={(e) => {
                           const raw = e.target.value.replace(/\D/g, '')
                           e.target.value = raw ? rp(Number(raw)) : ''
-                          if (raw !== String(i.price || '')) edit(i.id, 'price', raw)
                         }}
                       />
                     ) : i.price ? (x ? <s>{rp(i.price)}</s> : rp(i.price)) : '—'}
                   </td>
                   <td>
-                    {(csu || perm.supItems?.includes(i.id)) && !x ? (
+                    {E && (csu || perm.supItems?.includes(i.id)) && !x ? (
                       <select
                         className={missing.has(`item:${i.id}`) && !i.supplier ? 'miss' : ''}
                         defaultValue={i.supplier} aria-label="Supplier"
-                        onChange={(e) => edit(i.id, 'supplier', e.target.value)}
+                        onChange={(e) => stage(i.id, 'supplier', e.target.value)}
                       >
                         <option value="">Pilih supplier</option>
                         {suppliers.filter((s) => s.active || s.name === i.supplier).map((s) => <option key={s.name}>{s.name}</option>)}
